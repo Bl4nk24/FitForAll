@@ -22,6 +22,15 @@
 
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto" role="menubar">
+          <!-- Link zum Upload Form -->
+          <li class="nav-item" role="none">
+            <router-link
+              to="/upload"
+              class="nav-link"
+              role="menuitem"
+              >Upload</router-link
+            >
+          </li>
           <!-- Link zu den Workouts -->
           <li class="nav-item" role="none">
             <router-link

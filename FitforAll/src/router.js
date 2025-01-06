@@ -5,6 +5,7 @@ import ProfileView from './views/ProfileView.vue'
 import AuthView from './views/AuthView.vue'
 import OnboardingView from './views/OnboardingView.vue'
 import WorkoutsView from './views/WorkoutView.vue'
+import AddWorkoutView from './views/AddWorkoutView.vue'
 
 const routes = [
   { path: '/auth', component: AuthView },
@@ -12,6 +13,7 @@ const routes = [
   { path: '/', component: HomeView, meta: { requiresAuth: true } },
   { path: '/profile', component: ProfileView, meta: { requiresAuth: true } },
   { path: '/workouts', component: WorkoutsView, meta: { requiresAuth: true } },
+  { path: '/upload', component: AddWorkoutView, meta: { requiresAuth: true } }
 ]
 
 const router = createRouter({
