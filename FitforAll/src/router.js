@@ -4,12 +4,14 @@ import HomeView from './views/HomeView.vue'
 import ProfileView from './views/ProfileView.vue'
 import AuthView from './views/AuthView.vue'
 import OnboardingView from './views/OnboardingView.vue'
+import WorkoutsView from './views/WorkoutView.vue'
 
 const routes = [
   { path: '/auth', component: AuthView },
   { path: '/onboarding', component: OnboardingView },
   { path: '/', component: HomeView, meta: { requiresAuth: true } },
   { path: '/profile', component: ProfileView, meta: { requiresAuth: true } },
+  { path: '/workouts', component: WorkoutsView, meta: { requiresAuth: true } },
 ]
 
 const router = createRouter({

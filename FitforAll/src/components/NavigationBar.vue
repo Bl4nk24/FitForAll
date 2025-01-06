@@ -22,6 +22,15 @@
 
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto" role="menubar">
+          <!-- Link zu den Workouts -->
+          <li class="nav-item" role="none">
+            <router-link
+              to="/workouts"
+              class="nav-link"
+              role="menuitem"
+              >Workouts</router-link
+            >
+          </li>
           <!-- Link zum Profil (falls eingeloggt) -->
           <li class="nav-item" role="none" v-if="userEmail">
             <router-link
