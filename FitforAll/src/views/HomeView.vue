@@ -23,7 +23,7 @@
       <div class="row">
         <!-- Zielkarten -->
         <div class="col-md-6 col-lg-4 mb-4" v-for="(card, index) in goalCards" :key="index">
-          <div class="card h-100 shadow-sm" role="article">
+          <div class="card h-100 shadow-sm" role="article" @click="gotoCardPage(card.link)" style="cursor: pointer;">
             <img :src="card.imgSrc" class="card-img-top" :alt="card.altText" />
             <div class="card-body">
               <h3 class="card-title fs-5 fw-bold">{{ card.title }}</h3>
@@ -39,7 +39,7 @@
       <h2 class="text-center mb-4">Weitere Funktionen</h2>
       <div class="row">
         <div class="col-md-6 col-lg-4 mb-4">
-          <div class="card h-100 shadow-sm" role="article">
+          <div class="card h-100 shadow-sm" role="article" @click="gotoPage('/videos')" style="cursor: pointer;">
             <img src="/assets/videos.jpg" class="card-img-top" alt="Videos" />
             <div class="card-body">
               <h3 class="card-title fs-5 fw-bold">Videos</h3>
@@ -50,8 +50,8 @@
           </div>
         </div>
         <div class="col-md-6 col-lg-4 mb-4">
-          <div class="card h-100 shadow-sm" role="article">
-            <img src="\assets\trainingsplan.jpg" class="card-img-top" alt="Trainingsplan" />
+          <div class="card h-100 shadow-sm" role="article" @click="gotoPage('/trainingsplan')" style="cursor: pointer;">
+            <img src="/assets/trainingsplan.jpg" class="card-img-top" alt="Trainingsplan" />
             <div class="card-body">
               <h3 class="card-title fs-5 fw-bold">Trainingsplan</h3>
               <p class="card-text">
@@ -61,8 +61,8 @@
           </div>
         </div>
         <div class="col-md-6 col-lg-4 mb-4">
-          <div class="card h-100 shadow-sm" role="article">
-            <img src="\assets\ernaehrungsplan.jpg" class="card-img-top" alt="Ernährungsplan" />
+          <div class="card h-100 shadow-sm" role="article" @click="gotoPage('/ernaehrungsplan')" style="cursor: pointer;">
+            <img src="/assets/ernaehrungsplan.jpg" class="card-img-top" alt="Ernährungsplan" />
             <div class="card-body">
               <h3 class="card-title fs-5 fw-bold">Ernährungsplan</h3>
               <p class="card-text">
@@ -103,6 +103,14 @@ const gotoCommunity = () => {
   router.push('/community');
 };
 
+const gotoPage = (path) => {
+  router.push(path);
+};
+
+const gotoCardPage = (path) => {
+  router.push(path);
+};
+
 const goalCards = [
   {
     imgSrc: '/assets/navigation.jpg',
@@ -110,6 +118,7 @@ const goalCards = [
     title: 'Klare Navigation & Struktur',
     description:
       'Logische Menüs und ARIA-Rollen für Screenreader. Einfach per Tastatur und Sprache zu bedienen, damit jede:r schnell zurechtfindet.',
+    link: '/navigation',
   },
   {
     imgSrc: '/assets/design.jpg',
@@ -117,6 +126,7 @@ const goalCards = [
     title: 'Visuelles Design',
     description:
       'Hohe Kontraste, anpassbare Schriftgrößen, responsives Layout – so bleibt alles gut lesbar und übersichtlich auf jedem Gerät.',
+    link: '/design',
   },
   {
     imgSrc: '/assets/barrierefreiheit.jpg',
@@ -124,6 +134,7 @@ const goalCards = [
     title: 'Barrierefreiheit im Fokus',
     description:
       'Videos mit Untertiteln, Gebärdensprache und Audiodeskriptionen. Einfache Sprache, Screenreader- und Braille-Unterstützung für maximale Inklusion.',
+    link: '/barrierefreiheit',
   },
 ];
 </script>

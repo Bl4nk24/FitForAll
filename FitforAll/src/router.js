@@ -6,6 +6,9 @@ import AuthView from './views/AuthView.vue'
 import OnboardingView from './views/OnboardingView.vue'
 import WorkoutsView from './views/WorkoutView.vue'
 import AddWorkoutView from './views/AddWorkoutView.vue'
+import VideosPage from './views/VideosPage.vue'
+import TrainingsplanPage from './views/TraininsplanPage.vue'
+import ErnaehrungsplanPage from './views/ErnaehrungsplanPage.vue'
 
 const routes = [
   { path: '/auth', component: AuthView },
@@ -13,7 +16,10 @@ const routes = [
   { path: '/', component: HomeView, meta: { requiresAuth: true } },
   { path: '/profile', component: ProfileView, meta: { requiresAuth: true } },
   { path: '/workouts', component: WorkoutsView, meta: { requiresAuth: true } },
-  { path: '/upload', component: AddWorkoutView, meta: { requiresAuth: true } }
+  { path: '/upload', component: AddWorkoutView, meta: { requiresAuth: true } },
+  { path: '/videos', component: VideosPage, meta: { requiresAuth: true } },
+  { path: '/trainingsplan', component: TrainingsplanPage, meta: { requiresAuth: true } },
+  { path: '/ernaehrungsplan', component: ErnaehrungsplanPage, meta: { requiresAuth: true } }
 ]
 
 const router = createRouter({
@@ -21,7 +27,7 @@ const router = createRouter({
   routes
 })
 
-// router.js (Ausschnitt)
+// Authentifizierungsprüfung
 router.beforeEach(async (to, from) => {
   if (to.meta.requiresAuth) {
     const { data } = await supabase.auth.getUser()
@@ -38,6 +44,5 @@ router.beforeEach(async (to, from) => {
     }
   }
 })
-
 
 export default router
