@@ -40,7 +40,7 @@
       <div class="row">
         <div class="col-md-6 col-lg-4 mb-4">
           <div class="card h-100 shadow-sm" role="article">
-            <img src="FitforAll\src\assets\videos.jpg" class="card-img-top" alt="Videos" />
+            <img src=".\FitforAll\src\assets\videos.jpg" class="card-img-top" alt="Videos" />
             <div class="card-body">
               <h3 class="card-title fs-5 fw-bold">Videos</h3>
               <p class="card-text">
@@ -51,7 +51,7 @@
         </div>
         <div class="col-md-6 col-lg-4 mb-4">
           <div class="card h-100 shadow-sm" role="article">
-            <img src="FitforAll\src\assets\trainingsplan.jpg" class="card-img-top" alt="Trainingsplan" />
+            <img src=".\FitforAll\src\assets\trainingsplan.jpg" class="card-img-top" alt="Trainingsplan" />
             <div class="card-body">
               <h3 class="card-title fs-5 fw-bold">Trainingsplan</h3>
               <p class="card-text">
@@ -62,7 +62,7 @@
         </div>
         <div class="col-md-6 col-lg-4 mb-4">
           <div class="card h-100 shadow-sm" role="article">
-            <img src="FitforAll\src\assets\ernaehrungsplan.jpg" class="card-img-top" alt="Ernährungsplan" />
+            <img src=".\FitforAll\src\assets\ernaehrungsplan.jpg" class="card-img-top" alt="Ernährungsplan" />
             <div class="card-body">
               <h3 class="card-title fs-5 fw-bold">Ernährungsplan</h3>
               <p class="card-text">
