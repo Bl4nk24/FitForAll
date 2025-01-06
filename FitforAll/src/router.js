@@ -25,9 +25,9 @@ router.beforeEach(async (to, from) => {
       return '/auth'
     }
     const { data: profileData } = await supabase
-      .from('profiles')
+      .from('user_settings')
       .select('has_finished_onboarding')
-      .eq('id', data.user.id)
+      .eq('user_id', data.user.id)
       .single()
     if (profileData && !profileData.has_finished_onboarding && to.path !== '/onboarding') {
       return '/onboarding'

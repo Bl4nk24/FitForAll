@@ -130,11 +130,11 @@
   
     // Profil laden (falls User schon einmal Onboarding begonnen hat)
     const { data: profileData, error } = await supabase
-      .from('profiles')
+      .from('user_settings')
       .select(
         'has_finished_onboarding, color_contrast, font_size, screenreader, physical_limitations'
       )
-      .eq('id', authData.user.id)
+      .eq('user_id', authData.user.id)
       .single()
   
     if (error) {
@@ -173,7 +173,7 @@
   
     // Update der profiles-Tabelle
     const { error } = await supabase
-      .from('profiles')
+      .from('user_settings')
       .update({
         color_contrast: colorContrast.value,
         font_size: fontSize.value,
@@ -181,7 +181,7 @@
         physical_limitations: mergedLimitations, // text[]
         has_finished_onboarding: true
       })
-      .eq('id', authData.user.id)
+      .eq('user_id', authData.user.id)
   
     if (error) {
       errorMessage.value = error.message
