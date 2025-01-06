@@ -128,7 +128,7 @@
                       </div>
                     </div>
                   </div>
-                </div>
+                </div> <!-- Ende tab-pane -->
               </div> <!-- Ende tab-content -->
             </div> <!-- Ende card-body -->
           </div> <!-- Ende card -->
@@ -170,16 +170,46 @@
   
   const handleRegister = async () => {
     registerError.value = ''
-    const { error } = await supabase.auth.signUp({
+    // 1) Versuche, einen neuen User anzulegen
+    const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
       email: registerEmail.value,
       password: registerPassword.value,
     })
-    if (error) {
-      registerError.value = error.message
-    } else {
-      // Bei Erfolg: Weiterleitung zur Hauptseite (bspw. "/")
-      router.push('/')
+  
+    if (signUpError) {
+      // Fehler beim Registrieren
+      registerError.value = signUpError.message
+      return
     }
+  
+    // 2) Hat das geklappt und wir haben einen neuen User?
+    if (signUpData?.user) {
+      // 3) Erstelle einen Eintrag in user_settings (oder in profiles),
+      //    damit jeder User dort einen Datensatz hat.
+      const { id: newUserId } = signUpData.user
+  
+      // Beispiel: user_settings
+      // Passe an deine Spalten an (z.B. has_finished_onboarding, color_contrast etc.).
+      const { error: insertError } = await supabase
+        .from('user_settings')
+        .insert({
+          user_id: newUserId,
+          has_finished_onboarding: false,
+          color_contrast: 'normal',
+          font_size: 'normal',
+          screenreader: false,
+          // physical_limitations: '{}', // falls du das Feld hast (text[] oder ähnliches)
+        })
+  
+      if (insertError) {
+        // Falls das Anlegen fehlschlägt, kannst du eine Fehlermeldung ausgeben
+        registerError.value = insertError.message
+        return
+      }
+    }
+  
+    // 4) Weiterleitung nach erfolgreicher Registrierung
+    router.push('/')
   }
   </script>
   

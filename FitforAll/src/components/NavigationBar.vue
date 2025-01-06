@@ -22,6 +22,15 @@
 
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto" role="menubar">
+          <!-- Link zum Profil (falls eingeloggt) -->
+          <li class="nav-item" role="none" v-if="userEmail">
+            <router-link
+              to="/profile"
+              class="nav-link"
+              role="menuitem"
+              >Profil</router-link
+            >
+          </li>
           <!-- Link zur Startseite (falls eingeloggt) -->
           <li class="nav-item" role="none" v-if="userEmail">
             <router-link
@@ -84,6 +93,10 @@ const goHome = () => {
 
 const goLogin = () => {
   router.push('/auth')
+}
+
+const goProfile = () => {
+  router.push('/profile')
 }
 
 // Logout
