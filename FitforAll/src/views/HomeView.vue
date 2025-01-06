@@ -21,86 +21,52 @@
     <section class="container py-5">
       <h2 class="text-center mb-4">Unsere Ziele für eine barrierefreie Fitnessplattform</h2>
       <div class="row">
-        <!-- Ziel 1: Navigation & Struktur -->
+        <!-- Zielkarten -->
+        <div class="col-md-6 col-lg-4 mb-4" v-for="(card, index) in goalCards" :key="index">
+          <div class="card h-100 shadow-sm" role="article">
+            <img :src="card.imgSrc" class="card-img-top" :alt="card.altText" />
+            <div class="card-body">
+              <h3 class="card-title fs-5 fw-bold">{{ card.title }}</h3>
+              <p class="card-text">{{ card.description }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Zusätzliche Karten: Videos, Trainingsplan, Ernährungsplan -->
+    <section class="container py-5">
+      <h2 class="text-center mb-4">Weitere Funktionen</h2>
+      <div class="row">
         <div class="col-md-6 col-lg-4 mb-4">
           <div class="card h-100 shadow-sm" role="article">
+            <img src="FitforAll\src\assets\videos.jpg" class="card-img-top" alt="Videos" />
             <div class="card-body">
-              <h3 class="card-title fs-5 fw-bold">1. Klare Navigation & Struktur</h3>
+              <h3 class="card-title fs-5 fw-bold">Videos</h3>
               <p class="card-text">
-                Logische Menüs und ARIA-Rollen für Screenreader. Einfach per Tastatur und Sprache zu
-                bedienen, damit jede:r schnell zurechtfindet.
+                Entdecke unsere Trainingsvideos mit professionellen Coaches, die dir bei jedem Schritt helfen.
               </p>
             </div>
           </div>
         </div>
-        <!-- Ziel 2: Visuelles Design -->
         <div class="col-md-6 col-lg-4 mb-4">
           <div class="card h-100 shadow-sm" role="article">
+            <img src="FitforAll\src\assets\trainingsplan.jpg" class="card-img-top" alt="Trainingsplan" />
             <div class="card-body">
-              <h3 class="card-title fs-5 fw-bold">2. Visuelles Design</h3>
+              <h3 class="card-title fs-5 fw-bold">Trainingsplan</h3>
               <p class="card-text">
-                Hohe Kontraste, anpassbare Schriftgrößen, responsives Layout – so bleibt alles gut
-                lesbar und übersichtlich auf jedem Gerät.
+                Erstelle deinen individuellen Trainingsplan, der perfekt auf deine Bedürfnisse abgestimmt ist.
               </p>
             </div>
           </div>
         </div>
-        <!-- Ziel 3: Barrierefreiheit im Fokus -->
         <div class="col-md-6 col-lg-4 mb-4">
           <div class="card h-100 shadow-sm" role="article">
+            <img src="FitforAll\src\assets\ernaehrungsplan.jpg" class="card-img-top" alt="Ernährungsplan" />
             <div class="card-body">
-              <h3 class="card-title fs-5 fw-bold">3. Barrierefreiheit im Fokus</h3>
+              <h3 class="card-title fs-5 fw-bold">Ernährungsplan</h3>
               <p class="card-text">
-                Videos mit Untertiteln, Gebärdensprache und Audiodeskriptionen. 
-                Einfache Sprache, Screenreader- und Braille-Unterstützung für maximale Inklusion.
-              </p>
-            </div>
-          </div>
-        </div>
-        <!-- Ziel 4: Personalisierung & Nutzerorientierung -->
-        <div class="col-md-6 col-lg-4 mb-4">
-          <div class="card h-100 shadow-sm" role="article">
-            <div class="card-body">
-              <h3 class="card-title fs-5 fw-bold">4. Personalisierung & Nutzerorientierung</h3>
-              <p class="card-text">
-                Individuelle Trainingspläne: Ob Rollstuhl oder Sehbehinderung – jeder kann die
-                Übungen an die eigenen Bedürfnisse anpassen.
-              </p>
-            </div>
-          </div>
-        </div>
-        <!-- Ziel 5: Qualitätskontrolle & Support -->
-        <div class="col-md-6 col-lg-4 mb-4">
-          <div class="card h-100 shadow-sm" role="article">
-            <div class="card-body">
-              <h3 class="card-title fs-5 fw-bold">5. Qualitätskontrolle & Support</h3>
-              <p class="card-text">
-                Regelmäßige WCAG-Tests, barrierefreier Kundendienst (z. B. Live-Chat mit
-                Gebärdendolmetscher), FAQ und Videoanleitungen in einfacher Sprache.
-              </p>
-            </div>
-          </div>
-        </div>
-        <!-- Ziel 6: Community & Aufklärung -->
-        <div class="col-md-6 col-lg-4 mb-4">
-          <div class="card h-100 shadow-sm" role="article">
-            <div class="card-body">
-              <h3 class="card-title fs-5 fw-bold">6. Community & Aufklärung</h3>
-              <p class="card-text">
-                Vernetzung mit anderen, Fokus auf mentale Gesundheit und Inklusion. Tutorials zur
-                Nutzung der Plattform und ihrer Funktionen.
-              </p>
-            </div>
-          </div>
-        </div>
-        <!-- Ziel 7: Technische Tools & Umsetzung -->
-        <div class="col-md-6 col-lg-4 mb-4 mx-auto">
-          <div class="card h-100 shadow-sm" role="article">
-            <div class="card-body">
-              <h3 class="card-title fs-5 fw-bold">7. Technische Tools & Umsetzung</h3>
-              <p class="card-text">
-                Prüfung mit Lighthouse & Co., Integration barrierefreundlicher Frameworks,
-                kontinuierliche Optimierung für alle Geräte.
+                Plane deine Mahlzeiten mit unserem Ernährungsplan, um deine Fitnessziele zu erreichen.
               </p>
             </div>
           </div>
@@ -125,28 +91,54 @@
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router'
+import { useRouter } from 'vue-router';
 
-const router = useRouter()
+const router = useRouter();
 
 const gotoWorkouts = () => {
-  // Beispiel: Navigieren zur Workout-Übersicht
-  router.push('/workouts')
-}
+  router.push('/workouts');
+};
 
 const gotoCommunity = () => {
-  // Beispiel: Navigieren zur Community-Seite oder zum Forum
-  router.push('/community')
-}
+  router.push('/community');
+};
+
+const goalCards = [
+  {
+    imgSrc: '/assets/navigation.jpg',
+    altText: 'Navigation und Struktur',
+    title: 'Klare Navigation & Struktur',
+    description:
+      'Logische Menüs und ARIA-Rollen für Screenreader. Einfach per Tastatur und Sprache zu bedienen, damit jede:r schnell zurechtfindet.',
+  },
+  {
+    imgSrc: '/assets/design.jpg',
+    altText: 'Visuelles Design',
+    title: 'Visuelles Design',
+    description:
+      'Hohe Kontraste, anpassbare Schriftgrößen, responsives Layout – so bleibt alles gut lesbar und übersichtlich auf jedem Gerät.',
+  },
+  {
+    imgSrc: '/assets/barrierefreiheit.jpg',
+    altText: 'Barrierefreiheit',
+    title: 'Barrierefreiheit im Fokus',
+    description:
+      'Videos mit Untertiteln, Gebärdensprache und Audiodeskriptionen. Einfache Sprache, Screenreader- und Braille-Unterstützung für maximale Inklusion.',
+  },
+];
 </script>
 
 <style scoped>
 .home-page {
-  /* Du kannst hier globale oder seitenbezogene Styles definieren */
+  /* Globale oder seitenbezogene Styles */
 }
 
-/* Beispiel: kleine Anpassung der Kartenhöhe */
 .card {
-  min-height: 200px;
+  min-height: 300px;
+}
+
+.card-img-top {
+  height: 200px;
+  object-fit: cover;
 }
 </style>
