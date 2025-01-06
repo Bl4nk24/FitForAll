@@ -1,22 +1,24 @@
 <template>
   <div>
-    <Navbar />
+    <NavigationBar />
 
-    <div class="container mt-4">
+    <!-- Container für die aktive View -->
+    <main id="main-content" class="mt-4">
       <router-view />
-    </div>
+    </main>
   </div>
 </template>
 
 <script>
-import Navbar from './components/Navbar.vue'
+import NavigationBar from './components/NavigationBar.vue'
+
 export default {
   components: {
-    Navbar
-  }
+    NavigationBar,
+  },
 }
 </script>
 
 <style>
-/* Optional: globale Styles */
+/* Globale Styles (falls gewünscht) */
 </style>
