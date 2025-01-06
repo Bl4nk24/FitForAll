@@ -66,26 +66,7 @@
                     </label>
                   </div>
                 </div>
-  
-                <!-- Freitextfeld: weitere Hinweise -->
-                <div class="mb-3">
-                  <label for="otherLimitations" class="form-label"
-                    >Weitere Hinweise (optional)</label
-                  >
-                  <textarea
-                    class="form-control"
-                    id="otherLimitations"
-                    rows="3"
-                    v-model="otherLimitations"
-                    placeholder="Hast du weitere gesundheitliche Einschränkungen oder Wünsche?"
-                  ></textarea>
-                </div>
-  
-                <button type="submit" class="btn btn-success w-100">
-                  Speichern & Weiter
-                </button>
               </form>
-  
               <div v-if="errorMessage" class="alert alert-danger mt-3">
                 {{ errorMessage }}
               </div>
