@@ -4,12 +4,16 @@ import HomeView from './views/HomeView.vue'
 import ProfileView from './views/ProfileView.vue'
 import AuthView from './views/AuthView.vue'
 import OnboardingView from './views/OnboardingView.vue'
+import WorkoutsView from './views/WorkoutView.vue'
+import AddWorkoutView from './views/AddWorkoutView.vue'
 
 const routes = [
   { path: '/auth', component: AuthView },
   { path: '/onboarding', component: OnboardingView },
   { path: '/', component: HomeView, meta: { requiresAuth: true } },
   { path: '/profile', component: ProfileView, meta: { requiresAuth: true } },
+  { path: '/workouts', component: WorkoutsView, meta: { requiresAuth: true } },
+  { path: '/upload', component: AddWorkoutView, meta: { requiresAuth: true } }
 ]
 
 const router = createRouter({
@@ -25,9 +29,9 @@ router.beforeEach(async (to, from) => {
       return '/auth'
     }
     const { data: profileData } = await supabase
-      .from('profiles')
+      .from('user_settings')
       .select('has_finished_onboarding')
-      .eq('id', data.user.id)
+      .eq('user_id', data.user.id)
       .single()
     if (profileData && !profileData.has_finished_onboarding && to.path !== '/onboarding') {
       return '/onboarding'
