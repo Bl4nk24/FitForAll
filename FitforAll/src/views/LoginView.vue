@@ -1,10 +1,11 @@
 <template>
+  <div class="container">
     <div class="row justify-content-center">
       <div class="col-md-6">
-        <h2>Login</h2>
-        <form @submit.prevent="handleLogin">
+        <h2 class="text-center">Einloggen</h2>
+        <form @submit.prevent="signIn">
           <div class="mb-3">
-            <label for="email" class="form-label">E-Mail</label>
+            <label for="email" class="form-label">Email</label>
             <input
               type="email"
               class="form-control"
@@ -25,45 +26,39 @@
           </div>
           <button type="submit" class="btn btn-primary">Einloggen</button>
         </form>
-  
+
         <div class="mt-3" v-if="errorMessage">
           <div class="alert alert-danger">{{ errorMessage }}</div>
         </div>
       </div>
     </div>
-  </template>
-  
-  <script>
-  import { supabase } from '../supabase'
-  
-  export default {
-    data() {
-      return {
-        email: '',
-        password: '',
-        errorMessage: '',
-      }
-    },
-    methods: {
-      async handleLogin() {
-        this.errorMessage = ''
-        try {
-          const { user, error } = await supabase.auth.signIn({
-            email: this.email,
-            password: this.password
-          })
-          if (error) throw error
-          // Weiterleitung zum Profil
-          this.$router.push('/profile')
-        } catch (err) {
-          this.errorMessage = err.message
-        }
-      }
-    }
+  </div>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+import { supabase } from '../supabase'
+
+const email = ref('')
+const password = ref('')
+const errorMessage = ref('')
+
+const signIn = async () => {
+  const { error } = await supabase.auth.signInWithPassword({
+    email: email.value,
+    password: password.value,
+  })
+  if (error) {
+    errorMessage.value = error.message
+  } else {
+    errorMessage.value = ''
+    // Handle successful sign-in
   }
-  </script>
-  
-  <style scoped>
-  /* Optionale Styles */
-  </style>
-  
+}
+</script>
+
+<style>
+.container {
+  margin-top: 50px;
+}
+</style>
