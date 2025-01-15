@@ -311,3 +311,26 @@ async function saveProfile() {
   }
 }
 </script>
+
+<style>
+/* Globale Farbschema-Stile */
+/* Add your styles for .theme-normal here if needed */
+
+.theme-dark {
+  background-color: #121212;
+  color: #ffffff;
+}
+
+.modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  background-color: #ffffff;
+}
+
+.theme-dark .modal-content {
+  background-color: #333333;
+  color: #ffffff;
+}
+</style>
