@@ -20,5 +20,21 @@ export default {
 </script>
 
 <style>
-/* Globale Styles (falls gewünscht) */
+/* Globale Farbschema-Stile */
+.theme-normal {
+  background-color: white;
+  color: black;
+}
+
+.theme-high-contrast {
+  background-color: black;
+  color: yellow;
+}
+
+.theme-dark {
+  background-color: #121212;
+  color: white;
+}
+
+/* Zusätzliche globale Styles, falls gewünscht */
 </style>

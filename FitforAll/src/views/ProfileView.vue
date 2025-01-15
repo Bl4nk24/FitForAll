@@ -1,5 +1,5 @@
 <template>
-  <div class="container mt-5" aria-label="Profil und Übersicht">
+  <div :class="`theme-${editProfileData.color_contrast}`" class="container mt-5" aria-label="Profil und Übersicht">
     <div class="row">
       <!-- Linke Spalte: Benutzerinformationen -->
       <div class="col-md-4 mb-4">
@@ -180,19 +180,15 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { useRouter } from "vue-router";
 import { supabase } from "../supabase";
 
-// Reaktive Eigenschaft für `physicalLimitations`
 const physicalLimitations = ref([]);
-
-// Lokale Refs
 const userEmail = ref("");
 const profile = ref(null);
-const defaultAvatar = "/assets/default-avatar.png"; // z.B. im "public"-Ordner
+const defaultAvatar = "/assets/default-avatar.png";
 
-// Beispielhafter "Dashboard"-Content
 const nextWorkout = ref(null);
 const monthlyStats = ref({
   completedWorkouts: 0,
@@ -200,7 +196,6 @@ const monthlyStats = ref({
 });
 const recommendedExercises = ref([]);
 
-// mögliche körperliche Einschränkungen als Auswahl
 const limitationOptions = [
   { value: "rollstuhl", label: "Rollstuhl erforderlich" },
   { value: "sehbehinderung", label: "Sehbehinderung" },
@@ -210,8 +205,6 @@ const limitationOptions = [
 ];
 
 const router = useRouter();
-
-// State fürs Bearbeiten
 const editMode = ref(false);
 const editProfileData = ref({
   full_name: "",
@@ -230,107 +223,55 @@ onMounted(async () => {
   userEmail.value = authData.user.email;
 
   try {
-    // Abfrage von `user_settings`
-    const { data: userSettingsData, error: userSettingsError } = await supabase
+    const { data: userSettingsData } = await supabase
       .from("user_settings")
       .select("*")
       .eq("user_id", authData.user.id)
       .single();
 
-    if (userSettingsError) {
-      console.error("Fehler beim Abrufen von user_settings:", userSettingsError.message);
-      throw userSettingsError;
-    }
-
-    // Abfrage von `profiles`
-    const { data: profileData, error: profileError } = await supabase
+    const { data: profileData } = await supabase
       .from("profiles")
       .select("*")
-      .eq("id", authData.user.id) // `id` in `profiles` entspricht `auth.users.id`
+      .eq("id", authData.user.id)
       .single();
 
-    if (profileError) {
-      console.error("Fehler beim Abrufen von profiles:", profileError.message);
-      throw profileError;
-    }
-
-    // Zusammenführen der Daten
     profile.value = {
       ...userSettingsData,
       ...profileData,
-      physical_limitations: userSettingsData.physical_limitations || [],
-      full_name: profileData.full_name || "", // Stelle sicher, dass dieser Wert gesetzt wird
-      avatar_url: profileData.avatar_url || "",
     };
-
-    const defaultAvatar = "/assets/default-avatar.png"; // Lokaler Standardwert
 
     physicalLimitations.value = userSettingsData.physical_limitations || [];
 
-    // Initialisiere Bearbeitungsdaten
     editProfileData.value = {
       full_name: profile.value.full_name,
       avatar_url: profile.value.avatar_url,
-      physicalLimitations: profile.value.physical_limitations,
-      has_finished_onboarding: userSettingsData.has_finished_onboarding,
       color_contrast: userSettingsData.color_contrast,
-      font_size: userSettingsData.font_size,
-      screenreader: userSettingsData.screenreader,
     };
+
+    document.body.className = `theme-${editProfileData.value.color_contrast}`;
   } catch (err) {
-    console.error("Fehler beim Laden der Profildaten:", err.message);
+    console.error(err);
   }
 });
 
+watch(
+  () => editProfileData.value.color_contrast,
+  (newContrast) => {
+    document.body.className = `theme-${newContrast}`;
+    console.log(`Theme geändert zu: theme-${newContrast}`);
+  }
+);
 
-/**
- * Lädt verschiedene Infos für das Dashboard (Beispielhaft).
- */
-async function loadDashboardData(userId) {
-  // Normalerweise würdest du hier ggf. mehrere Supabase-Abfragen machen.
-  // Wir machen ein Beispiel und setzen Dummy-Daten.
-  nextWorkout.value = {
-    name: "Oberkörper-Workout",
-    progress: 45, // Fortschrittsbalken in Prozent
-  };
-
-  monthlyStats.value = {
-    completedWorkouts: 5,
-    remainingWorkouts: 3,
-  };
-
-  recommendedExercises.value = [
-    { id: 1, name: "Kniebeugen", description: "Kräftigt Beine und Rumpf." },
-    {
-      id: 2,
-      name: "Liegestütze",
-      description: "Trainiert Brust, Arme und Schulter.",
-    },
-  ];
-}
-
-/**
- * Abbrechen des Bearbeitungsmodus
- */
- function cancelEdit() {
-  editMode.value = false; // Modal schließen
-}
-
-
-/**
- * Speichert die geänderten Profildaten in Supabase
- */
 async function saveProfile() {
-  const { data: authData } = await supabase.auth.getUser();
+  const { data: authData, error: authError } = await supabase.auth.getUser();
   if (!authData?.user) {
+    console.error("Benutzer nicht authentifiziert.");
     return router.push("/auth");
   }
 
   try {
-    // Update der Tabelle "profiles"
     const profileUpdates = {
-      full_name: editProfileData.value.full_name,
-      username: editProfileData.value.username,
+      full_name: editProfileData.value.full_name || null,
       avatar_url: editProfileData.value.avatar_url || null,
     };
 
@@ -339,15 +280,16 @@ async function saveProfile() {
       .update(profileUpdates)
       .eq("id", authData.user.id);
 
-    if (profileError) throw profileError;
+    if (profileError) {
+      console.error("Fehler beim Speichern in profiles:", profileError.message);
+      return;
+    }
 
-    // Update der Tabelle "user_settings"
     const userSettingsUpdates = {
-      physical_limitations: physicalLimitations.value, // Schreibe die aktualisierten Einschränkungen
-      has_finished_onboarding: editProfileData.value.has_finished_onboarding,
       color_contrast: editProfileData.value.color_contrast,
       font_size: editProfileData.value.font_size,
       screenreader: editProfileData.value.screenreader,
+      physical_limitations: physicalLimitations.value,
     };
 
     const { error: userSettingsError } = await supabase
@@ -355,53 +297,17 @@ async function saveProfile() {
       .update(userSettingsUpdates)
       .eq("user_id", authData.user.id);
 
-    if (userSettingsError) throw userSettingsError;
+    if (userSettingsError) {
+      console.error("Fehler beim Speichern in user_settings:", userSettingsError.message);
+      return;
+    }
 
-
+    document.body.className = `theme-${editProfileData.value.color_contrast}`;
     console.log("Profil erfolgreich gespeichert!");
+
     editMode.value = false;
   } catch (err) {
-    console.error("Fehler beim Speichern des Profils:", err.message);
+    console.error("Fehler beim Speichern:", err.message);
   }
 }
 </script>
-
-<style scoped>
-/* Zusätzliche Styles für Karten, Abstände etc. */
-.card-header {
-  font-weight: 600;
-}
-
-/* Modal-Style (Bootstrap, gemischt mit unserem Code) */
-.modal.fade {
-  opacity: 0;
-  transition: opacity 0.15s linear;
-}
-
-.modal.show {
-  opacity: 1;
-}
-
-.modal-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.5);
-  /* Halbtransparent */
-  z-index: 1040;
-  /* Etwas niedriger als das Modal */
-}
-
-.modal-dialog {
-  margin-top: 10vh;
-  /* margin for vertical centering */
-}
-
-.btn-close {
-  background: none;
-  border: 0;
-  font-size: 1.2rem;
-}
-</style>

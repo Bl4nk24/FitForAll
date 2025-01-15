@@ -77,3 +77,58 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+/* Farbschema für die Anwendung */
+.theme-normal {
+  background-color: white;
+  color: black;
+}
+
+.theme-high-contrast {
+  background-color: black;
+  color: yellow;
+}
+
+/* Dunkles Design */
+/* Globale Farbschema-Definitionen */
+.theme-dark {
+  background-color: #121212 !important; /* Dunkler Hintergrund */
+  color: #ffffff !important; /* Weiße Standard-Schrift */
+}
+
+/* Überschriften, Absätze und Links im dunklen Modus */
+.theme-dark h1,
+.theme-dark h2,
+.theme-dark h3,
+.theme-dark h4,
+.theme-dark h5,
+.theme-dark h6,
+.theme-dark p,
+.theme-dark a {
+  color: #ffffff !important; /* Weiße Schrift */
+}
+
+/* Spezifische Anpassungen für die unteren Abschnitte */
+.theme-dark .footer, 
+.theme-dark .community-section {
+  background-color: #1f1f1f !important; /* Dunkler Hintergrund */
+  color: #ffffff !important; /* Weiße Schrift */
+}
+
+/* Anpassungen für Buttons in dunklem Design */
+.theme-dark .btn {
+  background-color: #333333 !important; /* Dunkler Button-Hintergrund */
+  color: #ffffff !important; /* Weiße Button-Schrift */
+  border-color: #555555 !important; /* Button-Rand */
+}
+
+/* Links im Footer und ähnlichen Abschnitten */
+.theme-dark .footer a,
+.theme-dark .community-section a {
+  color: #add8e6 !important; /* Helles Blau für Links im Footer */
+}
+
+.theme-dark .footer a:hover,
+.theme-dark .community-section a:hover {
+  color: #ffffff !important; /* Weiße Schrift beim Hover */
+}
