@@ -6,97 +6,18 @@
     </p>
 
     <div class="row">
-      <!-- Linke Spalte: SVG mit Muskeln -->
+      <!-- Linke Spalte: Eingebettete SVG -->
       <div class="col-md-6">
-        <div class="svg-container">
-          <!-- SVG mit v-bind:class für Hover- und Active-States -->
-          <svg
-            viewBox="0 0 500 1000"
-            xmlns="http://www.w3.org/2000/svg"
-            class="muscle-svg"
-          >
-            <!-- Vorderseite (Beispiel) -->
-            <!-- Brust -->
-            <path
-              class="muscle-area"
-              :class="{ active: selectedParts.includes('brust') }"
-              d="M 200 150 C 210 130, 290 130, 300 150 L 300 250 L 200 250 Z"
-              @click="toggleBodyPart('brust')"
-            ></path>
-            <!-- Bauch (Abs) -->
-            <path
-              class="muscle-area"
-              :class="{ active: selectedParts.includes('bauch') }"
-              d="M 220 250 L 280 250 L 280 400 L 220 400 Z"
-              @click="toggleBodyPart('bauch')"
-            ></path>
-            <!-- Bizeps links -->
-            <path
-              class="muscle-area"
-              :class="{ active: selectedParts.includes('bizeps_links') }"
-              d="M 150 180 C 140 210, 140 250, 150 280 L 170 280 L 170 180 Z"
-              @click="toggleBodyPart('bizeps_links')"
-            ></path>
-            <!-- Bizeps rechts -->
-            <path
-              class="muscle-area"
-              :class="{ active: selectedParts.includes('bizeps_rechts') }"
-              d="M 330 180 C 340 210, 340 250, 330 280 L 310 280 L 310 180 Z"
-              @click="toggleBodyPart('bizeps_rechts')"
-            ></path>
-            <!-- Oberschenkel links -->
-            <path
-              class="muscle-area"
-              :class="{ active: selectedParts.includes('oberschenkel_links') }"
-              d="M 210 420 L 180 560 L 220 560 L 250 420 Z"
-              @click="toggleBodyPart('oberschenkel_links')"
-            ></path>
-            <!-- Oberschenkel rechts -->
-            <path
-              class="muscle-area"
-              :class="{ active: selectedParts.includes('oberschenkel_rechts') }"
-              d="M 290 420 L 320 560 L 280 560 L 250 420 Z"
-              @click="toggleBodyPart('oberschenkel_rechts')"
-            ></path>
-
-            <!-- Hinterseite (Beispiel) – du könntest entweder eine zweite SVG oder denselben
-                 SVG-Container weiter unten benutzen. Hier nur ein kurzer Ausschnitt für die Rückenmuskeln. -->
-            <!-- Rücken oben -->
-            <path
-              class="muscle-area"
-              :class="{ active: selectedParts.includes('ruecken_oben') }"
-              d="M 200 150 C 210 130, 290 130, 300 150 L 300 250 L 200 250 Z"
-              transform="translate(0, 450)" 
-              @click="toggleBodyPart('ruecken_oben')"
-            ></path>
-            <!-- Rücken unten -->
-            <path
-              class="muscle-area"
-              :class="{ active: selectedParts.includes('ruecken_unten') }"
-              d="M 200 250 L 300 250 L 300 380 L 200 380 Z"
-              transform="translate(0, 450)"
-              @click="toggleBodyPart('ruecken_unten')"
-            ></path>
-            <!-- Po (Gluteus) -->
-            <path
-              class="muscle-area"
-              :class="{ active: selectedParts.includes('po') }"
-              d="M 220 380 L 280 380 L 280 480 L 220 480 Z"
-              transform="translate(0, 450)"
-              @click="toggleBodyPart('po')"
-            ></path>
-          </svg>
-        </div>
+        <div class="svg-container" v-html="svgContent" @click="handleSvgClick"></div>
       </div>
 
-      <!-- Rechte Spalte: Deine weiteren Einstellungen und Eingabefelder (unverändert) -->
+      <!-- Rechte Spalte: Deine weiteren Einstellungen -->
       <div class="col-md-6">
         <div class="card shadow">
           <div class="card-header bg-primary text-white">
             <h5>Zusätzliche Einstellungen</h5>
           </div>
           <div class="card-body">
-            <!-- Farbschema -->
             <div class="mb-3">
               <label for="colorContrast" class="form-label">Farbschema</label>
               <select id="colorContrast" class="form-select" v-model="colorContrast">
@@ -105,8 +26,6 @@
                 <option value="dark">Dunkles Design</option>
               </select>
             </div>
-
-            <!-- Schriftgröße -->
             <div class="mb-3">
               <label for="fontSize" class="form-label">Schriftgröße</label>
               <select id="fontSize" class="form-select" v-model="fontSize">
@@ -115,62 +34,33 @@
                 <option value="x-large">Extra Groß</option>
               </select>
             </div>
-
-            <!-- Screenreader -->
             <div class="mb-3 form-check">
-              <input
-                type="checkbox"
-                class="form-check-input"
-                id="screenreader"
-                v-model="screenreader"
-              />
+              <input type="checkbox" class="form-check-input" id="screenreader" v-model="screenreader" />
               <label for="screenreader" class="form-check-label">
                 Screenreader-Modus aktivieren
               </label>
             </div>
-            
-            <!-- Zusätzliche Fragen -->
             <div class="mb-3">
               <label for="fullName" class="form-label">Voller Name</label>
               <input id="fullName" type="text" class="form-control" v-model="fullName" />
             </div>
-
             <div class="mb-3">
               <label for="username" class="form-label">Benutzername</label>
               <input id="username" type="text" class="form-control" v-model="username" />
             </div>
-
             <div class="mb-3">
               <label for="age" class="form-label">Alter</label>
-              <input
-                id="age"
-                type="number"
-                class="form-control"
-                v-model.number="age"
-                min="0"
-                step="1"
-                @input="validateAge"
-              />
+              <input id="age" type="number" class="form-control" v-model.number="age" min="0" step="1" />
             </div>
-
             <div class="mb-3">
               <label for="weight" class="form-label">Gewicht (kg)</label>
-              <input
-                id="weight"
-                type="number"
-                class="form-control"
-                v-model.number="weight"
-                min="0"
-                step="0.1"
-                @input="validateWeight"
-              />
+              <input id="weight" type="number" class="form-control" v-model.number="weight" min="0" step="0.1" />
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Speichern-Button -->
     <div class="text-center mt-4">
       <button class="btn btn-primary" @click="savePreferences">Speichern</button>
     </div>
@@ -181,18 +71,26 @@
 import { ref, onMounted } from "vue";
 import { supabase } from "../supabase";
 
-// Reaktive Daten
+const svgContent = ref("");
 const selectedParts = ref([]);
 const colorContrast = ref("normal");
 const fontSize = ref("normal");
 const screenreader = ref(false);
 
-// Körperteil hinzufügen/entfernen
-function toggleBodyPart(part) {
-  if (selectedParts.value.includes(part)) {
-    selectedParts.value = selectedParts.value.filter((p) => p !== part);
+function toggleBodyPart(partId) {
+  if (selectedParts.value.includes(partId)) {
+    selectedParts.value = selectedParts.value.filter((id) => id !== partId);
   } else {
-    selectedParts.value.push(part);
+    selectedParts.value.push(partId);
+  }
+}
+
+function handleSvgClick(event) {
+  const target = event.target;
+  if (target.classList.contains("s2")) { // Nur Elemente mit Klasse "s2" sind anklickbar
+    const partId = target.id;
+    toggleBodyPart(partId); // Markiere den Muskel
+    target.classList.toggle("active"); // Ändere die Darstellung
   }
 }
 
@@ -202,27 +100,6 @@ async function savePreferences() {
   if (!authData?.user) {
     console.error("Benutzer nicht eingeloggt");
     return;
-  }
-
-  try {
-    const { data, error } = await supabase
-      .from("user_settings")
-      .select("has_finished_onboarding")
-      .eq("user_id", authData.user.id)
-      .single();
-
-    if (error) {
-      console.error("Fehler beim Laden der Einstellungen:", error.message);
-      return;
-    }
-
-    // Überprüfen, ob das Onboarding abgeschlossen ist
-    if (data.has_finished_onboarding) {
-      window.location.href = "/";
-      return;
-    }
-  } catch (err) {
-    console.error("Fehler beim Laden der Daten:", err.message);
   }
 
   try {
@@ -245,8 +122,6 @@ async function savePreferences() {
     console.error("Fehler beim Speichern:", err.message);
   }
 
-
-
   try {
     const { error } = await supabase
       .from("profiles")
@@ -265,21 +140,6 @@ async function savePreferences() {
     }
   } catch (err) {
     console.error("Fehler beim Speichern:", err.message);
-  }
-}
-
-// Zusätzliche Eingabefelder
-const fullName = ref("");
-const username = ref("");
-const age = ref(null);
-const weight = ref(null);
-
-// Beim Laden des Profils: Daten aus der Datenbank laden
-onMounted(async () => {
-  const { data: authData } = await supabase.auth.getUser();
-  if (!authData?.user) {
-    console.error("Benutzer nicht eingeloggt");
-    return;
   }
 
   try {
@@ -301,6 +161,28 @@ onMounted(async () => {
     }
   } catch (err) {
     console.error("Fehler beim Laden der Daten:", err.message);
+  }
+}
+
+// Zusätzliche Eingabefelder
+const fullName = ref("");
+const username = ref("");
+const age = ref(null);
+const weight = ref(null);
+
+// Beim Laden des Profils: Daten aus der Datenbank laden
+onMounted(async () => {
+  const { data: authData } = await supabase.auth.getUser();
+  if (!authData?.user) {
+    console.error("Benutzer nicht eingeloggt");
+    return;
+  }
+
+  try {
+    const response = await fetch("/assets/Muscle_Map.svg");
+    svgContent.value = await response.text();
+  } catch (error) {
+    console.error("Fehler beim Laden der SVG:", error);
   }
 
   try {
@@ -399,36 +281,25 @@ onMounted(async () => {
 });
 </script>
 
-
 <style scoped>
-/* Container für das SVG, damit es nicht zu groß wird */
 .svg-container {
-  max-width: 300px;
-  margin: 0 auto;
-}
-
-.muscle-svg {
   width: 100%;
   height: auto;
-  display: block;
-  margin: 0 auto;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .muscle-area {
-  fill: #ccc;
-  stroke: #888;
-  stroke-width: 2;
+  fill: #cccccc;
   cursor: pointer;
-  transition: fill 0.3s, stroke 0.3s;
+  transition: fill 0.3s;
 }
 
 .muscle-area:hover {
-  fill: #007bff; /* Hover-Farbe */
-  stroke: #0056b3;
+  fill: #007bff;
 }
 
 .muscle-area.active {
-  fill: #0056b3; /* Wenn ausgewählt */
-  stroke: #003f7f;
+  fill: #0056b3;
 }
 </style>
