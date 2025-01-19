@@ -16,24 +16,7 @@
         </button>
       </div>
     </section>
-
-    <!-- Vorstellung der Hauptziele / Kernprinzipien -->
-    <section class="container py-5">
-      <h2 class="text-center mb-4">Unsere Ziele für eine barrierefreie Fitnessplattform</h2>
-      <div class="row">
-        <!-- Zielkarten -->
-        <div class="col-md-6 col-lg-4 mb-4" v-for="(card, index) in goalCards" :key="index">
-          <div class="card h-100 shadow-sm" role="article" @click="gotoCardPage(card.link)" style="cursor: pointer;">
-            <img :src="card.imgSrc" class="card-img-top" :alt="card.altText" />
-            <div class="card-body">
-              <h3 class="card-title fs-5 fw-bold">{{ card.title }}</h3>
-              <p class="card-text">{{ card.description }}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
+    
     <!-- Zusätzliche Karten: Videos, Trainingsplan, Ernährungsplan -->
     <section class="container py-5">
       <h2 class="text-center mb-4">Unsere Funktionen</h2>
@@ -145,7 +128,7 @@ const goalCards = [
 }
 
 .card {
-  min-height: 300px;
+  min-height: 500px; /* Verlängert die Karten */
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -155,7 +138,7 @@ const goalCards = [
 }
 
 .card-img-top {
-  height: 200px;
+  height: 300px; /* Bildhöhe angepasst */
   object-fit: cover;
 }
 </style>
