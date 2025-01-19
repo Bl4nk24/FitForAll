@@ -36,7 +36,7 @@
 
     <!-- Zusätzliche Karten: Videos, Trainingsplan, Ernährungsplan -->
     <section class="container py-5">
-      <h2 class="text-center mb-4">Weitere Funktionen</h2>
+      <h2 class="text-center mb-4">Unsere Funktionen</h2>
       <div class="row">
         <div class="col-md-6 col-lg-4 mb-4">
           <div class="card h-100 shadow-sm" role="article" @click="gotoPage('/videos')" style="cursor: pointer;">
