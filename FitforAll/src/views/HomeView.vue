@@ -1,7 +1,7 @@
 <template>
   <div class="home-page" aria-labelledby="pageTitle">
-    <!-- Hero-Bereich (Titel, Untertitel, Call-to-Action) -->
-    <section class="bg-primary text-white text-center py-5">
+    <!-- Hero-Bereich -->
+    <section class="hero-section text-center py-5">
       <div class="container">
         <h1 id="pageTitle" class="display-4 fw-bold">Willkommen bei FitforAll</h1>
         <p class="lead">
@@ -16,8 +16,8 @@
         </button>
       </div>
     </section>
-    
-    <!-- Zusätzliche Karten: Videos, Trainingsplan, Ernährungsplan -->
+
+    <!-- Karten: Videos, Trainingsplan, Ernährungsplan -->
     <section class="container py-5">
       <h2 class="text-center mb-4">Unsere Funktionen</h2>
       <div class="row">
@@ -57,13 +57,13 @@
       </div>
     </section>
 
-    <!-- Call-to-Action / Community Hinweis -->
-    <section class="bg-light py-5">
+    <!-- Call-to-Action -->
+    <section class="community-section py-5">
       <div class="container text-center">
         <h2 class="mb-3">Werde Teil unserer Community</h2>
         <p class="mb-4">
-          Vernetze dich mit anderen, teile deine Erfolge und profitiere von gegenseitiger
-          Motivation. Gemeinsam erreichen wir mehr!
+          Vernetze dich mit anderen, teile deine Erfolge und profitiere von gegenseitiger Motivation.
+          Gemeinsam erreichen wir mehr!
         </p>
         <button class="btn btn-secondary btn-lg" @click="gotoCommunity">
           Zur Community
@@ -73,62 +73,35 @@
   </div>
 </template>
 
-<script setup>
-import { useRouter } from 'vue-router';
-
-const router = useRouter();
-
-const gotoWorkouts = () => {
-  router.push('/workouts');
-};
-
-const gotoCommunity = () => {
-  router.push('/community');
-};
-
-const gotoPage = (path) => {
-  router.push(path);
-};
-
-const gotoCardPage = (path) => {
-  router.push(path);
-};
-
-const goalCards = [
-  {
-    imgSrc: '/assets/navigation.jpg',
-    altText: 'Navigation und Struktur',
-    title: 'Klare Navigation & Struktur',
-    description:
-      'Logische Menüs und ARIA-Rollen für Screenreader. Einfach per Tastatur und Sprache zu bedienen, damit jede:r schnell zurechtfindet.',
-    link: '/navigation',
+<script>
+export default {
+  methods: {
+    gotoWorkouts() {
+      this.$router.push('/workouts');
+    },
+    gotoCommunity() {
+      this.$router.push('/community');
+    },
+    gotoPage(path) {
+      this.$router.push(path);
+    },
   },
-  {
-    imgSrc: '/assets/design.jpg',
-    altText: 'Visuelles Design',
-    title: 'Visuelles Design',
-    description:
-      'Hohe Kontraste, anpassbare Schriftgrößen, responsives Layout – so bleibt alles gut lesbar und übersichtlich auf jedem Gerät.',
-    link: '/design',
-  },
-  {
-    imgSrc: '/assets/barrierefreiheit.jpg',
-    altText: 'Barrierefreiheit',
-    title: 'Barrierefreiheit im Fokus',
-    description:
-      'Videos mit Untertiteln, Gebärdensprache und Audiodeskriptionen. Einfache Sprache, Screenreader- und Braille-Unterstützung für maximale Inklusion.',
-    link: '/barrierefreiheit',
-  },
-];
+};
 </script>
 
 <style scoped>
 .home-page {
-  /* Globale oder seitenbezogene Styles */
+  min-height: 100vh;
+  background-color: inherit; /* Erbt das globale Farbschema */
+}
+
+.hero-section {
+  background-color: var(--primary-color, #007bff); /* Helles Blau */
+  color: white;
 }
 
 .card {
-  min-height: 500px; /* Verlängert die Karten */
+  min-height: 500px;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -138,7 +111,7 @@ const goalCards = [
 }
 
 .card-img-top {
-  height: 300px; /* Bildhöhe angepasst */
+  height: 300px;
   object-fit: cover;
 }
 </style>
