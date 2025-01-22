@@ -34,9 +34,11 @@ import { ref } from 'vue';
 
 const loading = ref(false);
 const filteredWorkouts = ref([]);
+
 function getYoutubeThumbnail(url) {
   return url || '/fallback-thumbnail.jpg';
 }
+
 function excerpt(text, length) {
   return text.length > length ? text.slice(0, length) + '...' : text;
 }

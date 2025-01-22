@@ -11,3 +11,5 @@
 <script setup>
 import PageLayout from './PageLayout.vue';
 </script>
+
+<!-- Keine extra CSS notwendig (Thema wird global gesteuert) -->
