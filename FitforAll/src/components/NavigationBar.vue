@@ -29,16 +29,7 @@
               class="nav-link"
               role="menuitem"
               >Upload</router-link
-            >
-          </li>
-          <!-- Link zu den Workouts -->
-          <li class="nav-item" role="none">
-            <router-link
-              to="/workouts"
-              class="nav-link"
-              role="menuitem"
-              >Workouts</router-link
-            >
+            >          
           </li>
           <!-- Link zum Profil (falls eingeloggt) -->
           <li class="nav-item" role="none" v-if="userEmail">

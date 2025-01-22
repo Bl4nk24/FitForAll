@@ -4,7 +4,6 @@ import HomeView from './views/HomeView.vue'
 import ProfileView from './views/ProfileView.vue'
 import AuthView from './views/AuthView.vue'
 import OnboardingView from './views/OnboardingView.vue'
-import WorkoutsView from './views/WorkoutView.vue'
 import AddWorkoutView from './views/AddWorkoutView.vue'
 import VideosPage from './views/VideosPage.vue'
 import TrainingsplanPage from './views/TraininsplanPage.vue'
@@ -15,7 +14,6 @@ const routes = [
   { path: '/onboarding', component: OnboardingView },
   { path: '/', component: HomeView, meta: { requiresAuth: true } },
   { path: '/profile', component: ProfileView, meta: { requiresAuth: true } },
-  { path: '/workouts', component: WorkoutsView, meta: { requiresAuth: true } },
   { path: '/upload', component: AddWorkoutView, meta: { requiresAuth: true } },
   { path: '/videos', component: VideosPage, meta: { requiresAuth: true } },
   { path: '/trainingsplan', component: TrainingsplanPage, meta: { requiresAuth: true } },
