@@ -1,17 +1,17 @@
-/* Setze den gesamten Dokument-Hintergrund auf ein sanftes Dunkelgrau */
+/* Standard-Setup für den gesamten Hintergrund */
 html, body {
-  background-color: #1a1a1a !important; /* Sanftes Dunkelgrau */
-  color: white !important;
   margin: 0;
   padding: 0;
-  height: 100%; /* Vollständige Höhe */
+  min-height: 100vh;
+  height: 100%;
+  width: 100%;
 }
 
 /* Haupt-App-Div */
 #app {
-  background-color: #1a1a1a !important; /* Sanftes Dunkelgrau */
-  color: white !important;
+  min-height: 100vh;
   height: 100%;
+  width: 100%;
 }
 
 /* Normal Theme */
@@ -20,8 +20,8 @@ html, body {
   color: black !important;
 }
 
-.theme-normal body,
 .theme-normal html,
+.theme-normal body,
 .theme-normal #main-content,
 .theme-normal .home-page,
 .theme-normal section,
@@ -33,18 +33,18 @@ html, body {
 
 /* High Contrast Theme */
 .theme-high-contrast {
-  background-color: #1a1a1a !important; /* Sanftes Dunkelgrau */
+  background-color: black !important;
   color: yellow !important;
 }
 
-.theme-high-contrast body,
 .theme-high-contrast html,
+.theme-high-contrast body,
 .theme-high-contrast #main-content,
 .theme-high-contrast .home-page,
 .theme-high-contrast section,
 .theme-high-contrast .container,
 .theme-high-contrast .row {
-  background-color: #1a1a1a !important;
+  background-color: black !important;
   color: yellow !important;
 }
 
@@ -63,7 +63,7 @@ html, body {
 }
 
 .theme-high-contrast .card {
-  background-color: #1a1a1a !important; /* Sanftes Dunkelgrau */
+  background-color: black !important;
   color: yellow !important;
   border: 2px solid yellow !important;
 }
@@ -74,8 +74,8 @@ html, body {
   color: white !important;
 }
 
-.theme-dark body,
 .theme-dark html,
+.theme-dark body,
 .theme-dark #main-content,
 .theme-dark .home-page,
 .theme-dark section,
@@ -100,14 +100,14 @@ html, body {
 }
 
 .theme-dark .card {
-  background-color: #232323 !important; /* Leicht helleres Dunkelgrau für Kontrast */
+  background-color: #232323 !important;
   color: white !important;
   border: 1px solid #444 !important;
 }
 
 /* Bootstrap-Überschreibungen */
 .container, .row, section {
-  background-color: inherit !important; /* Übernimmt das globale Farbschema */
+  background-color: inherit !important;
 }
 
 .bg-light {
