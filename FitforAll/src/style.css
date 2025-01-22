@@ -1,18 +1,17 @@
-/* Setze den gesamten Dokument-Hintergrund auf ein sanftes Dunkelgrau */
+/* ========== Grundlayout ========== */
 html, body {
-  background-color: #1a1a1a !important; /* Sanftes Dunkelgrau */
-  color: white !important;
   margin: 0;
   padding: 0;
-  height: 100%; /* Vollständige Höhe */
+  min-height: 100vh;
+  width: 100%;
 }
 
-/* Haupt-App-Div */
 #app {
-  background-color: #1a1a1a !important; /* Sanftes Dunkelgrau */
-  color: white !important;
-  height: 100%;
+  min-height: 100vh;
+  width: 100%;
 }
+
+/* ========== Globale Themes ========== */
 
 /* Normal Theme */
 .theme-normal {
@@ -20,8 +19,8 @@ html, body {
   color: black !important;
 }
 
-.theme-normal body,
 .theme-normal html,
+.theme-normal body,
 .theme-normal #main-content,
 .theme-normal .home-page,
 .theme-normal section,
@@ -33,25 +32,24 @@ html, body {
 
 /* High Contrast Theme */
 .theme-high-contrast {
-  background-color: #1a1a1a !important; /* Sanftes Dunkelgrau */
+  background-color: black !important;
   color: yellow !important;
 }
 
-.theme-high-contrast body,
 .theme-high-contrast html,
+.theme-high-contrast body,
 .theme-high-contrast #main-content,
 .theme-high-contrast .home-page,
 .theme-high-contrast section,
 .theme-high-contrast .container,
 .theme-high-contrast .row {
-  background-color: #1a1a1a !important;
+  background-color: black !important;
   color: yellow !important;
 }
 
 .theme-high-contrast a {
   color: yellow !important;
 }
-
 .theme-high-contrast a:hover {
   color: white !important;
 }
@@ -63,19 +61,19 @@ html, body {
 }
 
 .theme-high-contrast .card {
-  background-color: #1a1a1a !important; /* Sanftes Dunkelgrau */
+  background-color: black !important;
   color: yellow !important;
   border: 2px solid yellow !important;
 }
 
 /* Dark Theme */
 .theme-dark {
-  background-color: #1a1a1a !important; /* Sanftes Dunkelgrau */
+  background-color: #1a1a1a !important; 
   color: white !important;
 }
 
-.theme-dark body,
 .theme-dark html,
+.theme-dark body,
 .theme-dark #main-content,
 .theme-dark .home-page,
 .theme-dark section,
@@ -88,7 +86,6 @@ html, body {
 .theme-dark a {
   color: #add8e6 !important;
 }
-
 .theme-dark a:hover {
   color: white !important;
 }
@@ -100,20 +97,58 @@ html, body {
 }
 
 .theme-dark .card {
-  background-color: #232323 !important; /* Leicht helleres Dunkelgrau für Kontrast */
+  background-color: #232323 !important;
   color: white !important;
   border: 1px solid #444 !important;
 }
 
-/* Bootstrap-Überschreibungen */
-.container, .row, section {
-  background-color: inherit !important; /* Übernimmt das globale Farbschema */
+/* ========== Bootstrap-Überschreibungen ========== */
+
+/* Container, Rows, Sections sollen einfach vererben */
+.container,
+.row,
+section {
+  background-color: inherit !important;
+  color: inherit !important;
 }
 
+/* Überschreibe ggf. Bootstrap .bg-light, .text-dark etc. */
 .bg-light {
-  background-color: #1a1a1a !important; /* Überschreibt Bootstrap's bg-light */
+  background-color: #1a1a1a !important; 
+}
+.text-dark {
+  color: white !important;
 }
 
-.text-dark {
-  color: white !important; /* Ändert die Schriftfarbe für text-dark */
+/* Falls "hero-section" woanders eine Farbe hat, kannst du pro Theme überschreiben */
+.theme-dark .hero-section {
+  background-color: #1a1a1a !important;
+  color: white !important;
+}
+.theme-high-contrast .hero-section {
+  background-color: black !important;
+  color: yellow !important;
+}
+
+/* card-body überschreiben */
+.theme-dark .card-body {
+  background-color: #232323 !important;
+  color: white !important;
+}
+.theme-high-contrast .card-body {
+  background-color: black !important;
+  color: yellow !important;
+  border: 2px solid yellow !important;
+}
+
+/* alert-info überschreiben */
+.theme-dark .alert-info {
+  background-color: #333 !important;
+  color: white !important;
+  border-color: #555 !important;
+}
+.theme-high-contrast .alert-info {
+  background-color: black !important;
+  color: yellow !important;
+  border-color: yellow !important;
 }

@@ -22,7 +22,12 @@
       <h2 class="text-center mb-4">Unsere Funktionen</h2>
       <div class="row">
         <div class="col-md-6 col-lg-4 mb-4">
-          <div class="card h-100 shadow-sm" role="article" @click="gotoPage('/videos')" style="cursor: pointer;">
+          <div
+            class="card h-100 shadow-sm"
+            role="article"
+            @click="gotoPage('/videos')"
+            style="cursor: pointer;"
+          >
             <img src="/assets/videos.jpg" class="card-img-top" alt="Videos" />
             <div class="card-body">
               <h3 class="card-title fs-5 fw-bold">Videos</h3>
@@ -33,7 +38,12 @@
           </div>
         </div>
         <div class="col-md-6 col-lg-4 mb-4">
-          <div class="card h-100 shadow-sm" role="article" @click="gotoPage('/trainingsplan')" style="cursor: pointer;">
+          <div
+            class="card h-100 shadow-sm"
+            role="article"
+            @click="gotoPage('/trainingsplan')"
+            style="cursor: pointer;"
+          >
             <img src="/assets/trainingsplan.jpg" class="card-img-top" alt="Trainingsplan" />
             <div class="card-body">
               <h3 class="card-title fs-5 fw-bold">Trainingsplan</h3>
@@ -44,7 +54,12 @@
           </div>
         </div>
         <div class="col-md-6 col-lg-4 mb-4">
-          <div class="card h-100 shadow-sm" role="article" @click="gotoPage('/ernaehrungsplan')" style="cursor: pointer;">
+          <div
+            class="card h-100 shadow-sm"
+            role="article"
+            @click="gotoPage('/ernaehrungsplan')"
+            style="cursor: pointer;"
+          >
             <img src="/assets/ernaehrungsplan.jpg" class="card-img-top" alt="Ernährungsplan" />
             <div class="card-body">
               <h3 class="card-title fs-5 fw-bold">Ernährungsplan</h3>
@@ -89,14 +104,16 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 .home-page {
   min-height: 100vh;
   background-color: inherit; /* Erbt das globale Farbschema */
 }
 
+/* Hero-Bereich: du kannst hier die Standardfarbe für "normal" drinlassen.
+   Für .theme-dark/.theme-high-contrast machen wir Overrides in style.css */
 .hero-section {
-  background-color: var(--primary-color, #007bff); /* Helles Blau */
+  background-color: var(--primary-color, #007bff); /* standard-blau */
   color: white;
 }
 
