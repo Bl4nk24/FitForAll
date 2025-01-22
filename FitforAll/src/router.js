@@ -9,6 +9,7 @@ import VideosPage from './views/VideosPage.vue'
 import TrainingsplanPage from './views/TraininsplanPage.vue'
 import ErnaehrungsplanPage from './views/ErnaehrungsplanPage.vue'
 
+
 const routes = [
   { path: '/auth', component: AuthView },
   { path: '/onboarding', component: OnboardingView },
@@ -17,7 +18,12 @@ const routes = [
   { path: '/upload', component: AddWorkoutView, meta: { requiresAuth: true } },
   { path: '/videos', component: VideosPage, meta: { requiresAuth: true } },
   { path: '/trainingsplan', component: TrainingsplanPage, meta: { requiresAuth: true } },
-  { path: '/ernaehrungsplan', component: ErnaehrungsplanPage, meta: { requiresAuth: true } }
+  { path: '/ernaehrungsplan', component: ErnaehrungsplanPage, meta: { requiresAuth: true } },
+  {
+    path: '/workout/:id',
+    name: 'ViewVideo',
+    component: () => import('./views/ViewVideo.vue'),
+  }
 ]
 
 const router = createRouter({
