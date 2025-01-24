@@ -303,6 +303,7 @@ onMounted(async () => {
 
     // Warte kurz, bis DOM (SVG) gerendert ist
     await nextTick();
+    console.log("Problem-Muskeln:", problemParts.value);
     // Markiere beim initialen Laden alle "problemParts" als active
     problemParts.value.forEach((muscleId) => {
       const el = document.getElementById(muscleId);

@@ -205,11 +205,12 @@ const errorMessage = ref('')
 // Success info
 const successMessage = ref('')
 
+// Workout-Daten
 const targetMuscles = ref([])
 
 // Workout + SVG
 const workout = ref(null)
-const svgContent = ref('')  // Hier landet der SVG-Text
+const svgContent = ref("")  // Hier landet der SVG-Text
 
 // Felder für "Neues Training"
 const trainingNote = ref('')
@@ -234,44 +235,49 @@ const monthName = computed(() => monthNames[month] || '')
 
 // onMounted
 onMounted(async () => {
+    loading.value = true
+    const res = await fetch("/assets/Muscle_Map.svg");
+    const rawSvg = await res.text();
+    const parser = new DOMParser();
+    const svgDoc = parser.parseFromString(rawSvg, "image/svg+xml");
+    const pathWithIds = svgDoc.querySelectorAll("path[id]");
+    console.log("Gefundene IDs (im <symbol> / <defs> evtl. Unsichtbar):", [...pathWithIds].map(el => el.id));
     try {
-        loading.value = true
-
         // 1) Workout-Daten laden
-        const { data: wData, error: wErr } = await supabase
+        const { data: wData } = await supabase
             .from('workouts')
             .select('*')
             .eq('id', workoutId)
             .single()
 
-        if (wErr) throw wErr
-        if (!wData) {
-            errorMessage.value = 'Kein Workout mit dieser ID gefunden.'
-            loading.value = false
-            return
-        }
-
         workout.value = wData
 
-        // 2) SVG laden
-        try {
-            const response = await fetch("/assets/Muscle_Map.svg");
-            svgContent.value = await response.text();
-        } catch (error) {
-            console.error("Fehler beim Laden der SVG:", error);
-        }
-        targetMuscles.value = workout.value.target_muscles || []
+        targetMuscles.value = wData.target_muscles || []
 
         // 3) Nach DOM-Update -> markiere Muskeln
-        await nextTick()
-        console.log(targetMuscles.value)
-        targetMuscles.value.forEach((muscleId) => {
-            const el = document.getElementById(muscleId)
-            if (el) {
-                // .active kommt aus deinem <style> in der SVG (fill: #0056b3, etc.)
-                el.classList.add("active")
+
+        // Debug
+        console.log("Lade SVG...");
+        try {
+            const res = await fetch("/assets/Muscle_Map.svg");
+            svgContent.value = await res.text();
+            while (!svgContent.value) {
+                await new Promise(resolve => setTimeout(resolve, 100));
             }
-        })
+            console.log("SVG geladen, Länge:", svgContent.value?.length);
+            await nextTick();
+            const pathIds = document.querySelectorAll('path[id]');
+            console.log("Vorhandene path-IDs:");
+            pathIds.forEach(el => console.log(el.id));
+            console.log("TargetMuscles:", targetMuscles.value);
+            targetMuscles.value.forEach((muscleId) => {
+                const el = document.getElementById(muscleId);
+                console.log(`Suche ${muscleId}:`, el);
+                if (el) el.classList.add("active");
+            });
+        } catch (error) {
+            console.error("Fehler beim Laden:", error);
+        }
 
         // 4) Trainings-Daten (sessions + sets)
         const { data: sessionsData, error: sessionsError } = await supabase
@@ -535,12 +541,14 @@ function getEmbeddedUrl(url) {
     height: auto;
     max-width: 100%;
     overflow: hidden;
-    border: 1px solid #dee2e6;
-    border-radius: 4px;
-    margin-top: 1rem;
-    background-color: #f8f9fa;
-    padding: 1rem;
 }
+
+.s2 {
+    fill: #cccccc;
+    cursor: pointer;
+    transition: fill 0.3s;
+}
+
 
 .s2.active {
     fill: #0056b3;
