@@ -19,5 +19,4 @@ const app = createApp(App);
 
 // Globale Funktion bereitstellen
 app.config.globalProperties.$toggleTheme = toggleTheme;
-
 app.use(router).mount('#app');
