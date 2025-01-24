@@ -14,4 +14,8 @@ const toggleTheme = (theme) => {
 const app = createApp(App);
 // Globale Funktion bereitstellen
 app.config.globalProperties.$toggleTheme = toggleTheme;
+<<<<<<< HEAD:fitforall/src/main.js
 app.use(router).mount('#app');
+=======
+app.use(router).mount('#app');
+>>>>>>> f9eda3aec94493d6c9ea0da4aa31d050bc573b3b:FitforAll/src/main.js

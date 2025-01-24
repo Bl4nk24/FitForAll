@@ -152,3 +152,20 @@ section {
   color: yellow !important;
   border-color: yellow !important;
 }
+
+/* style.css (Ergänzung) */
+/* Fixierte Position für den Vorlese-Button */
+.screenreader-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9999;
+  font-size: 1rem;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  /* optional: eigenes Farbschema */
+  background-color: #0d6efd; /* Bootstraps "btn-primary" */
+  color: #fff;
+  border: none;
+}
