@@ -319,8 +319,6 @@ onMounted(async () => {
 
     // SVG "active" markieren
     await nextTick();
-    console.log("Problem-Muskeln:", problemParts.value);
-    // Markiere beim initialen Laden alle "problemParts" als active
     problemParts.value.forEach((muscleId) => {
       const el = document.getElementById(muscleId);
       if (el) el.classList.add("active");
