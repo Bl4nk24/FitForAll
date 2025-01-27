@@ -110,8 +110,6 @@ export default {
   background-color: inherit; /* Erbt das globale Farbschema */
 }
 
-/* Hero-Bereich: du kannst hier die Standardfarbe für "normal" drinlassen.
-   Für .theme-dark/.theme-high-contrast machen wir Overrides in style.css */
 .hero-section {
   background-color: var(--primary-color, #007bff); /* standard-blau */
   color: white;

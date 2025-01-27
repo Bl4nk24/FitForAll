@@ -1,5 +1,5 @@
 <template>
-  <!-- Äußeres Wrapper-DIV, das von themeClass gesteuert wird -->
+  <!-- Äußeres Wrapper-DIV, gesteuert vom Theme -->
   <div :class="themeClass">
     <!-- Navigation oben -->
     <NavigationBar @toggleTheme="changeTheme" />
@@ -25,15 +25,12 @@ export default {
     ScreenReaderButton,
   },
   computed: {
-    // Liest die globale Klasse vom <body> aus,
-    // damit das Umschalten des Themes sofort in App.vue ankommt.
     themeClass() {
+      // Liest die globale Klasse vom <body> aus
       return document.body.className;
     },
   },
   methods: {
-    // Wird von <NavigationBar> aufgerufen, 
-    // um das globale Farbschema zu ändern (this.$toggleTheme).
     changeTheme(theme) {
       this.$toggleTheme(theme); 
     },
@@ -42,7 +39,7 @@ export default {
 </script>
 
 <style>
-/* ========= Themestyles (kannst du 1:1 übernehmen) ========== */
+/* ========== Themestyles (kannst du 1:1 übernehmen) ========== */
 
 /* Normal Theme */
 .theme-normal {

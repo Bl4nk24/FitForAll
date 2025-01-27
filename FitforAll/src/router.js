@@ -9,7 +9,6 @@ import VideosPage from './views/VideosPage.vue'
 import TrainingsplanPage from './views/TraininsplanPage.vue'
 import ErnaehrungsplanPage from './views/ErnaehrungsplanPage.vue'
 
-
 const routes = [
   { path: '/auth', component: AuthView },
   { path: '/onboarding', component: OnboardingView },
@@ -23,7 +22,7 @@ const routes = [
     path: '/workout/:id',
     name: 'ViewVideo',
     component: () => import('./views/ViewVideo.vue'),
-  }
+  },
 ]
 
 const router = createRouter({

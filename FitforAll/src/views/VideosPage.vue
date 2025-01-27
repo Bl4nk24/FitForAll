@@ -1,42 +1,57 @@
 <template>
-  <div class="container my-5">
-    <h1 class="mb-4">Deine Workout-Bibliothek</h1>
+  <div class="videos-page">
 
-    <!-- Fehlermeldung -->
-    <div v-if="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
-
-    <!-- Ladeanzeige -->
-    <div v-else-if="loading" class="text-center">
-      <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Loading...</span>
+    <!-- Neuer Hero-Bereich für die "Videos" Seite -->
+    <section class="videos-hero text-center py-5 mb-4">
+      <div class="container">
+        <h1 class="display-4 fw-bold">Deine Workout-Bibliothek</h1>
+        <p class="lead">
+          Finde Workouts, die zu dir passen – jederzeit und überall.
+        </p>
       </div>
-      <p class="mt-2">Lade Workouts...</p>
-    </div>
+    </section>
 
-    <!-- Gefilterte Workouts -->
-    <div v-else>
-      <!-- Keine passenden Workouts -->
-      <div v-if="filteredWorkouts.length === 0" class="alert alert-info">
-        Keine passenden Workouts gefunden.
+    <!-- Inhalt -->
+    <div class="container my-5">
+      <!-- Fehlermeldung -->
+      <div v-if="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+
+      <!-- Ladeanzeige -->
+      <div v-else-if="loading" class="text-center">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-2">Lade Workouts...</p>
       </div>
 
-      <!-- Grid aus Karten -->
-      <div class="row row-cols-1 row-cols-md-3 g-4">
-        <div class="col" v-for="workout in filteredWorkouts" :key="workout.id">
-          <div class="card h-100 shadow-sm position-relative">
-            <!-- Vorschaubild (YouTube-Thumbnail oder Fallback) -->
-            <!-- Wrap das <img> in <router-link> -->
-            <router-link :to="`/workout/${workout.id}`">
-              <img :src="getYoutubeThumbnail(workout.video_url)" class="card-img-top" alt="Workout Thumbnail"
-                style="max-height: 180px; object-fit: cover; cursor: pointer;" />
-            </router-link>
+      <!-- Gefilterte Workouts -->
+      <div v-else>
+        <!-- Keine passenden Workouts -->
+        <div v-if="filteredWorkouts.length === 0" class="alert alert-info">
+          Keine passenden Workouts gefunden.
+        </div>
 
-            <div class="card-body d-flex flex-column">
-              <h5 class="card-title mb-2">{{ workout.name }}</h5>
-              <!-- Kurzer Auszug aus der Beschreibung -->
-              <p class="card-text">
-                {{ excerpt(workout.description, 80) }}
-              </p>
+        <!-- Grid aus Karten -->
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+          <div class="col" v-for="workout in filteredWorkouts" :key="workout.id">
+            <div class="card h-100 shadow-sm position-relative">
+              <!-- Vorschaubild (YouTube-Thumbnail oder Fallback) -->
+              <router-link :to="`/workout/${workout.id}`">
+                <img 
+                  :src="getYoutubeThumbnail(workout.video_url)" 
+                  class="card-img-top" 
+                  alt="Workout Thumbnail"
+                  style="max-height: 180px; object-fit: cover; cursor: pointer;" 
+                />
+              </router-link>
+
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title mb-2">{{ workout.name }}</h5>
+                <!-- Kurzer Auszug aus der Beschreibung -->
+                <p class="card-text">
+                  {{ excerpt(workout.description, 80) }}
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -103,7 +118,7 @@ onMounted(async () => {
     return
   }
 
-  // 4) Filter: nur Workouts, die keine Overlap mit userProblemMuscles haben
+  // 4) Filter: nur Workouts, die KEINE Overlap mit userProblemMuscles haben
   filteredWorkouts.value = workouts.value.filter((workout) => {
     const pm = workout.problem_muscle_groups || []
     return !pm.some((muscle) => userProblemMuscles.includes(muscle))
@@ -148,6 +163,19 @@ function getYoutubeThumbnail(url) {
 </script>
 
 <style scoped>
+/* Hero-Bereich für die Videos-Seite */
+.videos-hero {
+  background: var(--videospage-bg, #007bff);
+  color: #fff;
+  border-radius: 0 0 10px 10px;
+  /* Optional: kleines Overlay */
+  background-image: linear-gradient(
+    rgba(0, 0, 0, 0.2), 
+    rgba(0, 0, 0, 0.2)
+  ), 
+  var(--videospage-bg, #007bff);
+}
+
 .container {
   max-width: 900px;
 }
