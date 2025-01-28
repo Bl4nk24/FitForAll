@@ -3,7 +3,7 @@ import App from './App.vue';
 import router from './router';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import './style.css'; // Wichtig: Deine eigene CSS-Datei importieren
+import './style.css'; // <- WICHTIG: Deine angepasste CSS-Datei importieren
 
 // Theme aus LocalStorage auslesen, default: 'normal'
 const savedTheme = localStorage.getItem('color_contrast') || 'normal';

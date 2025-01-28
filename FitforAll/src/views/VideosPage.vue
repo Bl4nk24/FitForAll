@@ -1,7 +1,6 @@
 <template>
   <div class="videos-page">
-
-    <!-- Neuer Hero-Bereich für die "Videos" Seite -->
+    <!-- Hero-Bereich -->
     <section class="videos-hero text-center py-5 mb-4">
       <div class="container">
         <h1 class="display-4 fw-bold">Deine Workout-Bibliothek</h1>
@@ -35,19 +34,18 @@
         <div class="row row-cols-1 row-cols-md-3 g-4">
           <div class="col" v-for="workout in filteredWorkouts" :key="workout.id">
             <div class="card h-100 shadow-sm position-relative">
-              <!-- Vorschaubild (YouTube-Thumbnail oder Fallback) -->
+              <!-- Vorschaubild (YouTube-Thumbnail) -->
               <router-link :to="`/workout/${workout.id}`">
-                <img 
-                  :src="getYoutubeThumbnail(workout.video_url)" 
-                  class="card-img-top" 
+                <img
+                  :src="getYoutubeThumbnail(workout.video_url)"
+                  class="card-img-top"
                   alt="Workout Thumbnail"
-                  style="max-height: 180px; object-fit: cover; cursor: pointer;" 
+                  style="max-height: 180px; object-fit: cover; cursor: pointer;"
                 />
               </router-link>
 
               <div class="card-body d-flex flex-column">
                 <h5 class="card-title mb-2">{{ workout.name }}</h5>
-                <!-- Kurzer Auszug aus der Beschreibung -->
                 <p class="card-text">
                   {{ excerpt(workout.description, 80) }}
                 </p>
@@ -64,20 +62,17 @@
 import { ref, onMounted } from 'vue'
 import { supabase } from '../supabase'
 
-// Lade-States
 const loading = ref(true)
 const errorMessage = ref('')
 
-// Gesamte Workout-Liste
 const workouts = ref([])
-// Gefilterte Workouts
 const filteredWorkouts = ref([])
 
 onMounted(async () => {
   loading.value = true
   errorMessage.value = ''
 
-  // 1) User check
+  // 1) Auth-Check
   const { data: authData, error: authError } = await supabase.auth.getUser()
   if (authError || !authData?.user) {
     errorMessage.value = 'Du bist nicht eingeloggt.'
@@ -85,7 +80,7 @@ onMounted(async () => {
     return
   }
 
-  // 2) problem_muscle_groups des Nutzers
+  // 2) problem_muscle_groups
   let userProblemMuscles = []
   try {
     const { data: userSettingsData, error: userSettingsError } = await supabase
@@ -118,7 +113,7 @@ onMounted(async () => {
     return
   }
 
-  // 4) Filter: nur Workouts, die KEINE Overlap mit userProblemMuscles haben
+  // 4) Filter: Workouts ohne Overlap mit userProblemMuscles
   filteredWorkouts.value = workouts.value.filter((workout) => {
     const pm = workout.problem_muscle_groups || []
     return !pm.some((muscle) => userProblemMuscles.includes(muscle))
@@ -127,18 +122,12 @@ onMounted(async () => {
   loading.value = false
 })
 
-/**
- * Beschreibungs-Auszug
- */
 function excerpt(text, maxLength) {
   if (!text) return ''
   if (text.length <= maxLength) return text
   return text.slice(0, maxLength) + '...'
 }
 
-/**
- * YouTube-Thumbnail
- */
 function getYoutubeThumbnail(url) {
   if (!url) return '/fallback-thumbnail.jpg'
   try {
@@ -163,14 +152,12 @@ function getYoutubeThumbnail(url) {
 </script>
 
 <style scoped>
-/* Hero-Bereich für die Videos-Seite */
 .videos-hero {
   background: var(--videospage-bg, #007bff);
   color: #fff;
   border-radius: 0 0 10px 10px;
-  /* Optional: kleines Overlay */
   background-image: linear-gradient(
-    rgba(0, 0, 0, 0.2), 
+    rgba(0, 0, 0, 0.2),
     rgba(0, 0, 0, 0.2)
   ), 
   var(--videospage-bg, #007bff);

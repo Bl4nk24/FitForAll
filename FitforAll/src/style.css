@@ -178,8 +178,7 @@ section {
 }
 
 /* ===================== */
-/* ZUSÄTZLICHE BLOCK-REGELN 
-   => ALLES KOMPLETT DUNKEL MACHEN 
+/* ALLES KOMPLETT DUNKEL MACHEN IN DARK/HC 
    UND BUTTON-HOVER-FARBEN */
 /* ===================== */
 
@@ -227,68 +226,70 @@ body.theme-high-contrast .btn-warning:hover {
   border-color: black !important;
 }
 
-/* Damit .container in Dark / High Contrast wirklich volle Breite bekommt */
+/* .container in Dark/High Contrast -> volle Breite */
 .theme-dark .container,
 .theme-high-contrast .container {
-  max-width: 100% !important;   /* Überschreibt Bootstrap */
+  max-width: 100% !important;
   width: 100% !important;
-  margin: 0 !important;        /* Entfernt die automatische Zentrierung */
-  /* Je nachdem, ob du seitliche Abstände willst, z. B.: */
+  margin: 0 !important;
   padding-left: 2rem !important;
   padding-right: 2rem !important;
-  /* Hintergrundfarbe sowieso geerbt = schwarz */
 }
 
-/* =====================================
-   TRENNER-LINIE je nach Theme
-   ===================================== */
-/* Normal Theme */
+/* Separator-Farbe pro Theme */
 .theme-normal .separator {
   background: #ddd !important;
 }
-
-/* Dark Theme */
 .theme-dark .separator {
   background: #444 !important;
   height: 2px;
 }
-
-/* High Contrast */
 .theme-high-contrast .separator {
   background: yellow !important;
+  height: 2px;
 }
 
-/* Entferne im Dark/High-Contrast jede Transparenz und Rundungen im Header */
+/* Header im Dark/High Contrast ohne Rundung, kein Weiß */
 .theme-dark .header,
 .theme-high-contrast .header {
-  background-color: #1a1a1a !important; /* oder black für high-contrast */
-  border-bottom: 1px solid #444 !important; 
-  border-radius: 0 !important;           /* Keine abgerundeten Ecken mehr */
-}
-
-/* Dark/High-Contrast: Header blickdicht, abgerundet */
-.theme-dark .header,
-.theme-high-contrast .header {
-  background-color: #1a1a1a !important; /* oder black im high-contrast */
-  border-bottom: 1px solid #444 !important; 
-  /* Behalte die Ecken */
-  border-radius: 8px !important; 
-  /* remove eventuelle margin-lücken */
-  margin-bottom: 0 !important;
-}
-
-/* Dark Theme: Blickdichter Header mit Rundung */
-.theme-dark .header {
-  background-color: #1a1a1a !important; 
+  background-color: #1a1a1a !important; /* oder black */
   border-bottom: 1px solid #444 !important;
-  border-radius: 8px !important;  /* Behalte Rundung, wenn gewünscht */
+  border-radius: 0 !important;  /* KEINE Abrundungen! */
   margin-bottom: 0 !important;
+  overflow: hidden !important;
 }
 
-/* High Contrast Theme: Dasselbe in Schwarz + Gelber Rahmen, wenn gewünscht */
-.theme-high-contrast .header {
-  background-color: black !important;
-  border-bottom: 1px solid yellow !important; 
-  border-radius: 8px !important;
+/* ========== NavigationBar-Overrides ========== */
+
+/* Immer: Entferne einen eventuellen Rand unten und Zwischenraum */
+.navbar {
   margin-bottom: 0 !important;
+  border: none !important;
 }
+
+/* Normal Theme: 
+   Falls du in Normal Theme *keinen* weißen Balken willst, 
+   kannst du hier ebenso was ändern. 
+   Ansonsten lass es weg, wenn Normal ruhig weiß sein darf. */
+
+/* Dark Theme: Navbar komplett dunkel, keine Ränder */
+.theme-dark .navbar,
+.theme-dark .navbar-light,
+.theme-dark .navbar-light.bg-light,
+.theme-dark .navbar-dark.bg-light {
+  background-color: #1a1a1a !important; /* Dunkelgrau wie der Rest */
+  border: none !important;
+  /* ggf. Schriftfarbe anpassen: */
+  color: #fff !important;
+}
+
+/* High Contrast: Navbar schwarz, keine Ränder */
+.theme-high-contrast .navbar,
+.theme-high-contrast .navbar-light,
+.theme-high-contrast .navbar-light.bg-light,
+.theme-high-contrast .navbar-dark.bg-light {
+  background-color: black !important;
+  border: none !important;
+  color: yellow !important;
+}
+
