@@ -41,7 +41,7 @@
           <div
             class="card h-100 shadow-sm"
             role="article"
-            @click="gotoPage('/trainingsplan')"
+            @click="gotoPage('/training-plans')"
             style="cursor: pointer;"
           >
             <img src="/assets/trainingsplan.jpg" class="card-img-top" alt="Trainingsplan" />

@@ -6,7 +6,7 @@ import AuthView from './views/AuthView.vue'
 import OnboardingView from './views/OnboardingView.vue'
 import AddWorkoutView from './views/AddWorkoutView.vue'
 import VideosPage from './views/VideosPage.vue'
-import TrainingsplanPage from './views/TraininsplanPage.vue'
+import TrainingPlansOverview from './views/TrainingPlansOverview.vue'
 import ErnaehrungsplanPage from './views/ErnaehrungsplanPage.vue'
 
 const routes = [
@@ -16,12 +16,17 @@ const routes = [
   { path: '/profile', component: ProfileView, meta: { requiresAuth: true } },
   { path: '/upload', component: AddWorkoutView, meta: { requiresAuth: true } },
   { path: '/videos', component: VideosPage, meta: { requiresAuth: true } },
-  { path: '/trainingsplan', component: TrainingsplanPage, meta: { requiresAuth: true } },
+  { path: '/training-plans', component: TrainingPlansOverview, meta: { requiresAuth: true } },
   { path: '/ernaehrungsplan', component: ErnaehrungsplanPage, meta: { requiresAuth: true } },
   {
     path: '/workout/:id',
     name: 'ViewVideo',
     component: () => import('./views/ViewVideo.vue'),
+  },
+  {
+    path: '/training-plans/:id',
+    name: 'TrainingPlanDetail',
+    component: () => import('./views/TrainingPlanDetail.vue'),
   },
 ]
 
