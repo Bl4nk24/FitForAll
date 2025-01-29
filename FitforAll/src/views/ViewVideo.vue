@@ -31,15 +31,13 @@
                 {{ workout.description }}
             </p>
 
-            <!-- Now render the (modified) SVG string -->
-            <div class="card mb-4">
-                <div class="card-header bg-light">
-                    <h5 class="mb-0">Trainierte Muskeln</h5>
+            <!-- MUSKELAUSWAHL (SVG) -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0">Muskeln mit Problemen</h4>
                 </div>
                 <div class="card-body">
-                    <div class="svg-container mb-4" v-html="svgContent">
-
-                    </div>
+                    <div class="svg-container" v-html="svgContent"></div>
                 </div>
             </div>
 
@@ -200,6 +198,7 @@ import { supabase } from '../supabase'
 const route = useRoute()
 const workoutId = route.params.id
 
+
 // Loading & Errors
 const loading = ref(true)
 const errorMessage = ref('')
@@ -253,11 +252,22 @@ onMounted(async () => {
 
         workout.value = wData
 
-        targetMuscles.value = wData.target_muscles || []
+        targetMuscles.value = wData.target_muscles || [];
 
-        let content = svgContent.value
-        content = markActiveMuscles(content, targetMuscles.value)
-        svgContent.value = content
+        // Debug targetMuscles
+        console.log('targetMuscles:', targetMuscles.value)
+
+        // SVG "active" markieren
+        // warte 5 sekunden, bis die SVG geladen ist, kein await nextTick() möglich
+        setTimeout(() => {
+            const svgEl = document.querySelector('.svg-container')
+            if (svgEl) {
+                targetMuscles.value.forEach((muscleId) => {
+                    const el = svgEl.querySelector(`#${muscleId}`);
+                    if (el) el.classList.add("active");
+                });
+            }
+        }, 1500);
 
         // 4) Trainings-Daten (sessions + sets)
         const { data: sessionsData, error: sessionsError } = await supabase
@@ -388,22 +398,6 @@ function addSet() {
 function removeSet(index) {
     trainingSets.value.splice(index, 1)
 }
-
-function markActiveMuscles(svgString, targetIds) {
-    // For each muscle ID in targetMuscles, find the `class="s2"` for the correct path 
-    // and add " active" => class="s2 active"
-    //
-    // A simplistic approach: use a regex that matches e.g. id="muscle001" followed by 
-    // some substring up until class="s2" and insert " active". 
-    // Be careful with real-world edge cases or do a small DOM parse.
-
-    targetIds.forEach(id => {
-        const re = new RegExp(`(id="${id}"[\\s\\S]*?class="s2)"`, 'g')
-        svgString = svgString.replace(re, '$1 active')
-    })
-    return svgString
-}
-
 
 async function reloadTrainings() {
     // Neu sessions + sets
@@ -556,5 +550,42 @@ function getEmbeddedUrl(url) {
 
 .modal.show {
     display: block;
+}
+
+.svg-container {
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+/* klickbare Muskeln */
+.s2 {
+    fill: #cccccc;
+    cursor: pointer;
+    transition: fill 0.3s;
+}
+
+.s2:hover {
+    fill: #007bff;
+}
+
+.s2.active {
+    fill: #ff0000;
+}
+
+/* Modal-Overlay */
+.modal-backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Modal */
+.modal-content {
+    background-color: #ffffff;
+}
+
+.theme-dark .modal-content {
+    background-color: #333333;
+    color: #ffffff;
 }
 </style>
