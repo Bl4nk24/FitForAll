@@ -18,7 +18,6 @@ html, body {
   background-color: white !important;
   color: black !important;
 }
-
 .theme-normal html,
 .theme-normal body,
 .theme-normal #main-content,
@@ -29,13 +28,16 @@ html, body {
   background-color: white !important;
   color: black !important;
 }
+/* Kleiner Gradient im Normal Theme */
+.theme-normal .full-background {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+}
 
 /* High Contrast Theme */
 .theme-high-contrast {
   background-color: black !important;
   color: yellow !important;
 }
-
 .theme-high-contrast html,
 .theme-high-contrast body,
 .theme-high-contrast #main-content,
@@ -46,32 +48,31 @@ html, body {
   background-color: black !important;
   color: yellow !important;
 }
-
 .theme-high-contrast a {
   color: yellow !important;
 }
 .theme-high-contrast a:hover {
   color: white !important;
 }
-
 .theme-high-contrast .btn {
   background-color: #444 !important;
   color: yellow !important;
   border-color: yellow !important;
 }
-
 .theme-high-contrast .card {
   background-color: black !important;
   color: yellow !important;
   border: 2px solid yellow !important;
 }
+.theme-high-contrast .full-background {
+  background-color: black !important;
+}
 
 /* Dark Theme */
 .theme-dark {
-  background-color: #1a1a1a !important; 
+  background-color: #1a1a1a !important;
   color: white !important;
 }
-
 .theme-dark html,
 .theme-dark body,
 .theme-dark #main-content,
@@ -82,29 +83,37 @@ html, body {
   background-color: #1a1a1a !important;
   color: white !important;
 }
-
 .theme-dark a {
   color: #add8e6 !important;
 }
 .theme-dark a:hover {
   color: white !important;
 }
-
 .theme-dark .btn {
   background-color: #333 !important;
   color: white !important;
   border-color: #555 !important;
 }
-
 .theme-dark .card {
   background-color: #232323 !important;
   color: white !important;
   border: 1px solid #444 !important;
 }
+.theme-dark .full-background {
+  background-color: #1a1a1a !important;
+}
 
-/* ========== Bootstrap-Überschreibungen ========== */
+/* Videos-Hero in den verschiedenen Themes */
+.theme-dark .videos-hero {
+  background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), #007bff;
+}
+.theme-high-contrast .videos-hero {
+  background-image: none;
+  background-color: black;
+  color: yellow !important;
+}
 
-/* Container, Rows, Sections sollen einfach vererben */
+/* Container, Rows, Sections sollen vererben */
 .container,
 .row,
 section {
@@ -112,7 +121,7 @@ section {
   color: inherit !important;
 }
 
-/* Überschreibe ggf. Bootstrap .bg-light, .text-dark etc. */
+/* Bootstrap-Überschreibungen */
 .bg-light {
   background-color: #1a1a1a !important; 
 }
@@ -120,7 +129,7 @@ section {
   color: white !important;
 }
 
-/* Falls "hero-section" woanders eine Farbe hat, kannst du pro Theme überschreiben */
+/* Hero-Section im Dark/High-Contrast */
 .theme-dark .hero-section {
   background-color: #1a1a1a !important;
   color: white !important;
@@ -153,8 +162,7 @@ section {
   border-color: yellow !important;
 }
 
-/* style.css (Ergänzung) */
-/* Fixierte Position für den Vorlese-Button */
+/* Vorlese-Button unten rechts */
 .screenreader-button {
   position: fixed;
   bottom: 20px;
@@ -164,8 +172,124 @@ section {
   padding: 10px 15px;
   border-radius: 5px;
   cursor: pointer;
-  /* optional: eigenes Farbschema */
-  background-color: #0d6efd; /* Bootstraps "btn-primary" */
+  background-color: #0d6efd;
   color: #fff;
   border: none;
 }
+
+/* ===================== */
+/* ALLES KOMPLETT DUNKEL MACHEN IN DARK/HC 
+   UND BUTTON-HOVER-FARBEN */
+/* ===================== */
+
+/* 1) Dark Theme: Alle Container dunkel */
+body.theme-dark,
+body.theme-dark #app,
+body.theme-dark .page,
+body.theme-dark .full-background,
+body.theme-dark section,
+body.theme-dark .container,
+body.theme-dark .row {
+  background-color: #1a1a1a !important;
+  color: #ffffff !important;
+}
+
+/* Button-Hover-Farben im Dark Theme */
+body.theme-dark .btn-success:hover {
+  background-color: #218838 !important; /* typisches Bootstrap-Grün */
+}
+body.theme-dark .btn-warning:hover {
+  background-color: #e0a800 !important; /* typisches Bootstrap-Orange */
+}
+
+/* 2) High Contrast: Alles komplett schwarz */
+body.theme-high-contrast,
+body.theme-high-contrast #app,
+body.theme-high-contrast .page,
+body.theme-high-contrast .full-background,
+body.theme-high-contrast section,
+body.theme-high-contrast .container,
+body.theme-high-contrast .row {
+  background-color: black !important;
+  color: yellow !important;
+}
+
+/* Button-Hover-Farben im High Contrast */
+body.theme-high-contrast .btn-success:hover {
+  background-color: green !important;
+  color: black !important;
+  border-color: black !important;
+}
+body.theme-high-contrast .btn-warning:hover {
+  background-color: orange !important;
+  color: black !important;
+  border-color: black !important;
+}
+
+/* .container in Dark/High Contrast -> volle Breite */
+.theme-dark .container,
+.theme-high-contrast .container {
+  max-width: 100% !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding-left: 2rem !important;
+  padding-right: 2rem !important;
+}
+
+/* Separator-Farbe pro Theme */
+.theme-normal .separator {
+  background: #ddd !important;
+}
+.theme-dark .separator {
+  background: #444 !important;
+  height: 2px;
+}
+.theme-high-contrast .separator {
+  background: yellow !important;
+  height: 2px;
+}
+
+/* Header im Dark/High Contrast ohne Rundung, kein Weiß */
+.theme-dark .header,
+.theme-high-contrast .header {
+  background-color: #1a1a1a !important; /* oder black */
+  border-bottom: 1px solid #444 !important;
+  border-radius: 0 !important;  /* KEINE Abrundungen! */
+  margin-bottom: 0 !important;
+  overflow: hidden !important;
+}
+
+/* ========== NavigationBar-Overrides ========== */
+
+/* Immer: Entferne einen eventuellen Rand unten und Zwischenraum */
+.navbar {
+  margin-bottom: 0 !important;
+  border: none !important;
+}
+
+/* Normal Theme: 
+   Falls du in Normal Theme *keinen* weißen Balken willst, 
+   kannst du hier ebenso was ändern. 
+   Ansonsten lass es weg, wenn Normal ruhig weiß sein darf. */
+
+/* Dark Theme: Navbar komplett dunkel, keine Ränder */
+.theme-dark .navbar,
+.theme-dark .navbar-light,
+.theme-dark .navbar-light.bg-light,
+.theme-dark .navbar-dark.bg-light {
+  background-color: #1a1a1a !important; /* Dunkelgrau wie der Rest */
+  border: none !important;
+  /* ggf. Schriftfarbe anpassen: */
+  color: #fff !important;
+}
+
+/* High Contrast: Navbar schwarz, keine Ränder */
+.theme-high-contrast .navbar,
+.theme-high-contrast .navbar-light,
+.theme-high-contrast .navbar-light.bg-light,
+.theme-high-contrast .navbar-dark.bg-light {
+  background-color: black !important;
+  border: none !important;
+  color: yellow !important;
+}
+

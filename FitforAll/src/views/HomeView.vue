@@ -110,8 +110,6 @@ export default {
   background-color: inherit; /* Erbt das globale Farbschema */
 }
 
-/* Hero-Bereich: du kannst hier die Standardfarbe für "normal" drinlassen.
-   Für .theme-dark/.theme-high-contrast machen wir Overrides in style.css */
 .hero-section {
   background-color: var(--primary-color, #007bff); /* standard-blau */
   color: white;
@@ -121,12 +119,10 @@ export default {
   min-height: 500px;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
-
 .card:hover {
   transform: translateY(-10px);
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
 }
-
 .card-img-top {
   height: 300px;
   object-fit: cover;

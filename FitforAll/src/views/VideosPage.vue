@@ -1,42 +1,55 @@
 <template>
-  <div class="container my-5">
-    <h1 class="mb-4">Deine Workout-Bibliothek</h1>
-
-    <!-- Fehlermeldung -->
-    <div v-if="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
-
-    <!-- Ladeanzeige -->
-    <div v-else-if="loading" class="text-center">
-      <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Loading...</span>
+  <div class="videos-page">
+    <!-- Hero-Bereich -->
+    <section class="videos-hero text-center py-5 mb-4">
+      <div class="container">
+        <h1 class="display-4 fw-bold">Deine Workout-Bibliothek</h1>
+        <p class="lead">
+          Finde Workouts, die zu dir passen – jederzeit und überall.
+        </p>
       </div>
-      <p class="mt-2">Lade Workouts...</p>
-    </div>
+    </section>
 
-    <!-- Gefilterte Workouts -->
-    <div v-else>
-      <!-- Keine passenden Workouts -->
-      <div v-if="filteredWorkouts.length === 0" class="alert alert-info">
-        Keine passenden Workouts gefunden.
+    <!-- Inhalt -->
+    <div class="container my-5">
+      <!-- Fehlermeldung -->
+      <div v-if="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+
+      <!-- Ladeanzeige -->
+      <div v-else-if="loading" class="text-center">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-2">Lade Workouts...</p>
       </div>
 
-      <!-- Grid aus Karten -->
-      <div class="row row-cols-1 row-cols-md-3 g-4">
-        <div class="col" v-for="workout in filteredWorkouts" :key="workout.id">
-          <div class="card h-100 shadow-sm position-relative">
-            <!-- Vorschaubild (YouTube-Thumbnail oder Fallback) -->
-            <!-- Wrap das <img> in <router-link> -->
-            <router-link :to="`/workout/${workout.id}`">
-              <img :src="getYoutubeThumbnail(workout.video_url)" class="card-img-top" alt="Workout Thumbnail"
-                style="max-height: 180px; object-fit: cover; cursor: pointer;" />
-            </router-link>
+      <!-- Gefilterte Workouts -->
+      <div v-else>
+        <!-- Keine passenden Workouts -->
+        <div v-if="filteredWorkouts.length === 0" class="alert alert-info">
+          Keine passenden Workouts gefunden.
+        </div>
 
-            <div class="card-body d-flex flex-column">
-              <h5 class="card-title mb-2">{{ workout.name }}</h5>
-              <!-- Kurzer Auszug aus der Beschreibung -->
-              <p class="card-text">
-                {{ excerpt(workout.description, 80) }}
-              </p>
+        <!-- Grid aus Karten -->
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+          <div class="col" v-for="workout in filteredWorkouts" :key="workout.id">
+            <div class="card h-100 shadow-sm position-relative">
+              <!-- Vorschaubild (YouTube-Thumbnail) -->
+              <router-link :to="`/workout/${workout.id}`">
+                <img
+                  :src="getYoutubeThumbnail(workout.video_url)"
+                  class="card-img-top"
+                  alt="Workout Thumbnail"
+                  style="max-height: 180px; object-fit: cover; cursor: pointer;"
+                />
+              </router-link>
+
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title mb-2">{{ workout.name }}</h5>
+                <p class="card-text">
+                  {{ excerpt(workout.description, 80) }}
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -49,20 +62,17 @@
 import { ref, onMounted } from 'vue'
 import { supabase } from '../supabase'
 
-// Lade-States
 const loading = ref(true)
 const errorMessage = ref('')
 
-// Gesamte Workout-Liste
 const workouts = ref([])
-// Gefilterte Workouts
 const filteredWorkouts = ref([])
 
 onMounted(async () => {
   loading.value = true
   errorMessage.value = ''
 
-  // 1) User check
+  // 1) Auth-Check
   const { data: authData, error: authError } = await supabase.auth.getUser()
   if (authError || !authData?.user) {
     errorMessage.value = 'Du bist nicht eingeloggt.'
@@ -70,7 +80,7 @@ onMounted(async () => {
     return
   }
 
-  // 2) problem_muscle_groups des Nutzers
+  // 2) problem_muscle_groups
   let userProblemMuscles = []
   try {
     const { data: userSettingsData, error: userSettingsError } = await supabase
@@ -103,7 +113,7 @@ onMounted(async () => {
     return
   }
 
-  // 4) Filter: nur Workouts, die keine Overlap mit userProblemMuscles haben
+  // 4) Filter: Workouts ohne Overlap mit userProblemMuscles
   filteredWorkouts.value = workouts.value.filter((workout) => {
     const pm = workout.problem_muscle_groups || []
     return !pm.some((muscle) => userProblemMuscles.includes(muscle))
@@ -112,18 +122,12 @@ onMounted(async () => {
   loading.value = false
 })
 
-/**
- * Beschreibungs-Auszug
- */
 function excerpt(text, maxLength) {
   if (!text) return ''
   if (text.length <= maxLength) return text
   return text.slice(0, maxLength) + '...'
 }
 
-/**
- * YouTube-Thumbnail
- */
 function getYoutubeThumbnail(url) {
   if (!url) return '/fallback-thumbnail.jpg'
   try {
@@ -148,6 +152,17 @@ function getYoutubeThumbnail(url) {
 </script>
 
 <style scoped>
+.videos-hero {
+  background: var(--videospage-bg, #007bff);
+  color: #fff;
+  border-radius: 0 0 10px 10px;
+  background-image: linear-gradient(
+    rgba(0, 0, 0, 0.2),
+    rgba(0, 0, 0, 0.2)
+  ), 
+  var(--videospage-bg, #007bff);
+}
+
 .container {
   max-width: 900px;
 }

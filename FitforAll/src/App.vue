@@ -1,20 +1,33 @@
 <template>
+  <!-- Äußeres Wrapper-DIV, gesteuert vom Theme -->
   <div :class="themeClass">
+    <!-- Navigation oben -->
     <NavigationBar @toggleTheme="changeTheme" />
+
+    <!-- Hauptbereich für Router -->
     <main id="main-content" class="mt-4">
       <router-view />
     </main>
+
+    <!-- ScreenReader-Button unten rechts -->
+    <ScreenReaderButton />
   </div>
 </template>
+
 <script>
 import NavigationBar from './components/NavigationBar.vue';
+import ScreenReaderButton from './views/ScreenReader.vue';
+
 export default {
+  name: 'App',
   components: {
     NavigationBar,
+    ScreenReaderButton,
   },
   computed: {
     themeClass() {
-      return document.body.className; // Greift auf die globale Design-Klasse zu
+      // Liest die globale Klasse vom <body> aus
+      return document.body.className;
     },
   },
   methods: {
@@ -25,6 +38,8 @@ export default {
 };
 </script>
 <style>
+/* ========== Themestyles (kannst du 1:1 übernehmen) ========== */
+
 /* Normal Theme */
 .theme-normal {
   background-color: white;
