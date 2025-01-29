@@ -31,14 +31,15 @@
                 {{ workout.description }}
             </p>
 
-            <!-- SVG mit trainierten Muskeln (READ-ONLY) -->
+            <!-- Now render the (modified) SVG string -->
             <div class="card mb-4">
                 <div class="card-header bg-light">
                     <h5 class="mb-0">Trainierte Muskeln</h5>
                 </div>
                 <div class="card-body">
-                    <!-- Wir binden die SVG -> read-only, keine Klick-Funktion -->
-                    <div class="svg-container" v-html="svgContent"></div>
+                    <div class="svg-container mb-4" v-html="svgContent">
+
+                    </div>
                 </div>
             </div>
 
@@ -235,13 +236,13 @@ const monthName = computed(() => monthNames[month] || '')
 
 // onMounted
 onMounted(async () => {
-    loading.value = true
-    const res = await fetch("/assets/Muscle_Map.svg");
-    const rawSvg = await res.text();
-    const parser = new DOMParser();
-    const svgDoc = parser.parseFromString(rawSvg, "image/svg+xml");
-    const pathWithIds = svgDoc.querySelectorAll("path[id]");
-    console.log("Gefundene IDs (im <symbol> / <defs> evtl. Unsichtbar):", [...pathWithIds].map(el => el.id));
+    // 2) SVG laden
+    try {
+        const response = await fetch("/assets/Muscle_Map.svg");
+        svgContent.value = await response.text();
+    } catch (error) {
+        console.error("Fehler beim Laden der SVG:", error);
+    }
     try {
         // 1) Workout-Daten laden
         const { data: wData } = await supabase
@@ -254,30 +255,9 @@ onMounted(async () => {
 
         targetMuscles.value = wData.target_muscles || []
 
-        // 3) Nach DOM-Update -> markiere Muskeln
-
-        // Debug
-        console.log("Lade SVG...");
-        try {
-            const res = await fetch("/assets/Muscle_Map.svg");
-            svgContent.value = await res.text();
-            while (!svgContent.value) {
-                await new Promise(resolve => setTimeout(resolve, 100));
-            }
-            console.log("SVG geladen, Länge:", svgContent.value?.length);
-            await nextTick();
-            const pathIds = document.querySelectorAll('path[id]');
-            console.log("Vorhandene path-IDs:");
-            pathIds.forEach(el => console.log(el.id));
-            console.log("TargetMuscles:", targetMuscles.value);
-            targetMuscles.value.forEach((muscleId) => {
-                const el = document.getElementById(muscleId);
-                console.log(`Suche ${muscleId}:`, el);
-                if (el) el.classList.add("active");
-            });
-        } catch (error) {
-            console.error("Fehler beim Laden:", error);
-        }
+        let content = svgContent.value
+        content = markActiveMuscles(content, targetMuscles.value)
+        svgContent.value = content
 
         // 4) Trainings-Daten (sessions + sets)
         const { data: sessionsData, error: sessionsError } = await supabase
@@ -409,6 +389,22 @@ function removeSet(index) {
     trainingSets.value.splice(index, 1)
 }
 
+function markActiveMuscles(svgString, targetIds) {
+    // For each muscle ID in targetMuscles, find the `class="s2"` for the correct path 
+    // and add " active" => class="s2 active"
+    //
+    // A simplistic approach: use a regex that matches e.g. id="muscle001" followed by 
+    // some substring up until class="s2" and insert " active". 
+    // Be careful with real-world edge cases or do a small DOM parse.
+
+    targetIds.forEach(id => {
+        const re = new RegExp(`(id="${id}"[\\s\\S]*?class="s2)"`, 'g')
+        svgString = svgString.replace(re, '$1 active')
+    })
+    return svgString
+}
+
+
 async function reloadTrainings() {
     // Neu sessions + sets
     const { data: sessionsData } = await supabase
@@ -535,26 +531,6 @@ function getEmbeddedUrl(url) {
 </script>
 
 <style scoped>
-/* SVG Container -> read-only */
-.svg-container {
-    width: 100%;
-    height: auto;
-    max-width: 100%;
-    overflow: hidden;
-}
-
-.s2 {
-    fill: #cccccc;
-    cursor: pointer;
-    transition: fill 0.3s;
-}
-
-
-.s2.active {
-    fill: #0056b3;
-    /* Blaue Hervorhebung aus dem SVG */
-}
-
 /* Tag-Zellen im Kalender */
 .day-cell {
     cursor: pointer;
