@@ -21,21 +21,35 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { computed } from 'vue';
 
 /**
- * Beispiel: Dynamische Seitentitel 
- * (Trainingsplan, Ernährungsplan, etc.)
+ * Props für dynamische Titel/Subtitel
+ * Titel & Untertitel übergeben (z.B. in einer Eltern-Komponente):
+ * <PageLayout
+ *   pageTitle="Ernährungsplan"
+ *   pageSubtitle="Dein Weg zur optimalen Ernährung"
+ * >
+ *   ... dein Inhalt ...
+ * </PageLayout>
  */
-const pageTitle = ref('Seiten Titel'); 
-const pageSubtitle = ref('Seiten Untertitel'); 
+const props = defineProps({
+  pageTitle: {
+    type: String,
+    default: 'Seiten Titel'
+  },
+  pageSubtitle: {
+    type: String,
+    default: 'Seiten Untertitel'
+  }
+});
 
 /**
- * Wir wählen nun KLASSE je nach Titel,
- * statt border-top inline zu setzen.
+ * Dynamische Klasse auf Basis des Titles
+ * (z.B. anderer Header-Hintergrund für Trainingsplan / Ernährungsplan)
  */
 const headerClass = computed(() => {
-  switch (pageTitle.value.toLowerCase()) {
+  switch (props.pageTitle.toLowerCase()) {
     case 'trainingsplan':
       return 'header-trainingsplan';
     case 'ernährungsplan':
@@ -46,7 +60,7 @@ const headerClass = computed(() => {
 });
 </script>
 
-<style>
+<style scoped>
 .page {
   display: flex;
   flex-direction: column;
@@ -65,14 +79,11 @@ const headerClass = computed(() => {
 .header {
   text-align: center;
   margin-bottom: 0;
-  /* Im Normal Theme leicht transparent => wird später 
-     in Dark/HighContrast überschrieben */
   background-color: rgba(255, 255, 255, 0.05);
   border: none;
 }
 
-/* Spezifische Seiten-Farben:
-   Statt border-top nutzen wir direkt die Hintergrundfarbe */
+/* Verschiedene Header-Farben je nach Seite */
 .header-trainingsplan {
   background-color: #28a745; /* Grün */
 }
@@ -85,14 +96,14 @@ const headerClass = computed(() => {
   background-color: #007bff; /* Blau */
 }
 
-/* Separator (dünne Linie) */
+/* Kleiner Trenner unter dem Header */
 .separator {
   width: 100%;
   height: 3px;
   background: var(--separator-color, #ccc);
 }
 
-/* Card/Button etc. (wie gehabt) */
+/* Beispielhafte Styles für Buttons oder Cards */
 .btn {
   border-radius: 20px;
   box-shadow: 2px 2px 8px rgba(0,0,0,0.3);
@@ -101,6 +112,7 @@ const headerClass = computed(() => {
 .btn:hover {
   transform: scale(1.05);
 }
+
 .card {
   border-radius: 10px;
   overflow: hidden;

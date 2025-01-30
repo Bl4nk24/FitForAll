@@ -1,9 +1,12 @@
 <template>
-  <PageLayout>
+  <PageLayout
+    pageTitle="Ernährungsplan"
+    pageSubtitle="Dein Weg zur optimalen Ernährung"
+  >
     <template #default>
       <div class="ernaehrungsplan-page container">
-        <!-- Überschrift -->
-        <h1 class="text-center mb-5 fw-bold">Vegetarische Ernährungspläne</h1>
+        <!-- Überschrift: -->
+        <h2 class="text-center mb-5 fw-bold">Vegetarische Ernährungspläne</h2>
 
         <!-- Vordefinierte Ernährungspläne (CUT, STAY, BULK) -->
         <div class="row justify-content-center">
@@ -13,6 +16,13 @@
             class="col-md-4 mb-4"
           >
             <div class="card h-100">
+              <!-- NEU: Bild einfügen -->
+              <img
+                v-if="plan.imageUrl"
+                :src="plan.imageUrl"
+                class="card-img-top"
+                :alt="'Bild - ' + plan.title"
+              >
               <div class="card-body d-flex flex-column justify-content-between">
                 <div>
                   <h5 class="card-title">{{ plan.title }}</h5>
@@ -77,7 +87,7 @@
                 />
               </div>
 
-              <!-- Ernährungsweise (Vegetarisch, Vegan, Normal) -->
+              <!-- Ernährungsweise -->
               <div class="mb-3">
                 <label for="preference" class="form-label">Ernährungsweise</label>
                 <select
@@ -104,30 +114,34 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import PageLayout from './PageLayout.vue';
+import { ref } from 'vue'
+import PageLayout from './PageLayout.vue'
 
 // Vordefinierte vegetarische Ernährungspläne (Cut, Stay, Bulk)
+// Hier fügen wir die passenden Bild-URLs hinzu (imageUrl)
 const predefinedPlans = ref([
   {
     id: 1,
     title: 'Cut',
     description:
-      'Reduziere gezielt Kalorien und fördere Fettabbau mit unserem professionellen vegetarischen Cut-Plan.'
+      'Reduziere gezielt Kalorien und fördere Fettabbau mit unserem professionellen vegetarischen Cut-Plan.',
+    imageUrl: new URL('/assets/Cut.png', import.meta.url).href
   },
   {
     id: 2,
     title: 'Stay',
     description:
-      'Halte dein Gewicht stabil und bleibe fit mit unserem ausgewogenen vegetarischen Stay-Plan.'
+      'Halte dein Gewicht stabil und bleibe fit mit unserem ausgewogenen vegetarischen Stay-Plan.',
+    imageUrl: new URL('/assets/Stay.png', import.meta.url).href
   },
   {
     id: 3,
     title: 'Bulk',
     description:
-      'Erhöhe deine Kalorienzufuhr und baue effektiv Muskeln auf mit unserem vegetarischen Bulk-Plan.'
+      'Erhöhe deine Kalorienzufuhr und baue effektiv Muskeln auf mit unserem vegetarischen Bulk-Plan.',
+    imageUrl: new URL('/assets/Bulk.png', import.meta.url).href
   }
-]);
+])
 
 // Daten für den individuellen Plan
 const formData = ref({
@@ -135,18 +149,15 @@ const formData = ref({
   height: null,
   weight: null,
   preference: 'vegetarisch'
-});
+})
 
 // Platzhalter-Funktion zum Herunterladen eines fertigen Plans
 function downloadPlan(plan) {
-  // Hier könnte z. B. ein PDF generiert oder ein Download-Link abgerufen werden
-  alert(`Der "${plan.title}"-Plan (vegetarisch) wird heruntergeladen...`);
+  alert(`Der "${plan.title}"-Plan (vegetarisch) wird heruntergeladen...`)
 }
 
 // Platzhalter-Funktion zum Generieren eines individuellen Plans
 function generateCustomPlan() {
-  // Hier könnte eine API oder ein PDF-Generator aufgerufen werden, um den Plan zu erstellen
-  // Anschließend kann eine Datei zum Download angeboten werden
   alert(
     `Dein individueller Plan wird erstellt:\n` +
     `- Ziel: ${formData.value.goal}\n` +
@@ -154,7 +165,7 @@ function generateCustomPlan() {
     `- Gewicht: ${formData.value.weight} kg\n` +
     `- Ernährungsweise: ${formData.value.preference}\n\n` +
     `Ein detaillierter Ernährungsplan wird generiert und steht gleich zum Download bereit.`
-  );
+  )
 }
 </script>
 
@@ -171,6 +182,12 @@ function generateCustomPlan() {
 
 .card-body {
   text-align: center;
+}
+
+.card-img-top {
+  /* Optional: ein wenig Styling fürs Bild */
+  max-height: 200px;
+  object-fit: cover;
 }
 
 hr {
