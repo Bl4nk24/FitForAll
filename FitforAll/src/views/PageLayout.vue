@@ -24,14 +24,7 @@
 import { computed } from 'vue';
 
 /**
- * Props für dynamische Titel/Subtitel
- * Titel & Untertitel übergeben (z.B. in einer Eltern-Komponente):
- * <PageLayout
- *   pageTitle="Ernährungsplan"
- *   pageSubtitle="Dein Weg zur optimalen Ernährung"
- * >
- *   ... dein Inhalt ...
- * </PageLayout>
+ * PageLayout: Dynamischer Titel & Untertitel per Props
  */
 const props = defineProps({
   pageTitle: {
@@ -45,8 +38,8 @@ const props = defineProps({
 });
 
 /**
- * Dynamische Klasse auf Basis des Titles
- * (z.B. anderer Header-Hintergrund für Trainingsplan / Ernährungsplan)
+ * Dynamische Header-Klasse je nach Titel (optional),
+ * damit du für bestimmte Titel andere Hintergründe nutzen kannst.
  */
 const headerClass = computed(() => {
   switch (props.pageTitle.toLowerCase()) {
@@ -66,7 +59,7 @@ const headerClass = computed(() => {
   flex-direction: column;
   min-height: 100vh;
   width: 100%;
-  margin: 0; /* Kein weißer Rand */
+  margin: 0;
   padding: 0;
 }
 
@@ -83,7 +76,7 @@ const headerClass = computed(() => {
   border: none;
 }
 
-/* Verschiedene Header-Farben je nach Seite */
+/* Header-Farben je nach Seite */
 .header-trainingsplan {
   background-color: #28a745; /* Grün */
 }
@@ -96,19 +89,20 @@ const headerClass = computed(() => {
   background-color: #007bff; /* Blau */
 }
 
-/* Kleiner Trenner unter dem Header */
+/* Separator (dünne Trennlinie) */
 .separator {
   width: 100%;
   height: 3px;
   background: var(--separator-color, #ccc);
 }
 
-/* Beispielhafte Styles für Buttons oder Cards */
+/* Beispiel-Styles für Buttons/Cards */
 .btn {
   border-radius: 20px;
   box-shadow: 2px 2px 8px rgba(0,0,0,0.3);
   transition: all 0.3s ease;
 }
+
 .btn:hover {
   transform: scale(1.05);
 }
@@ -119,6 +113,7 @@ const headerClass = computed(() => {
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
   transition: transform 0.2s;
 }
+
 .card:hover {
   transform: scale(1.03);
 }

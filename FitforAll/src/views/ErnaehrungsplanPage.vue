@@ -16,7 +16,7 @@
             class="col-md-4 mb-4"
           >
             <div class="card h-100">
-              <!-- NEU: Bild einfügen -->
+              <!-- Bild (optional) -->
               <img
                 v-if="plan.imageUrl"
                 :src="plan.imageUrl"
@@ -87,19 +87,52 @@
                 />
               </div>
 
-              <!-- Ernährungsweise -->
+              <!-- Ernährungsweise (MEHRFACH-Auswahl per Checkbox) -->
               <div class="mb-3">
-                <label for="preference" class="form-label">Ernährungsweise</label>
-                <select
-                  id="preference"
-                  class="form-select"
-                  v-model="formData.preference"
-                  required
+                <label class="form-label">Ernährungsweise</label>
+                <div
+                  v-for="option in dietaryOptions"
+                  :key="option.value"
+                  class="form-check"
                 >
-                  <option value="vegetarisch">Vegetarisch</option>
-                  <option value="vegan">Vegan</option>
-                  <option value="normal">Normal</option>
-                </select>
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    :value="option.value"
+                    v-model="formData.dietaryPreferences"
+                    :id="'diet-'+option.value"
+                  />
+                  <label
+                    class="form-check-label"
+                    :for="'diet-'+option.value"
+                  >
+                    {{ option.label }}
+                  </label>
+                </div>
+              </div>
+
+              <!-- Allergien (MEHRFACH-Auswahl per Checkbox) -->
+              <div class="mb-3">
+                <label class="form-label">Allergien / Unverträglichkeiten</label>
+                <div
+                  v-for="allergy in allergyOptions"
+                  :key="allergy.value"
+                  class="form-check"
+                >
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    :value="allergy.value"
+                    v-model="formData.allergies"
+                    :id="'allergy-'+allergy.value"
+                  />
+                  <label
+                    class="form-check-label"
+                    :for="'allergy-'+allergy.value"
+                  >
+                    {{ allergy.label }}
+                  </label>
+                </div>
               </div>
 
               <button type="submit" class="btn btn-warning w-100">
@@ -117,8 +150,7 @@
 import { ref } from 'vue'
 import PageLayout from './PageLayout.vue'
 
-// Vordefinierte vegetarische Ernährungspläne (Cut, Stay, Bulk)
-// Hier fügen wir die passenden Bild-URLs hinzu (imageUrl)
+// ========== 1) Cards (Cut, Stay, Bulk) mit Bildern ==========
 const predefinedPlans = ref([
   {
     id: 1,
@@ -143,27 +175,49 @@ const predefinedPlans = ref([
   }
 ])
 
-// Daten für den individuellen Plan
+// ========== 2) Ernährungsweise (Checkboxen) ==========
+const dietaryOptions = [
+  { value: 'vegetarisch', label: 'Vegetarisch' },
+  { value: 'vegan', label: 'Vegan' },
+  { value: 'pescetarisch', label: 'Pescetarisch' },
+  { value: 'lowcarb', label: 'Low-Carb' }
+]
+
+// ========== 3) Allergien (Checkboxen) ==========
+const allergyOptions = [
+  { value: 'nussallergie', label: 'Nussallergie' },
+  { value: 'laktose', label: 'Laktoseintoleranz' },
+  { value: 'gluten', label: 'Glutenunverträglichkeit' },
+  { value: 'eiallergie', label: 'Eiallergie' }
+]
+
+// ========== 4) Formulardaten ==========
 const formData = ref({
   goal: '',
   height: null,
   weight: null,
-  preference: 'vegetarisch'
+
+  // Mehrfachauswahl via Arrays
+  dietaryPreferences: [],
+  allergies: []
 })
 
-// Platzhalter-Funktion zum Herunterladen eines fertigen Plans
+// ========== 5) Funktionen ==========
 function downloadPlan(plan) {
-  alert(`Der "${plan.title}"-Plan (vegetarisch) wird heruntergeladen...`)
+  alert(`Der "${plan.title}"-Plan wird heruntergeladen...`)
 }
 
-// Platzhalter-Funktion zum Generieren eines individuellen Plans
 function generateCustomPlan() {
+  const chosenDiets = formData.value.dietaryPreferences.join(', ') || 'keine'
+  const chosenAllergies = formData.value.allergies.join(', ') || 'keine'
+
   alert(
     `Dein individueller Plan wird erstellt:\n` +
     `- Ziel: ${formData.value.goal}\n` +
     `- Größe: ${formData.value.height} cm\n` +
     `- Gewicht: ${formData.value.weight} kg\n` +
-    `- Ernährungsweise: ${formData.value.preference}\n\n` +
+    `- Ernährungsweisen: ${chosenDiets}\n` +
+    `- Allergien: ${chosenAllergies}\n\n` +
     `Ein detaillierter Ernährungsplan wird generiert und steht gleich zum Download bereit.`
   )
 }
@@ -175,6 +229,7 @@ function generateCustomPlan() {
   margin: 0 auto;
 }
 
+/* Card-Styling */
 .card {
   border: 1px solid #ddd;
   border-radius: 6px;
@@ -184,12 +239,13 @@ function generateCustomPlan() {
   text-align: center;
 }
 
+/* Bild oben in der Card */
 .card-img-top {
-  /* Optional: ein wenig Styling fürs Bild */
   max-height: 200px;
   object-fit: cover;
 }
 
+/* Trennlinie */
 hr {
   margin: 3rem 0;
 }
