@@ -12,6 +12,7 @@
         "@popperjs/core": "^2.11.8",
         "@supabase/supabase-js": "^2.47.10",
         "bootstrap": "^5.3.3",
+        "bootstrap-icons": "^1.11.3",
         "fitforall": "file:",
         "vue": "^3.5.13",
         "vue-router": "^4.0.13"
