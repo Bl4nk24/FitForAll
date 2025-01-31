@@ -21,17 +21,11 @@
         <h3 class="mb-0">Meine Pläne</h3>
         <div>
           <!-- Automatisch -->
-          <button
-            class="btn btn-success me-2"
-            @click="showAutoWizard = true"
-          >
+          <button class="btn btn-success me-2" @click="showAutoWizard = true">
             Automatisch erstellen
           </button>
           <!-- Manuell -->
-          <button
-            class="btn btn-secondary"
-            @click="showManualModal = true"
-          >
+          <button class="btn btn-secondary" @click="showManualModal = true">
             Manuell erstellen
           </button>
         </div>
@@ -40,11 +34,8 @@
       <!-- Liste der vorhandenen Pläne -->
       <div v-if="plans.length > 0">
         <ul class="list-group">
-          <li
-            class="list-group-item d-flex justify-content-between align-items-center"
-            v-for="(plan, index) in plans"
-            :key="plan.id"
-          >
+          <li class="list-group-item d-flex justify-content-between align-items-center" v-for="(plan, index) in plans"
+            :key="plan.id">
             <!-- Nur Plan-Name und Erstell-Datum -->
             <div>
               <strong>{{ plan.plan_name || 'Unbenannter Plan' }}</strong>
@@ -53,35 +44,28 @@
               </small>
             </div>
 
-            <!-- Rechts: Anzeigen + Drei-Punkte-Menü -->
+            <!-- Rechts: Buttons -->
             <div class="d-flex align-items-center">
+              <!-- Training starten -->
+              <router-link :to="`/training-plans/${plan.id}/start`" class="btn btn-success btn-sm me-2">
+                Training starten
+              </router-link>
+
               <!-- Detail-Link -->
-              <router-link
-                :to="`/training-plans/${plan.id}`"
-                class="btn btn-outline-primary btn-sm me-2"
-              >
+              <router-link :to="`/training-plans/${plan.id}/detail`" class="btn btn-outline-primary btn-sm me-2">
                 Anzeigen
               </router-link>
 
               <!-- Dropdown: 3-Punkte -->
               <div class="dropdown" @click.stop>
-                <button
-                  class="btn btn-sm btn-outline-secondary dropdown-toggle"
-                  type="button"
-                  @click="toggleDropdown(index)"
-                >
+                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
+                  @click="toggleDropdown(index)">
                   ⋮
                 </button>
                 <!-- Menü -->
-                <ul
-                  class="dropdown-menu dropdown-menu-end"
-                  :class="{ show: openDropdownIndex === index }"
-                >
+                <ul class="dropdown-menu dropdown-menu-end" :class="{ show: openDropdownIndex === index }">
                   <li>
-                    <button
-                      class="dropdown-item"
-                      @click="renamePlan(plan, index)"
-                    >
+                    <button class="dropdown-item" @click="renamePlan(plan, index)">
                       Umbenennen
                     </button>
                   </li>
@@ -89,10 +73,7 @@
                     <hr class="dropdown-divider" />
                   </li>
                   <li>
-                    <button
-                      class="dropdown-item text-danger"
-                      @click="deletePlan(plan, index)"
-                    >
+                    <button class="dropdown-item text-danger" @click="deletePlan(plan, index)">
                       Löschen
                     </button>
                   </li>
@@ -108,18 +89,10 @@
     </div>
 
     <!-- Auto-Wizard (automatische Filterlogik) -->
-    <AutoPlanWizard
-      v-if="showAutoWizard"
-      @close="showAutoWizard = false"
-      @plan-created="onPlanCreated"
-    />
+    <AutoPlanWizard v-if="showAutoWizard" @close="showAutoWizard = false" @plan-created="onPlanCreated" />
 
     <!-- Manuelles Modal -->
-    <ManualPlanModal
-      v-if="showManualModal"
-      @close="showManualModal = false"
-      @plan-created="onPlanCreated"
-    />
+    <ManualPlanModal v-if="showManualModal" @close="showManualModal = false" @plan-created="onPlanCreated" />
   </div>
 </template>
 
@@ -256,11 +229,12 @@ async function deletePlan(plan, idx) {
   top: 100%;
   right: 0;
   margin-top: 0.25rem;
-  display: none; /* Standard: none */
+  display: none;
+  /* Standard: none */
 
   /* Minimales Styling, du kannst Bootstrap-Klassen etc. verwenden */
   background-color: #fff;
-  border: 1px solid rgba(0,0,0,0.15);
+  border: 1px solid rgba(0, 0, 0, 0.15);
 }
 
 /* Wenn .show => Menü sichtbar */
