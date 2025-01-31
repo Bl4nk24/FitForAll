@@ -52,7 +52,7 @@
               </div>
               <div class="stat-item">
                 <i class="bi bi-heart-pulse"></i>
-                <span>Trainierte Muskelgruppen: {{ trainedMuscles.length }}</span>
+                <span>Trainierte Muskelgruppen: {{ allTrainedMuscles.length }}</span>
               </div>
             </div>
 
@@ -62,7 +62,7 @@
             </div>
 
             <button class="btn btn-success btn-lg" @click="finishWorkout">
-              Workout vollständig beenden <!-- Text angepasst -->
+              Workout vollständig beenden
             </button>
           </div>
         </div>
