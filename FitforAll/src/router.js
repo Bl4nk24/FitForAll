@@ -24,7 +24,7 @@ const routes = [
     component: () => import('./views/ViewVideo.vue'),
   },
   {
-    path: '/training-plans/:id',
+    path: '/training-plans/:planId',
     name: 'TrainingPlanDetail',
     component: () => import('./views/TrainingPlanDetail.vue'),
   },
