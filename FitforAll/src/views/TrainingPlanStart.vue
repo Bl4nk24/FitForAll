@@ -35,9 +35,36 @@
           </div>
         </div>
 
-        <!-- Summary View -->
+        <!-- Zusammenfassung anzeigen -->
         <div v-else-if="showSummary" class="summary-container">
-          <!-- ... Zusammenfassungsinhalt ... -->
+          <div class="summary-card">
+            <h2 class="mb-4">Workout abgeschlossen! 🎉</h2>
+
+            <!-- Muskelkarte -->
+            <div class="muscle-map-summary mb-5" v-if="svgContent" v-html="getSummaryMuscles"></div>
+
+            <!-- Statistiken -->
+            <div class="stats mb-4">
+              <h4 class="mb-3">Deine Leistung:</h4>
+              <div class="stat-item">
+                <i class="bi bi-lightning-charge"></i>
+                <span>Gesamtvolumen: {{ totalVolume }} kg</span>
+              </div>
+              <div class="stat-item">
+                <i class="bi bi-heart-pulse"></i>
+                <span>Trainierte Muskelgruppen: {{ trainedMuscles.length }}</span>
+              </div>
+            </div>
+
+            <!-- Danke-Nachricht -->
+            <div class="thank-you-message mb-4">
+              <p>Danke für dein Training! Weiter so!</p>
+            </div>
+
+            <button class="btn btn-success btn-lg" @click="finishWorkout">
+              Workout vollständig beenden <!-- Text angepasst -->
+            </button>
+          </div>
         </div>
       </div>
 
@@ -601,7 +628,8 @@ onUnmounted(() => {
 .video-section {
   background: #000;
   position: relative;
-  padding-top: 56.25%; /* 16:9 */
+  padding-top: 56.25%;
+  /* 16:9 */
   border-radius: 1rem;
   overflow: hidden;
 }
