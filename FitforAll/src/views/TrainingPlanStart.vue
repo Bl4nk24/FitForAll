@@ -1,148 +1,112 @@
 <template>
-  <div class="training-plan-start-page container my-5" style="max-width: 900px;">
-    <!-- Ladezustand / Fehler -->
-    <div v-if="loading" class="text-center">
-      <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Loading...</span>
-      </div>
-      <p class="mt-2">Lade Trainingsplan...</p>
-    </div>
-
-    <div v-else-if="errorMessage" class="alert alert-danger">
-      {{ errorMessage }}
-    </div>
-
-    <!-- Hauptinhalt oder Zusammenfassung -->
-    <div v-else>
-      <!-- Aktuelles Workout anzeigen -->
-      <div v-if="!showSummary && currentWorkout" class="current-workout">
-        <!-- Workout Video -->
-        <div class="video-section mb-4">
-          <div v-if="isYoutube(currentWorkout.video_url)" class="video-wrapper">
-            <iframe :src="getEmbeddedUrl(currentWorkout.video_url)" class="video-iframe" frameborder="0"
-              allowfullscreen></iframe>
-          </div>
-          <div v-else class="external-video-link text-center">
-            <a :href="currentWorkout.video_url" target="_blank" class="btn btn-outline-secondary">
-              <i class="bi bi-link-45deg"></i> Video ansehen
-            </a>
-          </div>
-        </div>
-
-        <!-- Workout Details -->
-        <div class="workout-details mb-4">
-          <h2>{{ currentWorkout.name }}</h2>
-          <p>{{ currentWorkout.description }}</p>
-        </div>
-
-        <!-- Muskelkarte -->
-        <div class="muscle-map-container mb-4" v-if="svgContent" v-html="getHighlightedMuscles(currentWorkout.id)">
-        </div>
-
-        <!-- Sätze eintragen -->
-        <div class="sets-section mb-4">
-          <h4>Sätze eintragen</h4>
-          <div v-for="(set, index) in currentSets" :key="set.id" class="set-entry d-flex align-items-center mb-2">
-            <div class="me-3">
-              <strong>Satz {{ index + 1 }}:</strong>
+  <div class="training-plan-start-page container my-5">
+    <div class="main-layout">
+      <!-- Left Column -->
+      <div class="content-column">
+        <div v-if="!showSummary && currentWorkout" class="current-workout">
+          <!-- Video Section -->
+          <div class="video-section">
+            <div v-if="isYoutube(currentWorkout.video_url)" class="video-wrapper">
+              <iframe :src="getEmbeddedUrl(currentWorkout.video_url)" class="video-iframe" frameborder="0"
+                allowfullscreen></iframe>
             </div>
-            <input type="number" v-model.number="set.reps" class="form-control me-2" placeholder="Wdh."
-              :disabled="set.completed" />
-            <input type="number" v-model.number="set.weight" class="form-control me-2" placeholder="kg"
-              :disabled="set.completed" />
-            <button class="btn btn-success" @click="completeSet(index)"
-              :disabled="set.completed || !set.reps || !set.weight">
-              <i v-if="set.completed" class="bi bi-check-circle-fill"></i>
-              <span v-else>Eintragen</span>
+            <div v-else class="external-video-link">
+              <a :href="currentWorkout.video_url" target="_blank" class="btn btn-outline-secondary">
+                <i class="bi bi-link-45deg"></i> Video ansehen
+              </a>
+            </div>
+          </div>
+
+          <!-- Workout Details -->
+          <div class="details-card">
+            <h1 class="workout-title">{{ currentWorkout.name }}</h1>
+            <p class="workout-description">{{ currentWorkout.description }}</p>
+          </div>
+
+          <!-- Navigation -->
+          <div class="navigation-buttons">
+            <button @click="previousWorkout" :disabled="currentWorkoutIndex === 0" class="btn btn-outline-secondary">
+              <i class="bi bi-arrow-left"></i> Vorherige Übung
             </button>
-            <button class="btn btn-danger ms-auto" @click="deleteSet(index)" :disabled="set.completed">
-              <i class="bi bi-trash"></i>
+            <button @click="nextWorkout" class="btn btn-outline-primary">
+              <span v-if="currentWorkoutIndex === workouts.length - 1">Workout beenden</span>
+              <span v-else>Nächste Übung <i class="bi bi-arrow-right"></i></span>
             </button>
           </div>
-          <button class="btn btn-outline-primary ms-2" @click="addSet">
-            <i class="bi bi-plus-circle"></i> Satz hinzufügen
-          </button>
-
-          <!-- Pausentimer anzeigen -->
-          <div v-if="timerActive" class="timer mt-3">
-            <p>Pause: {{ formattedTimer }}</p>
-            <div class="timer-controls">
-              <button class="btn btn-sm btn-outline-primary me-2" @click="decreaseTimer">
-                -15 Sek
-              </button>
-              <button class="btn btn-sm btn-outline-secondary me-2" @click="skipTimer">
-                Überspringen
-              </button>
-              <button class="btn btn-sm btn-outline-primary" @click="increaseTimer">
-                +15 Sek
-              </button>
-            </div>
-          </div>
         </div>
 
-        <!-- Navigation zwischen Workouts -->
-        <div class="navigation-buttons d-flex justify-content-between">
-          <button class="btn btn-outline-secondary" @click="previousWorkout" :disabled="currentWorkoutIndex === 0">
-            <i class="bi bi-arrow-left"></i> Vorherige Übung
-          </button>
-          <button class="btn btn-outline-secondary" @click="nextWorkout">
-            <span v-if="currentWorkoutIndex === workouts.length - 1">Workout beenden</span>
-            <span v-else>Nächste Übung <i class="bi bi-arrow-right"></i></span>
-          </button>
+        <!-- Summary View -->
+        <div v-else-if="showSummary" class="summary-container">
+          <!-- ... Zusammenfassungsinhalt ... -->
         </div>
       </div>
 
-      <!-- Zusammenfassung anzeigen -->
-      <div v-else-if="showSummary" class="summary-container">
-        <div class="summary-card">
-          <h2 class="mb-4">Workout abgeschlossen! 🎉</h2>
-
-          <!-- Muskelkarte -->
-          <div class="muscle-map-summary mb-5" v-if="svgContent" v-html="getSummaryMuscles"></div>
-
-          <!-- Statistiken -->
-          <div class="stats mb-4">
-            <h4 class="mb-3">Deine Leistung:</h4>
-            <div class="stat-item">
-              <i class="bi bi-lightning-charge"></i>
-              <span>Gesamtvolumen: {{ totalVolume }} kg</span>
-            </div>
-            <div class="stat-item">
-              <i class="bi bi-heart-pulse"></i>
-              <span>Trainierte Muskelgruppen: {{ allTrainedMuscles.length }}</span>
-            </div>
-          </div>
-
-          <!-- Danke-Nachricht -->
-          <div class="thank-you-message mb-4">
-            <p>Danke für dein Training! Weiter so!</p>
-          </div>
-
-          <button class="btn btn-success btn-lg" @click="finishWorkout">
-            Workout vollständig beenden <!-- Text angepasst -->
-          </button>
+      <!-- Right Column -->
+      <div class="sidebar-column">
+        <!-- Muscle Map Card -->
+        <div class="sidebar-card muscle-card">
+          <h3 class="card-title">
+            <i class="bi bi-heart-pulse"></i> Beanspruchte Muskeln
+          </h3>
+          <div class="muscle-map-container" v-if="svgContent" v-html="getHighlightedMuscles(currentWorkout.id)"></div>
         </div>
-      </div>
 
-      <!-- Keine Workouts vorhanden -->
-      <div v-else class="alert alert-info">
-        Keine Workouts im Trainingsplan gefunden.
-      </div>
-    </div>
+        <!-- Training Log Card -->
+        <div class="sidebar-card training-form">
+          <h3 class="card-title">
+            <i class="bi bi-clipboard-plus"></i> Training protokollieren
+          </h3>
 
-    <!-- Timer Bubble -->
-    <div class="timer-bubble" v-if="timerActive">
-      <p>Pause: {{ formattedTimer }}</p>
-      <div class="timer-controls">
-        <button class="btn btn-sm btn-outline-primary me-2" @click="decreaseTimer">
-          -15 Sek
-        </button>
-        <button class="btn btn-sm btn-outline-secondary me-2" @click="skipTimer">
-          Überspringen
-        </button>
-        <button class="btn btn-sm btn-outline-primary" @click="increaseTimer">
-          +15 Sek
-        </button>
+          <!-- Notes -->
+          <div class="notes-section">
+            <textarea v-model="sessionNote" class="form-control" rows="3"
+              placeholder="Notizen zur Übung (z.B. Ausführungsfehler, Schmerzen...)"></textarea>
+          </div>
+
+          <!-- Sets -->
+          <div class="sets-section">
+            <div class="sets-header">
+              <h4>Sätze</h4>
+              <button @click="addSet" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-plus-lg"></i> Satz hinzufügen
+              </button>
+            </div>
+
+            <div v-for="(set, index) in currentSets" :key="set.id" class="set-entry">
+              <div class="set-number">#{{ index + 1 }}</div>
+              <input type="number" v-model.number="set.reps" class="form-control" placeholder="Wdh."
+                :disabled="set.completed" />
+              <input type="number" v-model.number="set.weight" class="form-control" placeholder="kg"
+                :disabled="set.completed" />
+              <button class="btn btn-success set-action" @click="completeSet(index)"
+                :disabled="set.completed || !set.reps || !set.weight">
+                <i v-if="set.completed" class="bi bi-check-circle-fill"></i>
+                <span v-else>✓</span>
+              </button>
+              <button class="btn btn-danger set-action" @click="deleteSet(index)" :disabled="set.completed">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Timer -->
+          <div v-if="timerActive" class="timer-section">
+            <div class="timer-display">
+              <i class="bi bi-stopwatch"></i> {{ formattedTimer }}
+              <div class="timer-controls">
+                <button @click="decreaseTimer" class="btn btn-sm btn-outline-secondary">
+                  -15s
+                </button>
+                <button @click="skipTimer" class="btn btn-sm btn-outline-danger">
+                  Überspringen
+                </button>
+                <button @click="increaseTimer" class="btn btn-sm btn-outline-secondary">
+                  +15s
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -187,6 +151,9 @@ const svgContent = ref('')
 
 // Sets für das aktuelle Workout
 const currentSets = ref([])
+
+// Notizen für die aktuelle Trainingssession
+const sessionNote = ref('')
 
 // Timer
 const timerActive = ref(false)
@@ -268,7 +235,7 @@ async function initializeSets(workoutId) {
     // Neueste Session holen
     const { data: sessions, error: sessionErr } = await supabase
       .from('training_sessions')
-      .select('id, created_at')
+      .select('id, note, created_at')
       .eq('workout_id', workoutId)
       .order('created_at', { ascending: false })
       .limit(1);
@@ -354,7 +321,7 @@ async function enduebung() {
         id: sessionId,
         user_id: authUser.value.id,
         workout_id: currentWorkout.value.id,
-        note: '', // Optional: Notiz einfügen, falls gewünscht
+        note: sessionNote.value, // Optional: Notiz einfügen, falls gewünscht
         created_at: new Date().toISOString()
       })
     if (sessionError) throw sessionError
@@ -385,7 +352,7 @@ async function enduebung() {
 
     // Nächstes Workout anzeigen
     nextWorkout()
-    
+
   } catch (err) {
     console.error('Fehler beim Speichern des Workouts:', err)
   }
@@ -610,23 +577,32 @@ onUnmounted(() => {
 
 
 <style scoped>
+/* Base Styles */
 .training-plan-start-page {
-  min-height: 70vh;
+  min-height: 100vh;
+  padding: 2rem 0;
 }
 
-.current-workout,
-.summary-container {
-  background: #fff;
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+.main-layout {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Left Column Styles */
+.content-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
 .video-section {
+  background: #000;
   position: relative;
-  padding-top: 56.25%;
-  /* 16:9 Aspect Ratio */
-  border-radius: 12px;
+  padding-top: 56.25%; /* 16:9 */
+  border-radius: 1rem;
   overflow: hidden;
 }
 
@@ -641,202 +617,161 @@ onUnmounted(() => {
 .video-iframe {
   width: 100%;
   height: 100%;
+  border: none;
 }
 
-.workout-details {
-  text-align: center;
-}
-
-.muscle-map-container,
-.muscle-map-summary {
-  margin-top: 1rem;
-  /* Optional: border: 1px solid #ccc; padding: 1rem; */
-}
-
-.muscle-map-container svg,
-.muscle-map-summary svg {
-  width: 100%;
-  max-width: 400px;
-  height: auto;
-}
-
-.sets-section {
-  background: #f8f9fa;
+.details-card {
+  background: white;
   padding: 1.5rem;
-  border-radius: 12px;
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.workout-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+}
+
+.workout-description {
+  color: #666;
+  line-height: 1.6;
+}
+
+/* Right Column Styles */
+.sidebar-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.sidebar-card {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Training Form Styles */
+.sets-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.sets-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
 }
 
 .set-entry {
-  display: flex;
+  display: grid;
+  grid-template-columns: 40px 1fr 1fr 40px 40px;
+  gap: 0.75rem;
   align-items: center;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  background: #f8f9fa;
 }
 
-.set-entry input {
-  width: 80px;
+.set-number {
+  font-weight: 500;
+  color: #666;
+  text-align: center;
 }
 
-.set-entry button {
+.set-action {
+  padding: 0.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 40px;
+  height: 40px;
 }
 
-.timer {
-  font-size: 2rem;
-  /* Vergrößert den Timer weiter */
-  font-weight: bold;
-  color: #e74c3c;
+/* Timer Styles */
+.timer-section {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #eee;
+}
+
+.timer-display {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #2c3e50;
 }
 
 .timer-controls {
   display: flex;
   gap: 0.5rem;
-  margin-top: 0.5rem;
+  margin-left: auto;
 }
 
+/* Navigation Buttons */
 .navigation-buttons {
-  margin-top: 2rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.5rem;
 }
 
 .navigation-buttons .btn {
-  width: 48%;
-}
-
-.auto-next .btn {
-  width: 100%;
-}
-
-.current-workout h2,
-.summary-container h2 {
-  margin-bottom: 0.5rem;
-}
-
-.current-workout p,
-.summary-container .thank-you-message p {
-  color: #555;
-}
-
-.sets-section h4,
-.summary-container h4 {
-  margin-bottom: 1rem;
-}
-
-.sets-section .form-control {
-  width: 100px;
-}
-
-.sets-section .btn-success span {
-  display: none;
-}
-
-.sets-section .btn-success .bi-check-circle-fill {
-  display: inline;
-}
-
-.sets-section .btn-success:not(:disabled) span {
-  display: inline;
-}
-
-.sets-section .btn-success:not(:disabled) .bi-check-circle-fill {
-  display: none;
-}
-
-/* Responsive Anpassungen */
-@media (max-width: 767px) {
-  .navigation-buttons .btn {
-    width: 100%;
-    margin-bottom: 1rem;
-  }
-
-  .navigation-buttons .btn:last-child {
-    margin-bottom: 0;
-  }
-}
-
-/* Timer Bubble */
-.timer-bubble {
-  position: fixed;
-  bottom: 20px;
-  left: 20px;
-  background: rgba(255, 255, 255, 0.95);
-  /* Leicht transparenter Hintergrund */
-  border: 2px solid #007bff;
-  border-radius: 12px;
-  padding: 1.5rem;
-  /* Größerer Padding für einen größeren Timer */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-  max-width: 300px;
-}
-
-.timer-bubble p {
-  margin: 0 0 0.75rem 0;
-  font-size: 1.5rem;
-  /* Weiter vergrößert die Schriftgröße */
-  font-weight: bold;
-  color: #007bff;
-  text-align: center;
-}
-
-.timer-bubble .timer-controls {
-  display: flex;
-  justify-content: space-between;
-}
-
-/* Zusammenfassung Styles */
-.summary-container {
-  max-width: 600px;
-  margin: 2rem auto;
-  padding: 2rem;
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  text-align: center;
-}
-
-.summary-card {
-  /* Optional: Zusätzliche Styles für die Zusammenfassung */
-}
-
-.muscle-map-summary {
-  max-width: 400px;
-  margin: 0 auto;
-}
-
-.stats {
-  background: #f8f9fa;
-  border-radius: 12px;
-  padding: 1.5rem;
-  margin: 2rem 0;
-}
-
-.stat-item {
+  flex: 1;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.75rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.8rem;
-  font-size: 1.1rem;
-  margin: 1rem 0;
+  gap: 0.5rem;
+  transition: all 0.2s;
 }
 
-.stat-item i {
-  font-size: 1.4rem;
-  color: #007bff;
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .main-layout {
+    grid-template-columns: 1fr;
+    max-width: 800px;
+  }
+
+  .sidebar-column {
+    max-width: 100%;
+  }
 }
 
-.btn-success {
-  padding: 1rem 2rem;
-  font-size: 1.2rem;
-  transition: transform 0.2s;
-}
+@media (max-width: 576px) {
+  .set-entry {
+    grid-template-columns: 30px 1fr 1fr 30px 30px;
+    gap: 0.5rem;
+  }
 
-.btn-success:hover {
-  transform: scale(1.05);
-}
+  .set-action {
+    width: 30px;
+    height: 30px;
+  }
 
-.thank-you-message p {
-  font-size: 1.2rem;
-  color: #28a745;
-  text-align: center;
+  .navigation-buttons .btn span {
+    display: none;
+  }
+
+  .card-title {
+    font-size: 1rem;
+  }
 }
 </style>
