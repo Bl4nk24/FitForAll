@@ -236,7 +236,7 @@ async function generatePlan() {
 
     if (selectedSplit.value === 'upper_lower') {
       // Für Upper/Lower: Tag 1 = Push, Tag 2 = Pull
-      workoutName = i === 0 ? `Push - ${dateStr}` : `Pull - ${dateStr}`
+      workoutName = i === 0 ? `Upper - ${dateStr}` : `Lower - ${dateStr}`
     } else {
       // Standard: Basisname + " - Tag X"
       workoutName = `${autoPlanNameBase.value} - Tag ${i + 1}`
