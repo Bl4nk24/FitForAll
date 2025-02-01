@@ -31,22 +31,20 @@
           Keine Tagesdaten vorhanden.
         </div>
 
-        <!-- Tagesliste -->
+        <!-- Tagesliste ohne Tagesüberschrift -->
         <div v-else>
           <div v-for="(day, dayIndex) in planData.days" :key="dayIndex" class="mb-5">
-            <!-- Tages-Überschrift -->
-            <h2 class="mb-3">
-              {{ day.dayName ? day.dayName : 'Tag ' + (dayIndex + 1) }}
-            </h2>
-
-            <!-- Workouts des Tages -->
+            <!-- Überschrift des Tages entfernt -->
             <div class="row row-cols-1 row-cols-md-2 g-4">
               <div class="col" v-for="(workoutId, wIdx) in day.workouts" :key="wIdx">
                 <div class="card h-100 workout-card">
                   <!-- Thumbnail als klickbarer Link -->
                   <router-link :to="`/workout/${workoutId}`" class="thumbnail-link">
-                    <img :src="getYoutubeThumbnail(workoutMap[workoutId]?.video_url)" class="card-img-top"
-                      alt="Thumbnail" />
+                    <img
+                      :src="getYoutubeThumbnail(workoutMap[workoutId]?.video_url)"
+                      class="card-img-top"
+                      alt="Thumbnail"
+                    />
                   </router-link>
 
                   <div class="card-body d-flex flex-column">
@@ -64,7 +62,11 @@
                     </div>
 
                     <!-- Muskelkarte (SVG) direkt unter dem Video -->
-                    <div class="muscle-map-container" v-if="svgContent" v-html="getHighlightedMuscles(workoutId)"></div>
+                    <div
+                      class="muscle-map-container"
+                      v-if="svgContent"
+                      v-html="getHighlightedMuscles(workoutId)"
+                    ></div>
 
                     <!-- Letztes Training -->
                     <div class="last-training mt-auto" v-if="lastSessions[workoutId]">
@@ -211,7 +213,7 @@ async function loadLastSessions() {
   }
 }
 
-// 4) SVG laden
+// SVG laden
 async function loadMuscleSVG() {
   try {
     const res = await fetch('/assets/Muscle_Map.svg')
@@ -223,10 +225,9 @@ async function loadMuscleSVG() {
 
 /**
  * Erzeugt eine "kopierte" SVG pro Workout, in der nur dessen Zielmuskeln aktiv sind.
- * Wir parsen svgContent neu, fügen .active-Klasse bei den relevanten IDs hinzu, returnen das OuterHTML.
  */
 function getHighlightedMuscles(workoutId) {
-  if (!svgContent.value) return '' // Falls noch nicht geladen
+  if (!svgContent.value) return ''
 
   // 1) Kopie des SVG als DOM-Objekt
   const parser = new DOMParser()
@@ -235,14 +236,13 @@ function getHighlightedMuscles(workoutId) {
   // 2) alle .active entfernen
   doc.querySelectorAll('.active').forEach(el => el.classList.remove('active'))
 
-  // 3) dieses Workout => target_muscles
+  // 3) für das Workout: Zielmuskeln aktivieren
   const muscles = workoutMap[workoutId]?.target_muscles || []
   muscles.forEach(mId => {
     const muscleEl = doc.getElementById(mId)
     if (muscleEl) muscleEl.classList.add('active')
   })
 
-  // 4) als HTML-String zurückgeben
   return doc.documentElement.outerHTML
 }
 
@@ -314,7 +314,6 @@ function formatDate(dateStr) {
 /* muscle-map */
 .muscle-map-container {
   margin-top: 1rem;
-  /* ggf. Rahmen: border: 1px solid #ccc; padding: 1rem; */
 }
 
 .muscle-map-container svg {

@@ -1,14 +1,14 @@
 <template>
   <div class="training-plan-start-page container my-5">
     <div class="main-layout">
-      <!-- Left Column -->
+      <!-- Linke Spalte -->
       <div class="content-column">
+        <!-- Während des Trainings: aktuelles Workout -->
         <div v-if="!showSummary && currentWorkout" class="current-workout">
           <!-- Video Section -->
           <div class="video-section">
             <div v-if="isYoutube(currentWorkout.video_url)" class="video-wrapper">
-              <iframe :src="getEmbeddedUrl(currentWorkout.video_url)" class="video-iframe" frameborder="0"
-                allowfullscreen></iframe>
+              <iframe :src="getEmbeddedUrl(currentWorkout.video_url)" class="video-iframe" frameborder="0" allowfullscreen></iframe>
             </div>
             <div v-else class="external-video-link">
               <a :href="currentWorkout.video_url" target="_blank" class="btn btn-outline-secondary">
@@ -35,14 +35,10 @@
           </div>
         </div>
 
-        <!-- Zusammenfassung anzeigen -->
+        <!-- Zusammenfassung, wenn Training abgeschlossen -->
         <div v-else-if="showSummary" class="summary-container">
           <div class="summary-card">
             <h2 class="mb-4">Workout abgeschlossen! 🎉</h2>
-
-            <!-- Muskelkarte -->
-            <div class="muscle-map-summary mb-5" v-if="svgContent" v-html="getSummaryMuscles"></div>
-
             <!-- Statistiken -->
             <div class="stats mb-4">
               <h4 class="mb-3">Deine Leistung:</h4>
@@ -55,12 +51,10 @@
                 <span>Trainierte Muskelgruppen: {{ allTrainedMuscles.length }}</span>
               </div>
             </div>
-
             <!-- Danke-Nachricht -->
             <div class="thank-you-message mb-4">
               <p>Danke für dein Training! Weiter so!</p>
             </div>
-
             <button class="btn btn-success btn-lg" @click="finishWorkout">
               Workout vollständig beenden
             </button>
@@ -68,22 +62,23 @@
         </div>
       </div>
 
-      <!-- Right Column -->
+      <!-- Rechte Spalte (Muskelkarte und evtl. Trainingsprotokoll) -->
       <div class="sidebar-column">
-        <!-- Muscle Map Card -->
+        <!-- Muskelkarte (Zusammenfassung) -->
         <div class="sidebar-card muscle-card">
           <h3 class="card-title">
             <i class="bi bi-heart-pulse"></i> Beanspruchte Muskeln
           </h3>
-          <div class="muscle-map-container" v-if="svgContent" v-html="getHighlightedMuscles(currentWorkout.id)"></div>
+          <div class="muscle-map-container" v-if="svgContent"
+               v-html="showSummary ? getSummaryMuscles : getHighlightedMuscles(currentWorkout ? currentWorkout.id : '')">
+          </div>
         </div>
 
-        <!-- Training Log Card -->
-        <div class="sidebar-card training-form">
+        <!-- Trainingsprotokoll nur anzeigen, solange das Training läuft -->
+        <div class="sidebar-card training-form" v-if="!showSummary">
           <h3 class="card-title">
             <i class="bi bi-clipboard-plus"></i> Training protokollieren
           </h3>
-
           <!-- Notes -->
           <div class="notes-section">
             <textarea v-model="sessionNote" class="form-control" rows="3"
@@ -98,13 +93,10 @@
                 <i class="bi bi-plus-lg"></i> Satz hinzufügen
               </button>
             </div>
-
             <div v-for="(set, index) in currentSets" :key="set.id" class="set-entry">
               <div class="set-number">#{{ index + 1 }}</div>
-              <input type="number" v-model.number="set.reps" class="form-control" placeholder="Wdh."
-                :disabled="set.completed" />
-              <input type="number" v-model.number="set.weight" class="form-control" placeholder="kg"
-                :disabled="set.completed" />
+              <input type="number" v-model.number="set.reps" class="form-control" placeholder="Wdh." :disabled="set.completed" />
+              <input type="number" v-model.number="set.weight" class="form-control" placeholder="kg" :disabled="set.completed" />
               <button class="btn btn-success set-action" @click="completeSet(index)"
                 :disabled="set.completed || !set.reps || !set.weight">
                 <i v-if="set.completed" class="bi bi-check-circle-fill"></i>
@@ -121,15 +113,9 @@
             <div class="timer-display">
               <i class="bi bi-stopwatch"></i> {{ formattedTimer }}
               <div class="timer-controls">
-                <button @click="decreaseTimer" class="btn btn-sm btn-outline-secondary">
-                  -15s
-                </button>
-                <button @click="skipTimer" class="btn btn-sm btn-outline-danger">
-                  Überspringen
-                </button>
-                <button @click="increaseTimer" class="btn btn-sm btn-outline-secondary">
-                  +15s
-                </button>
+                <button @click="decreaseTimer" class="btn btn-sm btn-outline-secondary">-15s</button>
+                <button @click="skipTimer" class="btn btn-sm btn-outline-danger">Überspringen</button>
+                <button @click="increaseTimer" class="btn btn-sm btn-outline-secondary">+15s</button>
               </div>
             </div>
           </div>
@@ -138,7 +124,6 @@
     </div>
   </div>
 </template>
-
 
 <script setup>
 import { ref, reactive, onMounted, computed, watch, onUnmounted } from 'vue'

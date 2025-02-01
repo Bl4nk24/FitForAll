@@ -14,67 +14,38 @@
 
         <!-- Body-Scroller -->
         <div class="modal-body-scroller">
-          <!-- Tabs für die Tage -->
-          <ul class="nav nav-tabs mb-3">
-            <li class="nav-item" v-for="(dayObj, idx) in days" :key="idx">
-              <button
-                class="nav-link"
-                :class="{ active: idx === selectedDayIndex }"
-                @click="selectedDayIndex = idx"
+          <!-- Eingabe für den Plannamen -->
+          <div class="mb-3">
+            <label class="form-label">Planname:</label>
+            <input
+              type="text"
+              class="form-control"
+              v-model="planName"
+              placeholder="Gib den Plannamen ein"
+            />
+          </div>
+
+          <p class="text-muted" v-if="allWorkouts.length === 0">
+            Keine Workouts verfügbar (oder werden gerade geladen).
+          </p>
+
+          <!-- Grid der Workouts -->
+          <div class="row row-cols-1 row-cols-md-2 g-3">
+            <div class="col" v-for="workout in allWorkouts" :key="workout.id">
+              <div
+                class="card h-100"
+                :class="{'border-primary': isSelectedWorkout(workout.id)}"
+                @click="toggleWorkout(workout.id)"
+                style="cursor: pointer;"
               >
-                {{ dayObj.dayName || 'Neuer Tag' }}
-              </button>
-            </li>
-            <li class="nav-item">
-              <button class="btn btn-sm btn-success ms-2" @click="addDay">
-                + Tag
-              </button>
-            </li>
-          </ul>
-
-          <!-- Aktueller Tag -->
-          <div v-if="days.length > 0">
-            <div class="d-flex align-items-center mb-3">
-              <label class="form-label me-2" style="min-width:80px;">
-                Tagesname:
-              </label>
-              <input
-                type="text"
-                class="form-control"
-                style="max-width: 300px;"
-                v-model="currentDay.dayName"
-              />
-              <button
-                class="btn btn-outline-danger ms-3"
-                v-if="days.length > 1"
-                @click="removeDay(selectedDayIndex)"
-              >
-                Tag löschen
-              </button>
-            </div>
-
-            <p class="text-muted" v-if="allWorkouts.length === 0">
-              Keine Workouts verfügbar (oder werden gerade geladen).
-            </p>
-
-            <!-- Grid der Workouts -->
-            <div class="row row-cols-1 row-cols-md-2 g-3">
-              <div class="col" v-for="workout in allWorkouts" :key="workout.id">
-                <div
-                  class="card h-100"
-                  :class="{'border-primary': isSelectedWorkout(workout.id)}"
-                  @click="toggleWorkout(workout.id)"
-                  style="cursor: pointer;"
-                >
-                  <img
-                    :src="getYoutubeThumbnail(workout.video_url)"
-                    class="card-img-top"
-                    :alt="workout.name"
-                    style="object-fit: cover; height: 150px;"
-                  />
-                  <div class="card-body">
-                    <h6 class="card-title mb-0">{{ workout.name }}</h6>
-                  </div>
+                <img
+                  :src="getYoutubeThumbnail(workout.video_url)"
+                  class="card-img-top"
+                  :alt="workout.name"
+                  style="object-fit: cover; height: 150px;"
+                />
+                <div class="card-body">
+                  <h6 class="card-title mb-0">{{ workout.name }}</h6>
                 </div>
               </div>
             </div>
@@ -108,17 +79,23 @@ const emit = defineEmits(['close', 'plan-created'])
 
 // Workouts
 const allWorkouts = ref([])
+
 // Array für Tage => { dayName: string, workouts: string[] }
+// Auch wenn es nur einen Tag gibt, bleibt die Struktur gleich.
 const days = ref([])
+// Da es nur einen Tag gibt, ist der Index immer 0.
 const selectedDayIndex = ref(0)
 
-// Fehler
+// Eingabefeld für den Plannamen (UI/UX)
+const planName = ref('')
+
+// Fehleranzeige
 const planError = ref('')
 
 // User
 const userId = ref(null)
 
-// onMounted => Auth + Workouts laden => mind. 1 Tag
+// Beim Laden: Auth prüfen, Workouts laden und einen Tag anlegen
 onMounted(async () => {
   try {
     const { data: authData, error: authError } = await supabase.auth.getUser()
@@ -133,37 +110,29 @@ onMounted(async () => {
     if (wError) throw wError
     allWorkouts.value = wData || []
 
+    // Einen Tag hinzufügen – dieser wird im DB-Insert beibehalten.
     addDay()
   } catch (err) {
     planError.value = err.message
   }
 })
 
+// Da wir nur einen Tag haben, ist currentDay immer days[0]
 const currentDay = computed(() => {
   if (!days.value.length) return null
   return days.value[selectedDayIndex.value] || null
 })
 
-// Tag hinzufügen
+// Einen Tag hinzufügen (nur einmal aufgerufen)
 function addDay() {
-  const newIndex = days.value.length + 1
   days.value.push({
-    dayName: `Tag ${newIndex}`,
+    dayName: 'Tag 1',
     workouts: []
   })
-  selectedDayIndex.value = days.value.length - 1
+  selectedDayIndex.value = 0
 }
 
-// Tag entfernen
-function removeDay(index) {
-  if (days.value.length <= 1) return
-  days.value.splice(index, 1)
-  if (selectedDayIndex.value >= days.value.length) {
-    selectedDayIndex.value = days.value.length - 1
-  }
-}
-
-// Toggle
+// Auswahl eines Workouts für den (einzigen) Tag umschalten
 function toggleWorkout(workoutId) {
   if (!currentDay.value) return
   const arr = currentDay.value.workouts
@@ -177,12 +146,12 @@ function isSelectedWorkout(workoutId) {
   return currentDay.value.workouts.includes(workoutId)
 }
 
-// Modal
+// Modal schließen
 function closeModal() {
   emit('close')
 }
 
-// Speichern
+// Plan speichern – dabei bleibt die Struktur im Insert gleich.
 async function saveManualPlan() {
   planError.value = ''
   if (!userId.value) {
@@ -193,6 +162,10 @@ async function saveManualPlan() {
     planError.value = 'Bitte mindestens einen Tag hinzufügen.'
     return
   }
+  if (!planName.value.trim()) {
+    planError.value = 'Bitte einen Plannamen eingeben.'
+    return
+  }
 
   const plan_data = {
     days: days.value.map((d, i) => ({
@@ -201,8 +174,8 @@ async function saveManualPlan() {
     }))
   }
 
-  const plan_name = `Manueller Plan (${new Date().toLocaleDateString()})`
   const number_of_days = days.value.length
+  const plan_name = planName.value.trim() || `Manueller Plan (${new Date().toLocaleDateString()})`
 
   try {
     const { data: inserted, error } = await supabase
@@ -227,7 +200,7 @@ async function saveManualPlan() {
   }
 }
 
-// YouTube-Thumbnail
+// YouTube-Thumbnail (bleibt unverändert)
 function getYoutubeThumbnail(url) {
   if (!url) return '/fallback-thumbnail.jpg'
   try {
@@ -274,7 +247,6 @@ function getYoutubeThumbnail(url) {
   width: 100%;
   max-width: 900px;
   margin: auto;
-  /* Das Card-Element wird flexibel aufgeteilt */
   display: flex;
   flex-direction: column;
   max-height: 90vh;
@@ -286,14 +258,12 @@ function getYoutubeThumbnail(url) {
   max-height: 100%;
 }
 
-/* Body-Teil, der scrollen darf */
 .modal-body-scroller {
   flex: 1 1 auto;
   overflow-y: auto;
-  padding: 1rem;  /* card-body spacing */
+  padding: 1rem;
 }
 
-/* Markierung, wenn ein Workout ausgewählt ist: blaue Umrandung */
 .card.border-primary {
   border: 2px solid #0d6efd;
 }
