@@ -3,17 +3,17 @@
     <!-- Hintergrund -->
     <div class="modal-backdrop" @click="closeModal"></div>
 
-    <!-- Container mit Click-Stop -->
+    <!-- Modal-Container (Klicks außerhalb schließen) -->
     <div class="modal-container" @click.stop>
-      <div class="card shadow-lg modal-card">
+      <div class="card modal-card shadow-lg">
         <!-- Header -->
-        <div class="card-header d-flex justify-content-between align-items-center">
+        <div class="card-header modal-header d-flex justify-content-between align-items-center">
           <h5 class="mb-0">Manuellen Trainingsplan erstellen</h5>
           <button class="btn-close" @click="closeModal"></button>
         </div>
 
-        <!-- Body-Scroller -->
-        <div class="modal-body-scroller">
+        <!-- Body mit Scrollfunktion -->
+        <div class="modal-body modal-body-scroller">
           <!-- Eingabe für den Plannamen -->
           <div class="mb-3">
             <label class="form-label">Planname:</label>
@@ -30,24 +30,24 @@
           </p>
 
           <!-- Grid der Workouts -->
-          <div class="row row-cols-1 row-cols-md-2 g-3">
-            <div class="col" v-for="workout in allWorkouts" :key="workout.id">
-              <div
-                class="card h-100"
-                :class="{'border-primary': isSelectedWorkout(workout.id)}"
-                @click="toggleWorkout(workout.id)"
-                style="cursor: pointer;"
-              >
-                <img
-                  :src="getYoutubeThumbnail(workout.video_url)"
-                  class="card-img-top"
-                  :alt="workout.name"
-                  style="object-fit: cover; height: 150px;"
-                />
-                <div class="card-body">
-                  <h6 class="card-title mb-0">{{ workout.name }}</h6>
-                </div>
+          <div class="workout-grid">
+            <div
+              class="workout-card"
+              v-for="workout in allWorkouts"
+              :key="workout.id"
+              :class="{ selected: isSelectedWorkout(workout.id) }"
+              @click="toggleWorkout(workout.id)"
+            >
+              <img
+                :src="getYoutubeThumbnail(workout.video_url)"
+                class="workout-img"
+                :alt="workout.name"
+              />
+              <div class="card-body">
+                <h6 class="card-title mb-0">{{ workout.name }}</h6>
               </div>
+              <!-- Größere SVG-Muskelkarte: Zeigt aktiv die Zielmuskeln dieses Workouts -->
+              <div class="workout-muscle-map" v-if="svgContent" v-html="getWorkoutSvg(workout)"></div>
             </div>
           </div>
 
@@ -57,8 +57,8 @@
           </div>
         </div>
 
-        <!-- Footer (fix unten) -->
-        <div class="card-footer d-flex justify-content-end">
+        <!-- Footer (fixiert am unteren Rand) -->
+        <div class="card-footer modal-footer d-flex justify-content-end">
           <button class="btn btn-secondary me-2" @click="closeModal">
             Abbrechen
           </button>
@@ -86,7 +86,7 @@ const days = ref([])
 // Da es nur einen Tag gibt, ist der Index immer 0.
 const selectedDayIndex = ref(0)
 
-// Eingabefeld für den Plannamen (UI/UX)
+// Eingabefeld für den Plannamen
 const planName = ref('')
 
 // Fehleranzeige
@@ -95,7 +95,10 @@ const planError = ref('')
 // User
 const userId = ref(null)
 
-// Beim Laden: Auth prüfen, Workouts laden und einen Tag anlegen
+// Basis-SVG-Muskelkarte (einmalig laden)
+const svgContent = ref('')
+
+// Beim Laden: Auth prüfen, Workouts laden, SVG laden und einen Tag anlegen
 onMounted(async () => {
   try {
     const { data: authData, error: authError } = await supabase.auth.getUser()
@@ -109,6 +112,14 @@ onMounted(async () => {
       .select('*')
     if (wError) throw wError
     allWorkouts.value = wData || []
+
+    // SVG-Muskelkarte laden
+    try {
+      const response = await fetch("/assets/Muscle_Map.svg")
+      svgContent.value = await response.text()
+    } catch (svgError) {
+      console.error("Fehler beim Laden der SVG:", svgError)
+    }
 
     // Einen Tag hinzufügen – dieser wird im DB-Insert beibehalten.
     addDay()
@@ -200,6 +211,31 @@ async function saveManualPlan() {
   }
 }
 
+/**
+ * getWorkoutSvg(workout):
+ * Parst die Basis-SVG-Muskelkarte und fügt für alle in workout.target_muscles
+ * enthaltenen Muskel-IDs die CSS-Klasse "active" hinzu.
+ */
+function getWorkoutSvg(workout) {
+  if (!svgContent.value) return ''
+  const parser = new DOMParser()
+  const doc = parser.parseFromString(svgContent.value, 'image/svg+xml')
+
+  // Vorherige "active"-Klassen entfernen
+  doc.querySelectorAll('.active').forEach(el => el.classList.remove('active'))
+
+  // Falls für das Workout Zielmuskeln definiert sind, diese aktivieren
+  if (workout.target_muscles && Array.isArray(workout.target_muscles)) {
+    workout.target_muscles.forEach(muscle => {
+      const muscleEl = doc.getElementById(muscle)
+      if (muscleEl) {
+        muscleEl.classList.add('active')
+      }
+    })
+  }
+  return doc.documentElement.outerHTML
+}
+
 // YouTube-Thumbnail (bleibt unverändert)
 function getYoutubeThumbnail(url) {
   if (!url) return '/fallback-thumbnail.jpg'
@@ -225,6 +261,7 @@ function getYoutubeThumbnail(url) {
 </script>
 
 <style scoped>
+/* Grundlayout des Modals */
 .manual-plan-modal {
   position: fixed;
   inset: 0;
@@ -232,43 +269,114 @@ function getYoutubeThumbnail(url) {
   display: flex;
   align-items: center;
   justify-content: center;
+  font-family: 'Poppins', sans-serif;
 }
 
+/* Halbtransparenter Hintergrund */
 .modal-backdrop {
   position: absolute;
   inset: 0;
-  background-color: rgba(0,0,0,0.5);
+  background-color: rgba(0, 0, 0, 0.5);
   z-index: 10;
 }
 
+/* Container für das Modal */
 .modal-container {
   position: relative;
   z-index: 20;
   width: 100%;
-  max-width: 900px;
+  max-width: 800px;
   margin: auto;
   display: flex;
   flex-direction: column;
   max-height: 90vh;
 }
 
+/* Styling der Modal-Card */
 .modal-card {
+  border-radius: 12px;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  max-height: 100%;
+  background-color: #fff;
 }
 
-.modal-body-scroller {
-  flex: 1 1 auto;
-  overflow-y: auto;
+/* Header-Bereich */
+.modal-header {
+  background-color: #f7f7f7;
   padding: 1rem;
+  border-bottom: 1px solid #eaeaea;
 }
 
-.card.border-primary {
-  border: 2px solid #0d6efd;
+/* Body-Bereich mit Scrollfunktion */
+.modal-body-scroller {
+  padding: 1rem;
+  overflow-y: auto;
+  flex: 1;
 }
 
-.nav-tabs .nav-link {
+/* Grid-Layout für die Workout-Cards */
+.workout-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Erhöhter minimaler Wert */
+  gap: 1rem;
+}
+
+/* Styling für einzelne Workout-Cards */
+.workout-card {
   cursor: pointer;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.workout-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+.workout-card.selected {
+  border-color: #0d6efd;
+}
+
+/* Styling für Workout-Bilder */
+.workout-img {
+  width: 100%;
+  height: 200px; /* Erhöhte Höhe */
+  object-fit: cover;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+/* Container für die SVG-Muskelkarte in der Workout-Card – vergrößert und zentriert */
+.workout-muscle-map {
+  width: 250px;  /* Größere Darstellung der SVG */
+  margin: 0.5rem auto 0;
+}
+.workout-muscle-map svg {
+  width: 100%;
+  height: auto;
+}
+
+/* Footer-Bereich */
+.modal-footer {
+  background-color: #f7f7f7;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid #eaeaea;
+}
+
+/* Responsive Anpassungen */
+@media (max-width: 576px) {
+  .modal-container {
+    max-width: 95%;
+  }
+  .workout-img {
+    height: 150px; /* Für kleinere Geräte eventuell etwas kleiner, je nach Bedarf */
+  }
+  .workout-muscle-map {
+    width: 120px; /* Angepasste Größe für mobile Geräte */
+  }
 }
 </style>
