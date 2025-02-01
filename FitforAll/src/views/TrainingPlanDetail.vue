@@ -1,17 +1,5 @@
 <template>
   <div class="training-plan-page">
-    <!-- Hero-Bereich -->
-    <section class="plan-hero text-center py-5 mb-4">
-      <div class="container">
-        <h1 class="display-4 fw-bold">
-          Trainingsplan: {{ planNameDisplay }}
-        </h1>
-        <p class="lead">
-          Übersicht aller Workouts in diesem Plan
-        </p>
-      </div>
-    </section>
-
     <div class="container my-5" style="max-width: 900px;">
       <!-- Fehlermeldung -->
       <div v-if="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
@@ -26,15 +14,26 @@
 
       <!-- Plan-Inhalt -->
       <div v-else>
+        <!-- Überschrift -->
+        <div class="plan-header text-center mb-4">
+          <h1 class="display-5 fw-bold">{{ planNameDisplay }}</h1>
+          <p class="lead">Übersicht aller Workouts in diesem Plan</p>
+          <!-- Training starten Button -->
+          <div v-if="firstWorkoutId" class="mt-3">
+            <router-link :to="`/training-plans/${planId}/start`" class="btn btn-lg btn-success">
+              Training starten
+            </router-link>
+          </div>
+        </div>
+
         <!-- Falls keine Tage vorhanden -->
         <div v-if="!planData.days || planData.days.length === 0" class="alert alert-info">
           Keine Tagesdaten vorhanden.
         </div>
 
-        <!-- Tagesliste ohne Tagesüberschrift -->
+        <!-- Tagesliste -->
         <div v-else>
           <div v-for="(day, dayIndex) in planData.days" :key="dayIndex" class="mb-5">
-            <!-- Überschrift des Tages entfernt -->
             <div class="row row-cols-1 row-cols-md-2 g-4">
               <div class="col" v-for="(workoutId, wIdx) in day.workouts" :key="wIdx">
                 <div class="card h-100 workout-card">
@@ -46,7 +45,6 @@
                       alt="Thumbnail"
                     />
                   </router-link>
-
                   <div class="card-body d-flex flex-column">
                     <!-- Name & Beschreibung -->
                     <h5 class="card-title">
@@ -114,27 +112,25 @@ import { reactive, ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { supabase } from '../supabase'
 
-// Route-Parameter
 const route = useRoute()
 const planId = route.params.planId
 
-// Loading & Error
 const loading = ref(true)
 const errorMessage = ref('')
 
-// Reaktive Daten
 const planNameDisplay = ref('')
 const planData = reactive({ days: [] })
 const workoutMap = reactive({})
 const lastSessions = reactive({})
 
-// Hier speichern wir den reinen SVG-String
 const svgContent = ref('')
+
+const firstWorkoutId = ref(null)
 
 onMounted(async () => {
   loading.value = true
   try {
-    // 1) Plan laden
+    // Plan laden
     const { data: planRow, error: planError } = await supabase
       .from('training_plans')
       .select('*')
@@ -146,20 +142,23 @@ onMounted(async () => {
     planNameDisplay.value = planRow.plan_name || 'Unbenannter Plan'
     Object.assign(planData, planRow.plan_data)
 
-    // 2) Alle Workouts laden
+    // Alle Workouts laden
     const { data: workoutsData, error: wError } = await supabase
       .from('workouts')
       .select('id, name, description, video_url, target_muscles, equipment')
     if (wError) throw wError
-
     workoutsData.forEach(w => {
       workoutMap[w.id] = w
     })
 
-    // 3) Letzte Trainings laden
-    await loadLastSessions()
+    for (const day of planData.days) {
+      if (day.workouts && day.workouts.length > 0) {
+        firstWorkoutId.value = day.workouts[0]
+        break
+      }
+    }
 
-    // 4) Muscle SVG laden (einmalig)
+    await loadLastSessions()
     await loadMuscleSVG()
   } catch (err) {
     errorMessage.value = err.message
@@ -170,7 +169,6 @@ onMounted(async () => {
 
 async function loadLastSessions() {
   try {
-    // User
     const { data: userData } = await supabase.auth.getUser()
     if (!userData?.user) return
 
@@ -181,7 +179,6 @@ async function loadLastSessions() {
     const workoutIdArray = [...allIds]
     if (!workoutIdArray.length) return
 
-    // Sessions
     const { data: sessionsData } = await supabase
       .from('training_sessions')
       .select('id, created_at, workout_id')
@@ -190,7 +187,6 @@ async function loadLastSessions() {
       .order('created_at', { ascending: false })
     if (!sessionsData?.length) return
 
-    // Sets
     const sIds = sessionsData.map(s => s.id)
     const { data: setsData } = await supabase
       .from('training_session_sets')
@@ -198,7 +194,6 @@ async function loadLastSessions() {
       .in('training_session_id', sIds)
     if (!setsData) return
 
-    // Neueste Session
     workoutIdArray.forEach(wId => {
       const latest = sessionsData.find(s => s.workout_id === wId)
       if (!latest) return
@@ -213,7 +208,6 @@ async function loadLastSessions() {
   }
 }
 
-// SVG laden
 async function loadMuscleSVG() {
   try {
     const res = await fetch('/assets/Muscle_Map.svg')
@@ -223,39 +217,9 @@ async function loadMuscleSVG() {
   }
 }
 
-/**
- * Erzeugt eine "kopierte" SVG pro Workout, in der nur dessen Zielmuskeln aktiv sind.
- */
-function getHighlightedMuscles(workoutId) {
-  if (!svgContent.value) return ''
-
-  // 1) Kopie des SVG als DOM-Objekt
-  const parser = new DOMParser()
-  const doc = parser.parseFromString(svgContent.value, 'image/svg+xml')
-
-  // 2) alle .active entfernen
-  doc.querySelectorAll('.active').forEach(el => el.classList.remove('active'))
-
-  // 3) für das Workout: Zielmuskeln aktivieren
-  const muscles = workoutMap[workoutId]?.target_muscles || []
-  muscles.forEach(mId => {
-    const muscleEl = doc.getElementById(mId)
-    if (muscleEl) muscleEl.classList.add('active')
-  })
-
-  return doc.documentElement.outerHTML
-}
-
-/* Hilfsfunktionen */
-function hasTargetMuscles(workoutId) {
-  const w = workoutMap[workoutId]
-  return w && w.target_muscles && w.target_muscles.length > 0
-}
-
 function excerpt(text, maxLength) {
   if (!text) return ''
-  if (text.length <= maxLength) return text
-  return text.slice(0, maxLength) + '...'
+  return text.length <= maxLength ? text : text.slice(0, maxLength) + '...'
 }
 
 function getYoutubeThumbnail(url) {
@@ -275,57 +239,149 @@ function getYoutubeThumbnail(url) {
   }
 }
 
+function hasTargetMuscles(workoutId) {
+  const w = workoutMap[workoutId]
+  return w && w.target_muscles && w.target_muscles.length > 0
+}
+
 function formatDate(dateStr) {
   if (!dateStr) return ''
   return new Date(dateStr).toLocaleString()
 }
+
+/**
+ * getHighlightedMuscles(workoutId):
+ * Parst die Muscle-Map-SVG und hebt die Zielmuskeln des Workouts hervor.
+ */
+function getHighlightedMuscles(workoutId) {
+  if (!svgContent.value) return ''
+  const parser = new DOMParser()
+  const doc = parser.parseFromString(svgContent.value, 'image/svg+xml')
+  doc.querySelectorAll('.active').forEach(el => el.classList.remove('active'))
+  const muscles = workoutMap[workoutId]?.target_muscles || []
+  muscles.forEach(mId => {
+    const muscleEl = doc.getElementById(mId)
+    if (muscleEl) muscleEl.classList.add('active')
+  })
+  return doc.documentElement.outerHTML
+}
+
+/**
+ * getPlanSvg(plan):
+ * Parst die Muscle-Map-SVG und hebt für alle in plan.muscleGroups enthaltenen Muskel-IDs diese hervor.
+ */
+function getPlanSvg(plan) {
+  if (!svgContent.value) return ''
+  const parser = new DOMParser()
+  const doc = parser.parseFromString(svgContent.value, 'image/svg+xml')
+  doc.querySelectorAll('.active').forEach(el => el.classList.remove('active'))
+  if (plan.muscleGroups && plan.muscleGroups.length > 0) {
+    plan.muscleGroups.forEach(muscle => {
+      const muscleEl = doc.getElementById(muscle)
+      if (muscleEl) muscleEl.classList.add('active')
+    })
+  }
+  return doc.documentElement.outerHTML
+}
 </script>
 
 <style scoped>
-.plan-hero {
-  background: var(--videospage-bg, #007bff);
-  background-image: linear-gradient(rgba(0, 0, 0, 0.2),
-      rgba(0, 0, 0, 0.2)), var(--videospage-bg, #007bff);
-  color: #fff;
-  border-radius: 0 0 10px 10px;
+/* Allgemeines Seitenlayout */
+.training-plan-page {
+  font-family: 'Poppins', sans-serif;
+  background: #f5f7fa;
+  padding-bottom: 2rem;
 }
 
-.loading-section {
-  min-height: 200px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+/* Hero-Bereich wurde entfernt – stattdessen einfache Header-Anzeige */
+.plan-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.plan-header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+.plan-header p {
+  font-size: 1.2rem;
 }
 
+/* Hero-Aktion */
+.hero-action {
+  margin-top: 1.5rem;
+}
+.hero-action .btn {
+  padding: 0.75rem 1.5rem;
+  font-size: 1.1rem;
+}
+
+/* Container */
+.container {
+  max-width: 900px;
+}
+
+/* Workout Cards */
 .workout-card {
   transition: transform 0.2s ease;
 }
-
 .workout-card:hover {
   transform: translateY(-2px);
 }
-
 .workout-card img {
   height: 150px;
   object-fit: cover;
 }
 
-/* muscle-map */
+/* Muscle-Map Container */
 .muscle-map-container {
   margin-top: 1rem;
 }
-
 .muscle-map-container svg {
   width: 100%;
   max-width: 400px;
   height: auto;
 }
 
-/* Style für "aktive" Muskeln */
+/* Card-Übersicht */
+.card {
+  border: none;
+  border-radius: 10px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease;
+}
+.card:hover {
+  transform: translateY(-3px);
+}
+
+/* Texte */
+.card-title,
+.card-subtitle,
+.card-text {
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Icons & Buttons */
+.btn {
+  border-radius: 50px;
+  text-transform: none;
+}
+.thumbnail-link img {
+  width: 100%;
+}
+.dropdown-menu li {
+  cursor: pointer;
+}
+
+/* Basis-SVG-Muskelkarte */
 .active {
   fill: #ff5252 !important;
   stroke: #ff5252 !important;
   transition: all 0.2s;
+}
+
+/* Spezifische Styles für Workout Cards */
+.workout-card {
+  border: 1px solid #e0e0e0;
 }
 </style>

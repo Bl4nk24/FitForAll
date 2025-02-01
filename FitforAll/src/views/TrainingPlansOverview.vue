@@ -40,10 +40,20 @@
           <div class="col-12 col-md-6 col-lg-4" v-for="(plan, index) in plans" :key="plan.id">
             <div class="card card-modern h-100">
               <div class="card-body d-flex flex-column">
-                <!-- Plan Header: Titel und Datum -->
-                <div class="plan-header mb-3">
-                  <h5 class="card-title fs-6 mb-1">{{ plan.plan_name || 'Unbenannter Plan' }}</h5>
-                  <p class="card-subtitle text-muted small">{{ formatDate(plan.created_at) }}</p>
+                <!-- Plan-Header: Titel, Datum und Aktionen -->
+                <div class="plan-header mb-3 d-flex justify-content-between align-items-center">
+                  <div>
+                    <h5 class="card-title fs-6 mb-1">{{ plan.plan_name || 'Unbenannter Plan' }}</h5>
+                    <p class="card-subtitle text-muted small">{{ formatDate(plan.created_at) }}</p>
+                  </div>
+                  <div class="plan-actions">
+                    <button class="btn btn-link p-0 rename-btn" @click="renamePlan(plan, index)">
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-link p-0 delete-btn" @click="deletePlan(plan, index)">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </div>
                 </div>
                 <!-- SVG-Bereich: Voll sichtbar in der oberen Hälfte der Card -->
                 <div class="svg-section mb-3" v-if="svgContent">
@@ -58,24 +68,6 @@
                     <router-link :to="`/training-plans/${plan.id}/detail`" class="btn btn-outline-secondary btn-sm">
                       Anzeigen
                     </router-link>
-                    <div class="dropdown ms-auto" @click.stop>
-                      <button class="btn btn-link p-0 btn-sm" @click="toggleDropdown(index)">
-                        <i class="bi bi-three-dots-vertical fs-4"></i>
-                      </button>
-                      <ul class="dropdown-menu dropdown-menu-end" :class="{ show: openDropdownIndex === index }">
-                        <li>
-                          <button class="dropdown-item" @click="renamePlan(plan, index)">
-                            <i class="bi bi-pencil"></i> Umbenennen
-                          </button>
-                        </li>
-                        <li><hr class="dropdown-divider" /></li>
-                        <li>
-                          <button class="dropdown-item text-danger" @click="deletePlan(plan, index)">
-                            <i class="bi bi-trash"></i> Löschen
-                          </button>
-                        </li>
-                      </ul>
-                    </div>
                   </div>
                 </div>
               </div><!-- Ende Card-Body -->
@@ -105,12 +97,12 @@ const loading = ref(true)
 const errorMessage = ref('')
 const plans = ref([])
 
-// Dropdown-Steuerung und Wizard-States
-const openDropdownIndex = ref(null)
+// Wir benötigen kein Dropdown mehr, daher entfällt openDropdownIndex
+// Wizard-States
 const showAutoWizard = ref(false)
 const showManualModal = ref(false)
 
-// Basis-SVG (einmalig laden)
+// Basis-SVG (wird einmalig geladen)
 const svgContent = ref('')
 
 onMounted(async () => {
@@ -201,14 +193,8 @@ function formatDate(dateStr) {
   return dateStr ? new Date(dateStr).toLocaleString() : ''
 }
 
-// Dropdown toggeln
-function toggleDropdown(idx) {
-  openDropdownIndex.value = openDropdownIndex.value === idx ? null : idx
-}
-
-// Plan umbenennen
+// Funktion zum Umbenennen
 async function renamePlan(plan, idx) {
-  openDropdownIndex.value = null
   const newName = prompt('Neuen Namen eingeben:', plan.plan_name || '')
   if (!newName || newName.trim() === plan.plan_name) return
   
@@ -226,9 +212,8 @@ async function renamePlan(plan, idx) {
   }
 }
 
-// Plan löschen
+// Funktion zum Löschen
 async function deletePlan(plan, idx) {
-  openDropdownIndex.value = null
   const ok = confirm(`Möchtest du den Plan "${plan.plan_name}" wirklich löschen?`)
   if (!ok) return
   
@@ -313,13 +298,22 @@ function getPlanSvg(plan) {
 /* Plan Header */
 .plan-header {
   margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.plan-header h5 {
+  margin: 0;
+}
+.plan-actions button {
+  margin-left: 0.5rem;
+  color: #6c757d;
 }
 
-/* SVG-Bereich: Wir entfernen Hintergründe, damit keine weißen Balken entstehen.
-   Die SVG wird als Block-Element mit fester Höhe dargestellt. */
+/* SVG-Bereich: Der Container soll die SVG komplett anzeigen */
 .svg-section {
   width: 100%;
-  height: 200px; /* Erhöhe die Höhe, um die Grafik vollständig zu zeigen */
+  height: 200px; /* Hier wird die SVG angezeigt */
   margin-bottom: 1rem;
 }
 .svg-section svg {
@@ -329,14 +323,7 @@ function getPlanSvg(plan) {
   background: transparent;
 }
 
-/* Dropdown-Style */
-.dropdown-menu {
-  border: none;
-  border-radius: 8px;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.1);
-}
-
-/* Buttons */
+/* Aktionsbuttons bleiben unverändert */
 .btn {
   border-radius: 50px;
   text-transform: none;
@@ -344,9 +331,8 @@ function getPlanSvg(plan) {
 .btn-group .btn {
   flex: 1;
 }
-.dropdown-menu li {
-  cursor: pointer;
-}
+
+/* Dropdown entfällt */
 
 /* Basis-SVG-Muskelkarte */
 .s2 {
