@@ -24,9 +24,15 @@ const routes = [
     component: () => import('./views/ViewVideo.vue'),
   },
   {
-    path: '/training-plans/:id',
+    path: '/training-plans/:planId/detail',
     name: 'TrainingPlanDetail',
     component: () => import('./views/TrainingPlanDetail.vue'),
+  },
+  {
+    path: '/training-plans/:planId/start',
+    name: 'TrainingPlanStart',
+    component: () => import('./views/TrainingPlanStart.vue'),
+    props: true,
   },
 ]
 

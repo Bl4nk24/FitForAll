@@ -1,210 +1,247 @@
 <template>
-  <div class="training-plan-detail container my-5" style="max-width: 900px;">
-    <!-- Kopfzeile mit Planname + 3-Punkte-Menü -->
-    <div class="d-flex justify-content-between align-items-start mb-3">
-      <h1 class="mb-0">
-        Trainingsplan: {{ plan.value.plan_name || 'Unbenannter Plan' }}
-      </h1>
+  <div class="training-plan-page">
+    <div class="container my-5" style="max-width: 900px;">
+      <!-- Fehlermeldung -->
+      <div v-if="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
 
-      <!-- Drei-Punkte-Menü (Plan-Aktionen) -->
-      <div class="dropdown" @click.stop>
-        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" @click="toggleDropdown">
-          ⋮
-        </button>
-        <ul class="dropdown-menu dropdown-menu-end" :class="{ show: dropdownOpen }">
-          <li>
-            <button class="dropdown-item" @click="renamePlan">
-              Umbenennen
-            </button>
-          </li>
-          <li>
-            <hr class="dropdown-divider" />
-          </li>
-          <li>
-            <button class="dropdown-item text-danger" @click="deletePlan">
-              Löschen
-            </button>
-          </li>
-        </ul>
+      <!-- Ladeanzeige -->
+      <div v-else-if="loading" class="text-center loading-section">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-3 fw-semibold">Lade Trainingsplan...</p>
       </div>
-    </div>
 
-    <!-- Ladezustand / Fehler -->
-    <div v-if="loading" class="text-center">
-      <div class="spinner-border text-primary"></div>
-      <p class="mt-2">Daten werden geladen...</p>
-    </div>
-    <div v-else-if="errorMessage" class="alert alert-danger">
-      {{ errorMessage }}
-    </div>
-    <div v-else>
-      <!-- Plan-Infos -->
-      <p>
-        <strong>Anzahl Tage:</strong> {{ plan.value.number_of_days }}<br />
-        <strong>Erstellt am:</strong> {{ formatDate(plan.value.created_at) }}
-      </p>
-
-      <!-- Tages-Übersicht -->
-      <div v-if="plan.value.plan_data && plan.value.plan_data.days">
-        <div class="day-card card mb-3" v-for="(dayObj, index) in plan.value.plan_data.days" :key="index">
-          <div class="card-header bg-light">
-            <!-- Falls dayName existiert, zeigen wir das an. Sonst "Tag X". -->
-            <h5 class="mb-0">
-              {{ dayObj.dayName ? dayObj.dayName : 'Tag ' + (index + 1) }}
-            </h5>
+      <!-- Plan-Inhalt -->
+      <div v-else>
+        <!-- Überschrift -->
+        <div class="plan-header text-center mb-4">
+          <h1 class="display-5 fw-bold">{{ planNameDisplay }}</h1>
+          <p class="lead">Übersicht aller Workouts in diesem Plan</p>
+          <!-- Training starten Button -->
+          <div v-if="firstWorkoutId" class="mt-3">
+            <router-link :to="`/training-plans/${planId}/start`" class="btn btn-lg btn-success">
+              Training starten
+            </router-link>
           </div>
-          <div class="card-body">
-            <!-- Falls dieser Tag Workouts hat -->
-            <div v-if="dayObj.workouts && dayObj.workouts.length > 0">
-              <div class="row row-cols-1 row-cols-md-2 g-3">
-                <div v-for="(workoutId, i) in dayObj.workouts" :key="i" class="col">
-                  <!-- Check: Haben wir dieses Workout in workoutMap? -->
-                  <div class="card h-100" v-if="workoutMap.value[workoutId]">
-                    <!-- Thumbnail -->
-                    <img :src="getYoutubeThumbnail(workoutMap.value[workoutId].video_url)" class="card-img-top"
-                      alt="Workout Thumbnail" style="object-fit: cover; height: 150px;" />
-                    <div class="card-body">
-                      <h5 class="card-title mb-1">
-                        {{ workoutMap.value[workoutId].name }}
-                      </h5>
+        </div>
 
-                      <!-- Beschreibung -->
-                      <p class="card-text text-muted" v-if="workoutMap.value[workoutId].description">
-                        {{ excerpt(workoutMap.value[workoutId].description, 80) }}
-                      </p>
+        <!-- Falls keine Tage vorhanden -->
+        <div v-if="!planData.days || planData.days.length === 0" class="alert alert-info">
+          Keine Tagesdaten vorhanden.
+        </div>
 
-                      <!-- Equipment -->
-                      <div v-if="
-                        workoutMap.value[workoutId].equipment &&
-                        workoutMap.value[workoutId].equipment.length > 0
-                      ">
-                        <span v-for="(eq, eqIdx) in workoutMap.value[workoutId].equipment" :key="eqIdx"
-                          class="badge bg-info text-dark me-1">
-                          {{ eq }}
-                        </span>
-                      </div>
+        <!-- Tagesliste -->
+        <div v-else>
+          <div v-for="(day, dayIndex) in planData.days" :key="dayIndex" class="mb-5">
+            <div class="row row-cols-1 row-cols-md-2 g-4">
+              <div class="col" v-for="(workoutId, wIdx) in day.workouts" :key="wIdx">
+                <div class="card h-100 workout-card">
+                  <!-- Thumbnail als klickbarer Link -->
+                  <router-link :to="`/workout/${workoutId}`" class="thumbnail-link">
+                    <img
+                      :src="getYoutubeThumbnail(workoutMap[workoutId]?.video_url)"
+                      class="card-img-top"
+                      alt="Thumbnail"
+                    />
+                  </router-link>
+                  <div class="card-body d-flex flex-column">
+                    <!-- Name & Beschreibung -->
+                    <h5 class="card-title">
+                      {{ workoutMap[workoutId]?.name || 'Unbekanntes Workout' }}
+                    </h5>
+                    <p class="card-text text-muted">
+                      {{ excerpt(workoutMap[workoutId]?.description, 60) }}
+                    </p>
+
+                    <!-- Zielmuskeln direkt anzeigen -->
+                    <div v-if="hasTargetMuscles(workoutId)" class="mb-3">
+                      <strong>Beanspruchte Muskeln:</strong>
                     </div>
-                  </div>
 
-                  <!-- Workout nicht in Map gefunden -->
-                  <div class="card h-100" v-else>
-                    <div class="card-body">
-                      <p class="text-muted">
-                        Unbekanntes Workout (ID: {{ workoutId }})
+                    <!-- Muskelkarte (SVG) direkt unter dem Video -->
+                    <div
+                      class="muscle-map-container"
+                      v-if="svgContent"
+                      v-html="getHighlightedMuscles(workoutId)"
+                    ></div>
+
+                    <!-- Letztes Training -->
+                    <div class="last-training mt-auto" v-if="lastSessions[workoutId]">
+                      <hr />
+                      <h6 class="text-primary">Letztes Training:</h6>
+                      <p class="mb-1">
+                        <small class="text-muted">
+                          {{ formatDate(lastSessions[workoutId].date) }}
+                        </small>
                       </p>
+                      <ul class="list-unstyled">
+                        <li v-for="(set, sIndex) in lastSessions[workoutId].sets" :key="sIndex">
+                          {{ set.reps }} Wdh. x {{ set.weight }} kg
+                        </li>
+                      </ul>
                     </div>
+                    <div class="text-muted mt-auto" v-else>
+                      <hr />
+                      <p>Kein Training vorhanden</p>
+                    </div>
+
+                    <!-- Button zum Workout -->
+                    <router-link :to="`/workout/${workoutId}`" class="btn btn-primary mt-3">
+                      Workout ansehen
+                    </router-link>
                   </div>
                 </div>
+                <!-- /Workout-Card -->
               </div>
-            </div>
-            <div v-else>
-              <p class="text-muted">Keine Workouts an diesem Tag.</p>
             </div>
           </div>
         </div>
-      </div>
-      <div v-else class="alert alert-info">
-        Kein Tagesplan vorhanden.
-      </div>
 
-      <!-- Button: Zurück zur Übersicht -->
-      <router-link to="/training-plans" class="btn btn-outline-primary mt-3">
-        Zur Übersicht
-      </router-link>
+        <!-- Zurück-Button -->
+        <router-link to="/training-plans" class="btn btn-outline-primary mt-4">
+          Zur Trainingsplan-Übersicht
+        </router-link>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { reactive, ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import { supabase } from '../supabase'
 
-// Route param => planId
 const route = useRoute()
-const router = useRouter()
 const planId = route.params.planId
 
-// State
 const loading = ref(true)
 const errorMessage = ref('')
-const plan = ref({})
 
-// Dropdown
-const dropdownOpen = ref(false)
+const planNameDisplay = ref('')
+const planData = reactive({ days: [] })
+const workoutMap = reactive({})
+const lastSessions = reactive({})
 
-// workoutId -> { name, description, video_url, equipment: [] }
-const workoutMap = ref({})
+const svgContent = ref('')
 
-// onMounted => hole Plan + Workouts
+const firstWorkoutId = ref(null)
+
 onMounted(async () => {
+  loading.value = true
   try {
-    // Plan-Datensatz
-    const { data: planData, error: planError } = await supabase
+    // Plan laden
+    const { data: planRow, error: planError } = await supabase
       .from('training_plans')
       .select('*')
       .eq('id', planId)
       .single()
-
     if (planError) throw planError
-    if (!planData) throw new Error('Plan nicht gefunden.')
+    if (!planRow) throw new Error('Plan nicht gefunden.')
 
-    plan.value = planData
+    planNameDisplay.value = planRow.plan_name || 'Unbenannter Plan'
+    Object.assign(planData, planRow.plan_data)
 
-
-    // Workouts (Felder: id, name, description, video_url, equipment)
+    // Alle Workouts laden
     const { data: workoutsData, error: wError } = await supabase
       .from('workouts')
-      .select('id, name, description, video_url, equipment')
+      .select('id, name, description, video_url, target_muscles, equipment')
     if (wError) throw wError
-
-    // Aufbau der Map
-    const map = {}
-    workoutsData.forEach((w) => {
-      map[w.id] = {
-        name: w.name,
-        description: w.description,
-        video_url: w.video_url,
-        equipment: w.equipment || []
-      }
+    workoutsData.forEach(w => {
+      workoutMap[w.id] = w
     })
-    workoutMap.value = map
+
+    for (const day of planData.days) {
+      if (day.workouts && day.workouts.length > 0) {
+        firstWorkoutId.value = day.workouts[0]
+        break
+      }
+    }
+
+    await loadLastSessions()
+    await loadMuscleSVG()
   } catch (err) {
     errorMessage.value = err.message
-    console.error('Fehler beim Laden des Plans:', err)
   } finally {
     loading.value = false
   }
 })
 
-// Helpers
-
-function getYoutubeThumbnail(url) {
-  if (!url) return '/fallback-thumbnail.jpg'
+async function loadLastSessions() {
   try {
-    let videoId = ''
-    let match = url.match(/[?&]v=([^&]+)/)
-    if (match && match[1]) {
-      videoId = match[1]
-    } else {
-      match = url.match(/youtu\.be\/([^?]+)/)
-      if (match && match[1]) {
-        videoId = match[1]
+    const { data: userData } = await supabase.auth.getUser()
+    if (!userData?.user) return
+
+    const allIds = new Set()
+    planData.days.forEach(d => {
+      d.workouts.forEach(w => allIds.add(w))
+    })
+    const workoutIdArray = [...allIds]
+    if (!workoutIdArray.length) return
+
+    const { data: sessionsData } = await supabase
+      .from('training_sessions')
+      .select('id, created_at, workout_id')
+      .eq('user_id', userData.user.id)
+      .in('workout_id', workoutIdArray)
+      .order('created_at', { ascending: false })
+    if (!sessionsData?.length) return
+
+    const sIds = sessionsData.map(s => s.id)
+    const { data: setsData } = await supabase
+      .from('training_session_sets')
+      .select('training_session_id, reps, weight')
+      .in('training_session_id', sIds)
+    if (!setsData) return
+
+    workoutIdArray.forEach(wId => {
+      const latest = sessionsData.find(s => s.workout_id === wId)
+      if (!latest) return
+      const relevantSets = setsData.filter(x => x.training_session_id === latest.id)
+      lastSessions[wId] = {
+        date: latest.created_at,
+        sets: relevantSets
       }
-    }
-    if (!videoId) {
-      return '/fallback-thumbnail.jpg'
-    }
-    return `https://img.youtube.com/vi/${videoId}/0.jpg`
-  } catch {
-    return '/fallback-thumbnail.jpg'
+    })
+  } catch (err) {
+    console.error('Fehler bei loadLastSessions:', err)
+  }
+}
+
+async function loadMuscleSVG() {
+  try {
+    const res = await fetch('/assets/Muscle_Map.svg')
+    svgContent.value = await res.text()
+  } catch (err) {
+    console.error('Fehler beim Laden der Muscle_Map:', err)
   }
 }
 
 function excerpt(text, maxLength) {
   if (!text) return ''
-  if (text.length <= maxLength) return text
-  return text.slice(0, maxLength) + '...'
+  return text.length <= maxLength ? text : text.slice(0, maxLength) + '...'
+}
+
+function getYoutubeThumbnail(url) {
+  if (!url) return '/fallback-thumbnail.jpg'
+  try {
+    let match = url.match(/[?&]v=([^&]+)/)
+    if (match && match[1]) {
+      return `https://img.youtube.com/vi/${match[1]}/0.jpg`
+    }
+    match = url.match(/youtu\.be\/([^?]+)/)
+    if (match && match[1]) {
+      return `https://img.youtube.com/vi/${match[1]}/0.jpg`
+    }
+    return '/fallback-thumbnail.jpg'
+  } catch {
+    return '/fallback-thumbnail.jpg'
+  }
+}
+
+function hasTargetMuscles(workoutId) {
+  const w = workoutMap[workoutId]
+  return w && w.target_muscles && w.target_muscles.length > 0
 }
 
 function formatDate(dateStr) {
@@ -212,80 +249,139 @@ function formatDate(dateStr) {
   return new Date(dateStr).toLocaleString()
 }
 
-// Dropdown toggeln
-function toggleDropdown() {
-  dropdownOpen.value = !dropdownOpen.value
+/**
+ * getHighlightedMuscles(workoutId):
+ * Parst die Muscle-Map-SVG und hebt die Zielmuskeln des Workouts hervor.
+ */
+function getHighlightedMuscles(workoutId) {
+  if (!svgContent.value) return ''
+  const parser = new DOMParser()
+  const doc = parser.parseFromString(svgContent.value, 'image/svg+xml')
+  doc.querySelectorAll('.active').forEach(el => el.classList.remove('active'))
+  const muscles = workoutMap[workoutId]?.target_muscles || []
+  muscles.forEach(mId => {
+    const muscleEl = doc.getElementById(mId)
+    if (muscleEl) muscleEl.classList.add('active')
+  })
+  return doc.documentElement.outerHTML
 }
 
-// Plan umbenennen
-async function renamePlan() {
-  dropdownOpen.value = false
-  if (!plan.value?.id) return
-
-  const newName = prompt('Neuen Plan-Namen eingeben:', plan.value.plan_name || '')
-  if (!newName || !newName.trim()) return
-
-  try {
-    const { data, error } = await supabase
-      .from('training_plans')
-      .update({ plan_name: newName.trim() })
-      .eq('id', plan.value.id)
-      .select('*')
-      .single()
-
-    if (error) throw error
-    plan.value = data
-  } catch (err) {
-    alert('Fehler beim Umbenennen: ' + err.message)
+/**
+ * getPlanSvg(plan):
+ * Parst die Muscle-Map-SVG und hebt für alle in plan.muscleGroups enthaltenen Muskel-IDs diese hervor.
+ */
+function getPlanSvg(plan) {
+  if (!svgContent.value) return ''
+  const parser = new DOMParser()
+  const doc = parser.parseFromString(svgContent.value, 'image/svg+xml')
+  doc.querySelectorAll('.active').forEach(el => el.classList.remove('active'))
+  if (plan.muscleGroups && plan.muscleGroups.length > 0) {
+    plan.muscleGroups.forEach(muscle => {
+      const muscleEl = doc.getElementById(muscle)
+      if (muscleEl) muscleEl.classList.add('active')
+    })
   }
-}
-
-// Plan löschen
-async function deletePlan() {
-  dropdownOpen.value = false
-  if (!plan.value?.id) return
-
-  const ok = confirm(`Plan "${plan.value.plan_name}" wirklich löschen?`)
-  if (!ok) return
-
-  try {
-    const { error } = await supabase
-      .from('training_plans')
-      .delete()
-      .eq('id', plan.value.id)
-
-    if (error) throw error
-
-    // Nach dem Löschen zur Liste navigieren
-    router.push('/training-plans')
-  } catch (err) {
-    alert('Fehler beim Löschen: ' + err.message)
-  }
+  return doc.documentElement.outerHTML
 }
 </script>
 
 <style scoped>
-.training-plan-detail {
-  min-height: 70vh;
+/* Allgemeines Seitenlayout */
+.training-plan-page {
+  font-family: 'Poppins', sans-serif;
+  background: #f5f7fa;
+  padding-bottom: 2rem;
 }
 
-.day-card .card-header {
-  background-color: #f8f9fa;
+/* Hero-Bereich wurde entfernt – stattdessen einfache Header-Anzeige */
+.plan-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.plan-header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+.plan-header p {
+  font-size: 1.2rem;
 }
 
-/* Einfaches Dropdown-Styling */
-.dropdown-menu {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  margin-top: 0.25rem;
-  display: none;
-  min-width: 8rem;
-  background-color: #fff;
-  border: 1px solid rgba(0, 0, 0, 0.15);
+/* Hero-Aktion */
+.hero-action {
+  margin-top: 1.5rem;
+}
+.hero-action .btn {
+  padding: 0.75rem 1.5rem;
+  font-size: 1.1rem;
 }
 
-.dropdown-menu.show {
-  display: block;
+/* Container */
+.container {
+  max-width: 900px;
+}
+
+/* Workout Cards */
+.workout-card {
+  transition: transform 0.2s ease;
+}
+.workout-card:hover {
+  transform: translateY(-2px);
+}
+.workout-card img {
+  height: 150px;
+  object-fit: cover;
+}
+
+/* Muscle-Map Container */
+.muscle-map-container {
+  margin-top: 1rem;
+}
+.muscle-map-container svg {
+  width: 100%;
+  max-width: 400px;
+  height: auto;
+}
+
+/* Card-Übersicht */
+.card {
+  border: none;
+  border-radius: 10px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease;
+}
+.card:hover {
+  transform: translateY(-3px);
+}
+
+/* Texte */
+.card-title,
+.card-subtitle,
+.card-text {
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Icons & Buttons */
+.btn {
+  border-radius: 50px;
+  text-transform: none;
+}
+.thumbnail-link img {
+  width: 100%;
+}
+.dropdown-menu li {
+  cursor: pointer;
+}
+
+/* Basis-SVG-Muskelkarte */
+.active {
+  fill: #ff5252 !important;
+  stroke: #ff5252 !important;
+  transition: all 0.2s;
+}
+
+/* Spezifische Styles für Workout Cards */
+.workout-card {
+  border: 1px solid #e0e0e0;
 }
 </style>

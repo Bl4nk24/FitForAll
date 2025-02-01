@@ -5,7 +5,7 @@
       <div class="container">
         <h1 class="display-4 fw-bold">Deine Workout-Bibliothek</h1>
         <p class="lead">
-          Finde Workouts, die zu dir passen – jederzeit und überall.
+          Finde Workouts, die zu dir passen &mdash; jederzeit und überall.
         </p>
       </div>
     </section>
@@ -16,11 +16,11 @@
       <div v-if="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
 
       <!-- Ladeanzeige -->
-      <div v-else-if="loading" class="text-center">
+      <div v-else-if="loading" class="text-center loading-section">
         <div class="spinner-border text-primary" role="status">
           <span class="visually-hidden">Loading...</span>
         </div>
-        <p class="mt-2">Lade Workouts...</p>
+        <p class="mt-3 fw-semibold">Lade Workouts...</p>
       </div>
 
       <!-- Gefilterte Workouts -->
@@ -31,24 +31,37 @@
         </div>
 
         <!-- Grid aus Karten -->
-        <div class="row row-cols-1 row-cols-md-3 g-4">
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
           <div class="col" v-for="workout in filteredWorkouts" :key="workout.id">
-            <div class="card h-100 shadow-sm position-relative">
+            <!-- 
+              1) Card mit fixer/limitierter Höhe
+              2) shadow-sm + workout-card (für Hover-Effekt)
+            -->
+            <div class="card h-100 shadow-sm workout-card">
               <!-- Vorschaubild (YouTube-Thumbnail) -->
-              <router-link :to="`/workout/${workout.id}`">
-                <img
-                  :src="getYoutubeThumbnail(workout.video_url)"
-                  class="card-img-top"
-                  alt="Workout Thumbnail"
-                  style="max-height: 180px; object-fit: cover; cursor: pointer;"
+              <router-link :to="`/workout/${workout.id}`" class="thumbnail-link">
+                <img 
+                  :src="getYoutubeThumbnail(workout.video_url)" 
+                  class="card-img-top" 
+                  alt="Workout Thumbnail" 
                 />
               </router-link>
 
+              <!-- Card-Body mit Flex-Layout -->
               <div class="card-body d-flex flex-column">
                 <h5 class="card-title mb-2">{{ workout.name }}</h5>
-                <p class="card-text">
-                  {{ excerpt(workout.description, 80) }}
+                <!-- Kurzer Beschreibungstext (10 Zeichen + ...) -->
+                <p class="card-text text-muted mb-2">
+                  {{ excerpt(workout.description, 10) }}
                 </p>
+
+                <!-- Button am unteren Ende -->
+                <router-link 
+                  :to="`/workout/${workout.id}`" 
+                  class="btn btn-primary mt-auto"
+                >
+                  Workout ansehen
+                </router-link>
               </div>
             </div>
           </div>
@@ -64,7 +77,6 @@ import { supabase } from '../supabase'
 
 const loading = ref(true)
 const errorMessage = ref('')
-
 const workouts = ref([])
 const filteredWorkouts = ref([])
 
@@ -72,7 +84,7 @@ onMounted(async () => {
   loading.value = true
   errorMessage.value = ''
 
-  // 1) Auth-Check
+  // Auth-Check
   const { data: authData, error: authError } = await supabase.auth.getUser()
   if (authError || !authData?.user) {
     errorMessage.value = 'Du bist nicht eingeloggt.'
@@ -80,7 +92,7 @@ onMounted(async () => {
     return
   }
 
-  // 2) problem_muscle_groups
+  // user_problem_muscles laden
   let userProblemMuscles = []
   try {
     const { data: userSettingsData, error: userSettingsError } = await supabase
@@ -98,7 +110,7 @@ onMounted(async () => {
     return
   }
 
-  // 3) Alle Workouts laden
+  // Alle Workouts laden
   try {
     const { data: workoutsData, error: workoutsError } = await supabase
       .from('workouts')
@@ -113,7 +125,7 @@ onMounted(async () => {
     return
   }
 
-  // 4) Filter: Workouts ohne Overlap mit userProblemMuscles
+  // Filtern: nur Workouts ohne Overlap mit userProblemMuscles
   filteredWorkouts.value = workouts.value.filter((workout) => {
     const pm = workout.problem_muscle_groups || []
     return !pm.some((muscle) => userProblemMuscles.includes(muscle))
@@ -154,25 +166,65 @@ function getYoutubeThumbnail(url) {
 <style scoped>
 .videos-hero {
   background: var(--videospage-bg, #007bff);
-  color: #fff;
-  border-radius: 0 0 10px 10px;
   background-image: linear-gradient(
     rgba(0, 0, 0, 0.2),
     rgba(0, 0, 0, 0.2)
-  ), 
-  var(--videospage-bg, #007bff);
+  ), var(--videospage-bg, #007bff);
+  color: #fff;
+  border-radius: 0 0 10px 10px;
 }
 
+/* Container-Anpassungen */
 .container {
   max-width: 900px;
 }
 
-.card {
-  border-radius: 6px;
-}
-
-.card .card-body {
+/* Ladeanzeige zentrieren */
+.loading-section {
+  min-height: 200px;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Karten-Stil (h-100 & shadow-sm in Template) */
+.card {
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+/* Bildhöhe festlegen (z.B. 100 oder 120 px) */
+.card-img-top {
+  height: 300px;
+  object-fit: cover;
+}
+
+/* Flex-Layout fürs Card-Body, Button unten */
+.card-body {
+  display: flex;
+  flex-direction: column;
+  /* Damit Titel, Text, Button kompakt verteilt werden */
+  padding: 0.75rem;
+}
+
+/* Hover-Effekt */
+.workout-card:hover {
+  transform: translateY(-2px);
+  transition: transform 0.2s ease;
+}
+
+/* Router-Link fürs Bild */
+.thumbnail-link {
+  display: block;
+  overflow: hidden;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 767px) {
+  /* Bild darf ruhig etwas größer auf Mobile sein */
+  .card-img-top {
+    height: 120px;
+  }
 }
 </style>

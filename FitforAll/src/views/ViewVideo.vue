@@ -1,183 +1,112 @@
 <template>
-    <div class="container my-5" style="max-width: 900px;">
-        <!-- Ladezustand / Fehlerzustand -->
-        <div v-if="loading" class="text-center">
-            <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-            <p class="mt-2">Workout wird geladen...</p>
-        </div>
+    <div class="app-wrapper">
+        <!-- Main Content Layout -->
+        <div class="main-layout">
+            <!-- Left Column -->
+            <div class="content-column">
+                <!-- Video Section -->
+                <div class="video-section">
+                    <div v-if="!loading && !errorMessage && workout && isYoutube(workout.video_url)"
+                        class="video-wrapper">
+                        <iframe :src="getEmbeddedUrl(workout.video_url)" class="video-iframe" frameborder="0"
+                            allowfullscreen></iframe>
+                    </div>
 
-        <div v-else-if="errorMessage" class="alert alert-danger">
-            {{ errorMessage }}
-        </div>
-
-        <!-- Workout-Detail -->
-        <div v-else-if="workout">
-            <!-- Titel -->
-            <h2 class="mb-3">{{ workout.name }}</h2>
-
-            <!-- EINGEBETTETES VIDEO (YouTube) oder externer Link -->
-            <div class="ratio ratio-16x9 mb-3" v-if="isYoutube(workout.video_url)">
-                <iframe :src="getEmbeddedUrl(workout.video_url)" frameborder="0" allowfullscreen></iframe>
-            </div>
-            <div v-else class="mb-4">
-                <strong>Video-Link:</strong>
-                <a :href="workout.video_url" target="_blank">{{ workout.video_url }}</a>
-            </div>
-
-            <!-- Beschreibung -->
-            <p class="mb-4">
-                {{ workout.description }}
-            </p>
-
-            <!-- MUSKELAUSWAHL (SVG) -->
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-info text-white">
-                    <h4 class="mb-0">Muskeln mit Problemen</h4>
+                    <!-- Loading/Error States -->
+                    <div v-if="loading" class="state-overlay">
+                        <div class="spinner-border text-primary"></div>
+                        <p>Workout wird geladen...</p>
+                    </div>
+                    <div v-if="errorMessage" class="state-overlay error">
+                        {{ errorMessage }}
+                    </div>
                 </div>
-                <div class="card-body">
+
+                <!-- Workout Details -->
+                <div class="details-section">
+                    <div v-if="workout" class="details-card">
+                        <h1 class="workout-title">{{ workout.name }}</h1>
+                        <div v-if="!isYoutube(workout.video_url)" class="external-video-link">
+                            <a :href="workout.video_url" target="_blank">
+                                <i class="bi bi-link-45deg"></i> Video ansehen
+                            </a>
+                        </div>
+                        <p class="workout-description">{{ workout.description }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="sidebar-column">
+                <!-- Muscle Map Card -->
+                <div v-if="workout" class="sidebar-card muscle-card">
+                    <h3 class="card-title">
+                        <i class="bi bi-heart-pulse"></i> Beanspruchte Muskeln
+                    </h3>
                     <div class="svg-container" v-html="svgContent"></div>
                 </div>
-            </div>
 
-            <!-- Neues Training anlegen -->
-            <div class="card mb-4">
-                <div class="card-header bg-light">
-                    <h5 class="mb-0">Neues Training</h5>
-                </div>
-                <div class="card-body">
-                    <!-- Erfolgsmeldung -->
-                    <div v-if="successMessage" class="alert alert-success">
-                        {{ successMessage }}
+                <!-- Training Log Form -->
+                <div v-if="workout" class="sidebar-card training-form">
+                    <h3 class="card-title">
+                        <i class="bi bi-clipboard-plus"></i> Neues Training
+                    </h3>
+
+                    <div v-if="successMessage" class="success-message">
+                        <i class="bi bi-check-circle"></i> {{ successMessage }}
                     </div>
 
-                    <!-- Notiz zum Training -->
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Notiz zum Training</label>
-                        <textarea class="form-control" rows="2" v-model="trainingNote"
-                            placeholder="z.B. Allgemeines Befinden, Ziel, etc."></textarea>
+                    <div class="form-group">
+                        <label>Notiz</label>
+                        <textarea v-model="trainingNote" class="note-input"
+                            placeholder="Wie fühlst du dich heute?..."></textarea>
                     </div>
 
-                    <hr />
-                    <h6>Sätze hinzufügen:</h6>
-                    <p class="text-muted" v-if="copiedFromLast">
-                        <em>Sätze aus deinem letzten Training übernommen.</em>
-                    </p>
+                    <div class="sets-header">
+                        <h4>Sätze</h4>
+                        <button @click="addSet" class="icon-button">
+                            <i class="bi bi-plus-circle"></i>
+                        </button>
+                    </div>
 
-                    <!-- Sätze-Liste -->
-                    <div class="row g-2 align-items-end" v-for="(item, index) in trainingSets" :key="index"
-                        style="margin-bottom: 1rem;">
-                        <div class="col-4">
-                            <label class="form-label">Reps</label>
-                            <input type="number" min="1" class="form-control" v-model.number="item.reps"
-                                placeholder="z.B. 10" />
-                        </div>
-                        <div class="col-4">
-                            <label class="form-label">Gewicht (kg)</label>
-                            <input type="number" step="0.5" min="0" class="form-control" v-model.number="item.weight"
-                                placeholder="z.B. 40" />
-                        </div>
-                        <div class="col-4">
-                            <button class="btn btn-danger" @click="removeSet(index)">
-                                Entfernen
+                    <div class="sets-list">
+                        <div v-for="(item, index) in trainingSets" :key="index" class="set-item">
+                            <div class="set-number">#{{ index + 1 }}</div>
+                            <input type="number" v-model.number="item.reps" class="set-input" placeholder="Wdh." />
+                            <input type="number" v-model.number="item.weight" class="set-input" placeholder="kg" />
+                            <button @click="removeSet(index)" class="icon-button danger">
+                                <i class="bi bi-trash"></i>
                             </button>
                         </div>
                     </div>
 
-                    <div class="mt-3">
-                        <button class="btn btn-outline-success" @click="addSet">
-                            Weiteren Satz hinzufügen
+                    <button @click="saveTraining" class="save-button" :disabled="trainingSets.length === 0">
+                        <i class="bi bi-save"></i> Training speichern
+                    </button>
+                </div>
+
+                <!-- Calendar Section -->
+                <div v-if="workout" class="sidebar-card calendar-section">
+                    <h3 class="card-title calendar-header">
+                        <button class="icon-button" @click="goToPreviousMonth">
+                            <i class="bi bi-arrow-left-circle"></i>
                         </button>
-                        <button class="btn btn-primary ms-3" @click="saveTraining">
-                            Training speichern
+                        <span class="calendar-header-text">{{ monthName }} {{ year }}</span>
+                        <button class="icon-button" @click="goToNextMonth">
+                            <i class="bi bi-arrow-right-circle"></i>
                         </button>
-                    </div>
-                </div>
-            </div>
+                    </h3>
 
-            <!-- Kalender (Monat) -->
-            <div class="card" v-if="calendarRows.length > 0">
-                <div class="card-header bg-light">
-                    <h5 class="mb-0">Kalender für {{ monthName }} {{ year }}</h5>
-                </div>
-                <div class="card-body">
-                    <p class="text-muted">
-                        Klick auf einen Tag, um Details zum Training anzuzeigen.
-                    </p>
-
-                    <table class="table text-center">
-                        <thead>
-                            <tr>
-                                <th>Mo</th>
-                                <th>Di</th>
-                                <th>Mi</th>
-                                <th>Do</th>
-                                <th>Fr</th>
-                                <th>Sa</th>
-                                <th>So</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="(week, windex) in calendarRows" :key="windex">
-                                <td v-for="(dayObj, dindex) in week" :key="dindex"
-                                    :class="dayObj.isCurrentMonth ? '' : 'text-muted'">
-                                    <div class="day-cell" :class="{ 'has-training': dayObj.hasTraining }"
-                                        @click="dayClicked(dayObj)">
-                                        {{ dayObj.dayNum }}
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- Kein Workout gefunden -->
-        <div v-else class="alert alert-warning">
-            Kein Workout mit dieser ID gefunden.
-        </div>
-
-        <!-- Modal: Trainings-Detail / Tag-Details -->
-        <div class="modal fade" tabindex="-1" role="dialog" :class="{ show: showModal }" style="display: block"
-            v-if="showModal">
-            <div class="modal-dialog modal-lg" role="document" @click.stop>
-                <div class="modal-content">
-                    <div class="modal-header bg-primary text-white">
-                        <h5 class="modal-title">Training am {{ selectedDayLabel }}</h5>
-                        <button type="button" class="btn-close" aria-label="Close" @click="closeModal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p v-if="dayTrainings.length === 0" class="text-muted">
-                            Keine Trainingsdaten vorhanden.
-                        </p>
-                        <div v-else>
-                            <div v-for="(session, index) in dayTrainings" :key="session.id"
-                                class="mb-4 border-bottom pb-2">
-                                <h6>Training #{{ index + 1 }} – {{ formatDate(session.created_at) }}</h6>
-                                <p><strong>Notiz:</strong> {{ session.note || '-' }}</p>
-
-                                <!-- Sätze anzeigen -->
-                                <div v-if="session.sets && session.sets.length > 0">
-                                    <table class="table table-sm">
-                                        <thead>
-                                            <tr>
-                                                <th>Satz</th>
-                                                <th>Reps</th>
-                                                <th>Gewicht</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr v-for="(setItem, i) in session.sets" :key="i">
-                                                <td>{{ i + 1 }}</td>
-                                                <td>{{ setItem.reps }}</td>
-                                                <td>{{ setItem.weight }} kg</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <p v-else class="text-muted">Keine Sätze gespeichert.</p>
+                    <div class="calendar-grid">
+                        <!-- Wir durchlaufen jede Kalender-Zeile -->
+                        <div v-for="(row, rowIndex) in calendarRows" :key="rowIndex" class="calendar-row">
+                            <!-- Innerhalb jeder Zeile durchlaufen wir die Tage -->
+                            <div v-for="(dayObj, dayIndex) in row" :key="dayIndex" :class="[
+                                'calendar-day',
+                                { 'current-month': dayObj.isCurrentMonth },
+                                { 'has-training': dayObj.hasTraining }
+                            ]" @click="dayClicked(dayObj)">
+                                {{ dayObj.dayNum }}
                             </div>
                         </div>
                     </div>
@@ -185,19 +114,46 @@
             </div>
         </div>
 
-        <!-- Hintergrund Overlay fürs Modal -->
-        <div class="modal-backdrop fade" :class="{ show: showModal }" v-if="showModal" @click.self="closeModal"></div>
+        <!-- Training Details Modal -->
+        <div class="modal-overlay" v-if="showModal" @click.self="closeModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Training am {{ selectedDayLabel }}</h2>
+                    <button @click="closeModal" class="close-button">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Hier die Sessions des angeklickten Tages durchlaufen und anzeigen -->
+                    <div v-for="(training, tIndex) in dayTrainings" :key="training.id" class="training-details">
+                        <p><strong>Datum:</strong> {{ formatDate(training.created_at) }}</p>
+                        <p><strong>Notiz:</strong> {{ training.note || 'Keine Notiz vorhanden' }}</p>
+
+                        <div v-if="training.sets && training.sets.length > 0">
+                            <h5>Sätze</h5>
+                            <ul>
+                                <li v-for="(set, sIndex) in training.sets" :key="sIndex">
+                                    Satz {{ sIndex + 1 }}: {{ set.reps }} Wdh. x {{ set.weight }} kg
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Trennlinie nur zwischen mehreren Sessions -->
+                        <hr v-if="tIndex < dayTrainings.length - 1" />
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick, computed } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { supabase } from '../supabase'
 
 const route = useRoute()
 const workoutId = route.params.id
-
 
 // Loading & Errors
 const loading = ref(true)
@@ -206,13 +162,11 @@ const errorMessage = ref('')
 const successMessage = ref('')
 
 // Workout-Daten
-const targetMuscles = ref([])
-
-// Workout + SVG
 const workout = ref(null)
-const svgContent = ref("")  // Hier landet der SVG-Text
+const targetMuscles = ref([])
+const svgContent = ref("")
 
-// Felder für "Neues Training"
+// Neues Training
 const trainingNote = ref('')
 const trainingSets = ref([])
 const copiedFromLast = ref(false)
@@ -221,55 +175,55 @@ const copiedFromLast = ref(false)
 const showModal = ref(false)
 const selectedDayLabel = ref('')
 const dayTrainings = ref([])
+
+// WICHTIG: month & year als refs
+const year = ref(new Date().getFullYear())
+const month = ref(new Date().getMonth())
+
 const trainingsByDate = ref({})
-// Aktueller Monat / Jahr
-const year = new Date().getFullYear()
-const month = new Date().getMonth()
 const calendarRows = ref([])
-// Monatsname
+
+// Monatsnamen als Array
 const monthNames = [
     'Januar', 'Februar', 'März', 'April', 'Mai', 'Juni',
     'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'
 ]
-const monthName = computed(() => monthNames[month] || '')
 
-// onMounted
+// Zeigt den Namen zum aktuellen Monats-Wert
+const monthName = computed(() => monthNames[month.value] || '')
+
 onMounted(async () => {
-    // 2) SVG laden
     try {
-        const response = await fetch("/assets/Muscle_Map.svg");
-        svgContent.value = await response.text();
+        // SVG laden
+        const response = await fetch("/assets/Muscle_Map.svg")
+        svgContent.value = await response.text()
     } catch (error) {
-        console.error("Fehler beim Laden der SVG:", error);
+        console.error("Fehler beim Laden der SVG:", error)
     }
+
     try {
-        // 1) Workout-Daten laden
+        // Workout-Daten laden
         const { data: wData } = await supabase
             .from('workouts')
             .select('*')
             .eq('id', workoutId)
             .single()
 
-        workout.value = wData
+        workout.value = wData || null
+        targetMuscles.value = wData?.target_muscles || []
 
-        targetMuscles.value = wData.target_muscles || [];
-
-        // Debug targetMuscles
-        console.log('targetMuscles:', targetMuscles.value)
-
-        // SVG "active" markieren
-        // warte 5 sekunden, bis die SVG geladen ist, kein await nextTick() möglich
+        // SVG-Elemente aktivieren
         setTimeout(() => {
             const svgEl = document.querySelector('.svg-container')
             if (svgEl) {
                 targetMuscles.value.forEach((muscleId) => {
-                    const el = svgEl.querySelector(`#${muscleId}`);
-                    if (el) el.classList.add("active");
-                });
+                    const el = svgEl.querySelector(`#${muscleId}`)
+                    if (el) el.classList.add("active")
+                })
             }
-        }, 1500);
+        }, 1500)
 
-        // 4) Trainings-Daten (sessions + sets)
+        // Trainings laden
         const { data: sessionsData, error: sessionsError } = await supabase
             .from('training_sessions')
             .select('*')
@@ -290,20 +244,19 @@ onMounted(async () => {
             allSets = setsData || []
         }
 
-        // sessions -> date => arrays
-        sessionsData.forEach(session => {
+        // sessions zu trainingsByDate
+        sessionsData?.forEach(session => {
             const dayKey = formatDayKey(session.created_at)
             session.sets = allSets.filter(s => s.training_session_id === session.id)
-
             if (!trainingsByDate.value[dayKey]) {
                 trainingsByDate.value[dayKey] = []
             }
             trainingsByDate.value[dayKey].push(session)
         })
 
-        generateCalendar(year, month)
+        generateCalendar(year.value, month.value)
 
-        // 5) Optional: Letztes Training -> Sätze ins Formular
+        // Letztes Training
         await loadLastTraining()
     } catch (err) {
         console.error('Fehler beim Laden:', err)
@@ -313,7 +266,6 @@ onMounted(async () => {
     }
 })
 
-// Letztes Training -> Sätze übernehmen
 async function loadLastTraining() {
     try {
         const { data: lastSessionData } = await supabase
@@ -324,8 +276,8 @@ async function loadLastTraining() {
             .limit(1)
 
         if (!lastSessionData || lastSessionData.length === 0) return
-
         const lastSession = lastSessionData[0]
+
         const { data: setsData } = await supabase
             .from('training_session_sets')
             .select('reps, weight')
@@ -343,16 +295,19 @@ async function loadLastTraining() {
     }
 }
 
-// Training anlegen
+// Training speichern
 async function saveTraining() {
     errorMessage.value = ''
     successMessage.value = ''
 
     try {
+        // Get User ID
+        const { data: { user } } = await supabase.auth.getUser();
         // Neue Session
         const { data: insertSessionData, error: insertSessionError } = await supabase
             .from('training_sessions')
             .insert({
+                user_id: user.id,
                 workout_id: workoutId,
                 note: trainingNote.value,
             })
@@ -369,11 +324,9 @@ async function saveTraining() {
                 reps: s.reps || 0,
                 weight: s.weight || 0
             }))
-
             const { error: setInsertError } = await supabase
                 .from('training_session_sets')
                 .insert(inserts)
-
             if (setInsertError) throw setInsertError
         }
 
@@ -383,7 +336,7 @@ async function saveTraining() {
         trainingSets.value = []
         copiedFromLast.value = false
 
-        // Kalender updaten
+        // Kalender aktualisieren
         await reloadTrainings()
     } catch (err) {
         console.error('Fehler beim Anlegen des Trainings:', err)
@@ -391,7 +344,6 @@ async function saveTraining() {
     }
 }
 
-// Sätze-Logik
 function addSet() {
     trainingSets.value.push({ reps: null, weight: null })
 }
@@ -399,8 +351,8 @@ function removeSet(index) {
     trainingSets.value.splice(index, 1)
 }
 
+// Trainings-Daten neu laden
 async function reloadTrainings() {
-    // Neu sessions + sets
     const { data: sessionsData } = await supabase
         .from('training_sessions')
         .select('*')
@@ -418,17 +370,38 @@ async function reloadTrainings() {
     }
 
     trainingsByDate.value = {}
-    sessionsData.forEach(session => {
+    sessionsData?.forEach(session => {
         const dayKey = formatDayKey(session.created_at)
         session.sets = allSets.filter(s => s.training_session_id === session.id)
-
         if (!trainingsByDate.value[dayKey]) {
             trainingsByDate.value[dayKey] = []
         }
         trainingsByDate.value[dayKey].push(session)
     })
 
-    generateCalendar(year, month)
+    generateCalendar(year.value, month.value)
+}
+
+// Navigation: Vormonat
+function goToPreviousMonth() {
+    if (month.value === 0) {
+        month.value = 11
+        year.value -= 1
+    } else {
+        month.value -= 1
+    }
+    generateCalendar(year.value, month.value)
+}
+
+// Navigation: Folgemonat
+function goToNextMonth() {
+    if (month.value === 11) {
+        month.value = 0
+        year.value += 1
+    } else {
+        month.value += 1
+    }
+    generateCalendar(year.value, month.value)
 }
 
 // Kalender generieren
@@ -437,7 +410,7 @@ function generateCalendar(y, m) {
     const firstDay = new Date(y, m, 1)
     const lastDay = new Date(y, m + 1, 0)
     let startWeekday = firstDay.getDay()
-    if (startWeekday === 0) startWeekday = 7
+    if (startWeekday === 0) startWeekday = 7 // Sonntag -> index 7
     const totalDays = lastDay.getDate()
 
     for (let row = 0; row < 6; row++) {
@@ -472,13 +445,14 @@ function generateCalendar(y, m) {
             })
         }
         calendarRows.value.push(weekRow)
+        // Abbruch, wenn das Monatsende erreicht
         if (weekRow.some(d => d.dayNum === totalDays)) {
             break
         }
     }
 }
 
-// Tag klick
+// Tag-Klick -> Modal öffnen
 function dayClicked(dayObj) {
     if (!dayObj.isCurrentMonth || !dayObj.hasTraining) return
     const dayKey = formatDayKey(dayObj.date)
@@ -493,7 +467,6 @@ function closeModal() {
 
 // Tools
 function formatDayKey(dateOrString) {
-    // Falls "created_at" ein ISO-String ist:
     const d = new Date(dateOrString)
     const yyyy = d.getFullYear()
     const mm = String(d.getMonth() + 1).padStart(2, '0')
@@ -505,8 +478,6 @@ function formatDate(isoStr) {
     const d = new Date(isoStr)
     return d.toLocaleString()
 }
-
-// Check YouTube
 function isYoutube(url) {
     if (!url) return false
     return url.includes('youtube.com') || url.includes('youtu.be')
@@ -525,67 +496,286 @@ function getEmbeddedUrl(url) {
 </script>
 
 <style scoped>
-/* Tag-Zellen im Kalender */
-.day-cell {
-    cursor: pointer;
-    width: 30px;
-    height: 30px;
-    margin: auto;
-    line-height: 30px;
-    border-radius: 4px;
-    display: inline-block;
+/* Base Layout */
+.app-wrapper {
+    min-height: 100vh;
+    background: #f8f9fa;
 }
 
-.day-cell.has-training {
-    background-color: #ffc107;
-    /* Gelb */
-    color: #000;
+.main-layout {
+    display: grid;
+    grid-template-columns: 1fr 500px;
+    gap: 2rem;
+    padding: 2rem;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+/* Left Column */
+.content-column {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.video-section {
+    background: #000;
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    padding-top: 56.25%;
+    /* 16:9 Aspect Ratio */
+}
+
+.video-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.video-iframe {
+    width: 100%;
+    height: 100%;
+}
+
+.details-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.workout-title {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    font-weight: 700;
+}
+
+.workout-description {
+    color: #555;
+    line-height: 1.6;
+}
+
+/* Right Column */
+.sidebar-column {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.sidebar-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.card-title {
+    font-size: 1.1rem;
+    color: #34495e;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Training Form */
+.training-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.note-input {
+    width: 100%;
+    padding: 1rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    resize: vertical;
+    min-height: 100px;
+}
+
+.sets-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sets-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.set-item {
+    display: grid;
+    grid-template-columns: 40px 70px 70px 40px;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.set-number {
+    text-align: center;
+}
+
+.set-input {
+    width: 70px;
+    padding: 0.8rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    text-align: center;
+}
+
+.save-button {
+    background: #3498db;
+    color: white;
+    padding: 1rem;
+    border-radius: 8px;
+    border: none;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.save-button:disabled {
+    background: #bdc3c7;
+    cursor: not-allowed;
+}
+
+/* Calendar */
+.calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.calendar-header-text {
+    margin: 0 0.75rem;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.calendar-grid {
+    display: grid;
+    gap: 4px;
+}
+
+.calendar-row {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    margin-bottom: 4px;
+}
+
+.calendar-day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    cursor: pointer;
+    background: #f5f6fa;
+    color: #7f8c8d;
+}
+
+.calendar-day.current-month {
+    color: #2c3e50;
+    background: #fff;
+    border: 2px solid #e0e0e0;
+}
+
+.calendar-day.has-training {
+    background: #ffeaa7;
+    border-color: #fdcb6e;
     font-weight: 600;
 }
 
-/* Modal-Overlay */
-.modal-backdrop {
-    background-color: rgba(0, 0, 0, 0.5);
-}
-
-.modal.show {
-    display: block;
-}
-
-.svg-container {
-    width: 100%;
-    height: auto;
-    max-width: 100%;
-    overflow: hidden;
-}
-
-/* klickbare Muskeln */
-.s2 {
-    fill: #cccccc;
-    cursor: pointer;
-    transition: fill 0.3s;
-}
-
-.s2:hover {
-    fill: #007bff;
-}
-
-.s2.active {
-    fill: #ff0000;
-}
-
-/* Modal-Overlay */
-.modal-backdrop {
-    background-color: rgba(0, 0, 0, 0.5);
-}
-
 /* Modal */
-.modal-content {
-    background-color: #ffffff;
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(3px);
 }
 
-.theme-dark .modal-content {
-    background-color: #333333;
-    color: #ffffff;
+.modal-content {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    max-width: 600px;
+    width: 90%;
+    max-height: 80vh;
+    overflow: auto;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.close-button {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #7f8c8d;
+}
+
+.training-details+.training-details {
+    margin-top: 1rem;
+}
+
+/* Utility Classes */
+.icon-button {
+    background: none;
+    border: none;
+    padding: 0.5rem;
+    color: #7f8c8d;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.icon-button:hover {
+    color: #3498db;
+}
+
+.danger {
+    color: #e74c3c;
+}
+
+.state-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.error {
+    color: #e74c3c;
+    font-weight: 500;
+    padding: 2rem;
+    text-align: center;
+}
+
+.success-message {
+    color: #27ae60;
+    background: #e8f6ef;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
 }
 </style>
