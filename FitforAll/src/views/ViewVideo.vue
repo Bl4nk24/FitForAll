@@ -183,13 +183,11 @@ const month = ref(new Date().getMonth())
 const trainingsByDate = ref({})
 const calendarRows = ref([])
 
-// Monatsnamen als Array
 const monthNames = [
     'Januar', 'Februar', 'März', 'April', 'Mai', 'Juni',
     'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'
 ]
 
-// Zeigt den Namen zum aktuellen Monats-Wert
 const monthName = computed(() => monthNames[month.value] || '')
 
 onMounted(async () => {
@@ -295,7 +293,6 @@ async function loadLastTraining() {
     }
 }
 
-// Training speichern
 async function saveTraining() {
     errorMessage.value = ''
     successMessage.value = ''
@@ -339,7 +336,7 @@ async function saveTraining() {
         // Kalender aktualisieren
         await reloadTrainings()
     } catch (err) {
-        console.error('Fehler beim Anlegen des Trainings:', err)
+        console.error('Fehler beim Speichern des Trainings:', err)
         errorMessage.value = 'Fehler beim Speichern des Trainings.'
     }
 }
@@ -351,7 +348,6 @@ function removeSet(index) {
     trainingSets.value.splice(index, 1)
 }
 
-// Trainings-Daten neu laden
 async function reloadTrainings() {
     const { data: sessionsData } = await supabase
         .from('training_sessions')
@@ -382,7 +378,6 @@ async function reloadTrainings() {
     generateCalendar(year.value, month.value)
 }
 
-// Navigation: Vormonat
 function goToPreviousMonth() {
     if (month.value === 0) {
         month.value = 11
@@ -393,7 +388,6 @@ function goToPreviousMonth() {
     generateCalendar(year.value, month.value)
 }
 
-// Navigation: Folgemonat
 function goToNextMonth() {
     if (month.value === 11) {
         month.value = 0
@@ -404,7 +398,6 @@ function goToNextMonth() {
     generateCalendar(year.value, month.value)
 }
 
-// Kalender generieren
 function generateCalendar(y, m) {
     calendarRows.value = []
     const firstDay = new Date(y, m, 1)
@@ -445,14 +438,12 @@ function generateCalendar(y, m) {
             })
         }
         calendarRows.value.push(weekRow)
-        // Abbruch, wenn das Monatsende erreicht
         if (weekRow.some(d => d.dayNum === totalDays)) {
             break
         }
     }
 }
 
-// Tag-Klick -> Modal öffnen
 function dayClicked(dayObj) {
     if (!dayObj.isCurrentMonth || !dayObj.hasTraining) return
     const dayKey = formatDayKey(dayObj.date)
@@ -465,7 +456,7 @@ function closeModal() {
     dayTrainings.value = []
 }
 
-// Tools
+// Hilfsfunktionen
 function formatDayKey(dateOrString) {
     const d = new Date(dateOrString)
     const yyyy = d.getFullYear()
@@ -478,19 +469,31 @@ function formatDate(isoStr) {
     const d = new Date(isoStr)
     return d.toLocaleString()
 }
+
+// Prüft, ob URL zu YouTube gehört
 function isYoutube(url) {
     if (!url) return false
     return url.includes('youtube.com') || url.includes('youtu.be')
 }
+
+// **Erweiterte Funktion**: erkennt auch Shorts-URLs
 function getEmbeddedUrl(url) {
+    // 1) Check ?v=VIDEO_ID
     let match = url.match(/[?&]v=([^&]+)/)
     if (match && match[1]) {
         return `https://www.youtube.com/embed/${match[1]}`
     }
+    // 2) Check youtu.be/VIDEO_ID
     match = url.match(/youtu\.be\/([^?]+)/)
     if (match && match[1]) {
         return `https://www.youtube.com/embed/${match[1]}`
     }
+    // 3) Check /shorts/VIDEO_ID
+    match = url.match(/\/shorts\/([^?]+)/)
+    if (match && match[1]) {
+        return `https://www.youtube.com/embed/${match[1]}`
+    }
+    // Fallback
     return url
 }
 </script>
@@ -523,8 +526,13 @@ function getEmbeddedUrl(url) {
     border-radius: 12px;
     overflow: hidden;
     position: relative;
+    /* 
+    Für 16:9:
+    padding-top: 56.25%; 
+    Falls du Shorts 9:16 willst:
+    padding-top: 177.78%;
+    */
     padding-top: 56.25%;
-    /* 16:9 Aspect Ratio */
 }
 
 .video-wrapper {

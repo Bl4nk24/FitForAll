@@ -33,10 +33,7 @@
         <!-- Grid aus Karten -->
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
           <div class="col" v-for="workout in filteredWorkouts" :key="workout.id">
-            <!-- 
-              1) Card mit fixer/limitierter Höhe
-              2) shadow-sm + workout-card (für Hover-Effekt)
-            -->
+            <!-- Card mit Hover-Effekt -->
             <div class="card h-100 shadow-sm workout-card">
               <!-- Vorschaubild (YouTube-Thumbnail) -->
               <router-link :to="`/workout/${workout.id}`" class="thumbnail-link">
@@ -125,7 +122,7 @@ onMounted(async () => {
     return
   }
 
-  // Filtern: nur Workouts ohne Overlap mit userProblemMuscles
+  // Filtern: Nur Workouts ohne Overlap mit userProblemMuscles
   filteredWorkouts.value = workouts.value.filter((workout) => {
     const pm = workout.problem_muscle_groups || []
     return !pm.some((muscle) => userProblemMuscles.includes(muscle))
@@ -140,24 +137,42 @@ function excerpt(text, maxLength) {
   return text.slice(0, maxLength) + '...'
 }
 
+/**
+ * getYoutubeThumbnail(url):
+ * Extrahiert die Video-ID aus normalen YouTube-Links 
+ * oder Shorts-Links und liefert ein passendes Thumbnail zurück.
+ */
 function getYoutubeThumbnail(url) {
   if (!url) return '/fallback-thumbnail.jpg'
+
   try {
     let videoId = ''
-    let match = url.match(/[?&]v=([^&]+)/)
+
+    // 1) Shorts: /shorts/VIDEO_ID
+    let match = url.match(/\/shorts\/([^?]+)/)
     if (match && match[1]) {
       videoId = match[1]
-    } else {
-      match = url.match(/youtu\.be\/([^?]+)/)
-      if (match && match[1]) {
-        videoId = match[1]
-      }
+      return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
     }
-    if (!videoId) {
-      return '/fallback-thumbnail.jpg'
+
+    // 2) Normale YouTube-URL: ?v=VIDEO_ID
+    match = url.match(/[?&]v=([^&]+)/)
+    if (match && match[1]) {
+      videoId = match[1]
+      return `https://img.youtube.com/vi/${videoId}/0.jpg`
     }
-    return `https://img.youtube.com/vi/${videoId}/0.jpg`
+
+    // 3) Kurzlink: youtu.be/VIDEO_ID
+    match = url.match(/youtu\.be\/([^?]+)/)
+    if (match && match[1]) {
+      videoId = match[1]
+      return `https://img.youtube.com/vi/${videoId}/0.jpg`
+    }
+
+    // Fallback
+    return '/fallback-thumbnail.jpg'
   } catch (err) {
+    console.error('Fehler in getYoutubeThumbnail:', err)
     return '/fallback-thumbnail.jpg'
   }
 }
@@ -194,17 +209,21 @@ function getYoutubeThumbnail(url) {
   overflow: hidden;
 }
 
-/* Bildhöhe festlegen (z.B. 100 oder 120 px) */
+/* 
+   Verhindert schwarze Ränder, indem wir das Bild 
+   in ein 16:9-Format zwingen und zurechtschneiden.
+*/
 .card-img-top {
-  height: 300px;
-  object-fit: cover;
+  width: 100%;
+  aspect-ratio: 16 / 9;     /* Erzwingt Seitenverhältnis 16:9 (moderne Browser) */
+  object-fit: cover;        /* Schneidet Überschuss weg (keine Balken) */
+  object-position: center;  /* Zentriert das Bild beim Croppen */
 }
 
-/* Flex-Layout fürs Card-Body, Button unten */
+/* Text + Button am unteren Ende fixieren */
 .card-body {
   display: flex;
   flex-direction: column;
-  /* Damit Titel, Text, Button kompakt verteilt werden */
   padding: 0.75rem;
 }
 
@@ -222,9 +241,10 @@ function getYoutubeThumbnail(url) {
 
 /* Mobile Responsiveness */
 @media (max-width: 767px) {
-  /* Bild darf ruhig etwas größer auf Mobile sein */
   .card-img-top {
-    height: 120px;
+    /* Falls gewünscht, alternativ hier einfach height: auto lassen,
+       oder aspect-ratio beibehalten. */
+       aspect-ratio: 3 / 5;
   }
 }
 </style>
