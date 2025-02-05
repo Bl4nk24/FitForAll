@@ -241,18 +241,24 @@ function getYoutubeThumbnail(url) {
   if (!url) return '/fallback-thumbnail.jpg'
   try {
     let videoId = ''
+    // Standard YouTube-Parameter
     let match = url.match(/[?&]v=([^&]+)/)
     if (match && match[1]) {
       videoId = match[1]
     } else {
+      // youtu.be Kurz-Link
       match = url.match(/youtu\.be\/([^?]+)/)
       if (match && match[1]) {
         videoId = match[1]
+      } else {
+        // YouTube Shorts
+        match = url.match(/youtube\.com\/shorts\/([^?/]+)/)
+        if (match && match[1]) {
+          videoId = match[1]
+        }
       }
     }
-    if (!videoId) {
-      return '/fallback-thumbnail.jpg'
-    }
+    if (!videoId) return '/fallback-thumbnail.jpg'
     return `https://img.youtube.com/vi/${videoId}/0.jpg`
   } catch (err) {
     return '/fallback-thumbnail.jpg'
