@@ -72,7 +72,7 @@
       </div>
     </section>
 
-    <!-- Call-to-Action -->
+    <!-- Call-to-Action: Community -->
     <section class="community-section py-5">
       <div class="container text-center">
         <h2 class="mb-3">Werde Teil unserer Community</h2>
@@ -90,6 +90,7 @@
 
 <script>
 export default {
+  name: "HomeView",
   methods: {
     gotoWorkouts() {
       this.$router.push('/workouts');

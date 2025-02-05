@@ -34,6 +34,12 @@ const routes = [
     component: () => import('./views/TrainingPlanStart.vue'),
     props: true,
   },
+  // Neue Route für die Community-Seite:
+  {
+    path: '/community',
+    component: () => import('./views/Community.vue'),
+    meta: { requiresAuth: true },
+  },
 ];
 
 const router = createRouter({
