@@ -138,9 +138,4 @@ export default {
 .card-enlarged {
   transform: scale(1.05);
 }
-
-/* Extra Anpassung für die Ernährungsplan-Karte – falls gewünscht */
-.ernaehrungsplan-card .card {
-  transform: scale(1.07);
-}
 </style>
