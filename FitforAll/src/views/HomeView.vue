@@ -18,12 +18,15 @@
     </section>
 
     <!-- Karten: Videos, Trainingsplan, Ernährungsplan -->
-    <section class="container py-5">
-      <h2 class="text-center mb-4">Unsere Funktionen</h2>
-      <div class="row">
-        <div class="col-md-6 col-lg-4 mb-4">
+    <!-- Hier habe ich das Padding oben reduziert und der Überschrift zusätzlich mt-0 hinzugefügt -->
+    <section class="container pt-3 pb-5">
+      <h2 class="text-center mb-4 mt-0">Unsere Funktionen</h2>
+      <!-- Erhöhte Gutter-Abstände mit g-5 -->
+      <div class="row g-5">
+        <!-- Videos-Karte -->
+        <div class="col-md-6 col-lg-4">
           <div
-            class="card h-100 shadow-sm"
+            class="card h-100 shadow-sm card-enlarged"
             role="article"
             @click="gotoPage('/videos')"
             style="cursor: pointer;"
@@ -37,9 +40,10 @@
             </div>
           </div>
         </div>
-        <div class="col-md-6 col-lg-4 mb-4">
+        <!-- Trainingsplan-Karte -->
+        <div class="col-md-6 col-lg-4">
           <div
-            class="card h-100 shadow-sm"
+            class="card h-100 shadow-sm card-enlarged"
             role="article"
             @click="gotoPage('/training-plans')"
             style="cursor: pointer;"
@@ -53,9 +57,10 @@
             </div>
           </div>
         </div>
-        <div class="col-md-6 col-lg-4 mb-4">
+        <!-- Ernährungsplan-Karte (leicht extra verbreitert) -->
+        <div class="col-md-6 col-lg-4 ernaehrungsplan-card">
           <div
-            class="card h-100 shadow-sm"
+            class="card h-100 shadow-sm card-enlarged"
             role="article"
             @click="gotoPage('/ernaehrungsplan')"
             style="cursor: pointer;"
@@ -112,7 +117,7 @@ export default {
 }
 
 .hero-section {
-  background-color: var(--primary-color, #007bff); /* standard-blau */
+  background-color: var(--primary-color, #007bff); /* Standard-Blau */
   color: white;
 }
 
@@ -127,5 +132,15 @@ export default {
 .card-img-top {
   height: 300px;
   object-fit: cover;
+}
+
+/* Zusätzliche Klasse für leichte Vergrößerung der Karten (nur horizontale Anpassung wird hier nicht verändert) */
+.card-enlarged {
+  transform: scale(1.05);
+}
+
+/* Extra Anpassung für die Ernährungsplan-Karte – falls gewünscht */
+.ernaehrungsplan-card .card {
+  transform: scale(1.07);
 }
 </style>

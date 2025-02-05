@@ -16,7 +16,7 @@
 
 <script>
 import NavigationBar from './components/NavigationBar.vue';
-import ScreenReaderButton from './views/ScreenReader.vue'; // Stelle sicher, dass der Pfad stimmt
+import ScreenReaderButton from './views/ScreenReader.vue'; // Ggf. Pfad anpassen
 
 export default {
   name: 'App',
@@ -39,7 +39,7 @@ export default {
 </script>
 
 <style>
-/* Globale Themestyles bleiben unverändert */
+/* Globale Themestyles können hier bleiben, falls nötig */
 .theme-normal {
   background-color: white;
   color: black;
@@ -110,8 +110,7 @@ export default {
   fill: #bbbdbf;
 }
 
-/* Spezifische Anpassungen für den Main-Container in Option 1 */
-/* Statt margin-top wird hier padding-top verwendet, um einen Abstand zu erzeugen, ohne dass ein Margin-Collapse auftritt */
+/* Spezifische Anpassungen für den Main-Container */
 #main-content {
   padding-top: 1.5rem;
   background-color: transparent !important;

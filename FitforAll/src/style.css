@@ -9,7 +9,7 @@ html, body, #app {
   padding: 0;
   min-height: 100vh;
   width: 100%;
-  /* Schriftgröße: Wir setzen hier nur die Basis, weitere Anpassungen erfolgen über Klassen */
+  /* Die Schriftgröße wird nicht fix per Inline-Stil gesetzt, damit unsere Klassen greifen */
   line-height: 1.5 !important;
   transform: none !important;
   zoom: 1 !important;
@@ -21,7 +21,8 @@ html, body {
   background-color: inherit;
 }
 
-/* Safe-Area-Inset (für iOS u.a.) */
+/* Safe-Area-Inset (z. B. für iOS mit Notch)
+   Füllt den oberen Bereich (Notch) mit dem aktuellen Hintergrund */
 body::before {
   content: "";
   position: fixed;
@@ -32,11 +33,13 @@ body::before {
   background-color: inherit;
   z-index: 9998;
 }
+
+/* Alternativ: Falls nötig, direkt beim <html> */
 html {
   padding-top: env(safe-area-inset-top);
 }
 
-/* Moderne, serifenlose Schrift – hier könntest du auch 'Poppins' einbinden, falls gewünscht */
+/* Moderne, serifenlose Schrift */
 html, body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
@@ -53,7 +56,6 @@ html, body {
   border: none;
   transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
   font-weight: 600;
-  /* Leicht modernere Box-Schatten */
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
@@ -66,7 +68,7 @@ html, body {
 .card {
   padding: 1.5rem;
   margin-bottom: 1.5rem;
-  border-radius: 16px; /* Etwas abgerundet */
+  border-radius: 16px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   background-clip: border-box;
@@ -252,9 +254,10 @@ body.theme-high-contrast .btn-warning:hover {
   border-color: #000000 !important;
 }
 
-/* Angepasste Container in Dark/High Contrast – gleiche Breite wie im Normalen Design */
-.theme-dark .container,
-.theme-high-contrast .container {
+/* ==================== */
+/* Einheitliche Container-Breite für alle Themes */
+/* ==================== */
+.container {
   max-width: 1140px !important;
   width: 100% !important;
   margin: auto !important;
@@ -344,7 +347,7 @@ body.theme-high-contrast .btn-warning:hover {
 #main-content {
   background-color: transparent !important;
   overflow: auto;
-  /* Padding oder transparenten Rand nutzen, um margin-collapse zu verhindern */
+  /* Padding nutzen, um Margin-Collapse zu verhindern */
   padding-top: 1.5rem;
 }
 
