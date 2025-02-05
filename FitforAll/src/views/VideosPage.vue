@@ -209,15 +209,12 @@ function getYoutubeThumbnail(url) {
   overflow: hidden;
 }
 
-/* 
-   Verhindert schwarze Ränder, indem wir das Bild 
-   in ein 16:9-Format zwingen und zurechtschneiden.
-*/
+
 .card-img-top {
   width: 100%;
-  aspect-ratio: 16 / 9;     /* Erzwingt Seitenverhältnis 16:9 (moderne Browser) */
-  object-fit: cover;        /* Schneidet Überschuss weg (keine Balken) */
-  object-position: center;  /* Zentriert das Bild beim Croppen */
+  aspect-ratio: 16 / 9;     
+  object-fit: cover;        
+  object-position: center;  
 }
 
 /* Text + Button am unteren Ende fixieren */

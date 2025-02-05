@@ -5,9 +5,19 @@
     aria-label="Hauptnavigation"
   >
     <div class="container-fluid">
-      <a class="navbar-brand" href="#" @click.prevent="goHome">
-        FitforAll
+
+      <!-- Logo + Text im Markenzusammenhang -->
+      <a class="navbar-brand d-flex align-items-center" href="#" @click.prevent="goHome">
+        <!-- Logo-Bild -->
+        <img
+          src="/assets/icon.png"
+          alt="FitForAll Logo"
+          style="height: 40px; width: auto;"
+        />
+        <!-- Alternativ: Text daneben -->
+        <span class="ms-2">FitForAll</span>
       </a>
+
       <button
         class="navbar-toggler"
         type="button"
@@ -22,32 +32,38 @@
 
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto" role="menubar">
+
           <!-- Link zum Upload Form -->
           <li class="nav-item" role="none">
             <router-link
               to="/upload"
               class="nav-link"
               role="menuitem"
-              >Upload</router-link
-            >          
+            >
+              Upload
+            </router-link>
           </li>
+          
           <!-- Link zum Profil (falls eingeloggt) -->
           <li class="nav-item" role="none" v-if="userEmail">
             <router-link
               to="/profile"
               class="nav-link"
               role="menuitem"
-              >Profil</router-link
             >
+              Profil
+            </router-link>
           </li>
+
           <!-- Link zur Startseite (falls eingeloggt) -->
           <li class="nav-item" role="none" v-if="userEmail">
             <router-link
               to="/"
               class="nav-link"
               role="menuitem"
-              >Home</router-link
             >
+              Home
+            </router-link>
           </li>
 
           <!-- Login/Logout -->
@@ -120,4 +136,6 @@ const logout = async () => {
 .navbar-brand {
   cursor: pointer;
 }
+
+
 </style>

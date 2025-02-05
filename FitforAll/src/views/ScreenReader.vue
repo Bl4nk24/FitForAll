@@ -1,5 +1,4 @@
 <template>
-  <!-- Der Button wird nur angezeigt, wenn der Screenreader aktiviert ist (localStorage === 'true') -->
   <button
     v-if="screenreaderActive"
     class="screenreader-button"
@@ -22,7 +21,6 @@ onMounted(() => {
   screenreaderActive.value = localStorage.getItem('screenreader') === 'true';
 });
 
-// Optional: Falls sich der localStorage-Wert (z. B. in einem anderen Tab) ändert, wird dieser Listener aktiv
 window.addEventListener('storage', (e) => {
   if (e.key === 'screenreader') {
     screenreaderActive.value = e.newValue === 'true';
@@ -69,7 +67,3 @@ function stopReading() {
 }
 </script>
 
-<!-- 
-  Hinweis: Stelle sicher, dass in deiner style.css die CSS-Klasse .screenreader-button definiert ist,
-  damit der Button unten rechts fixiert und in allen Themes sichtbar ist.
--->

@@ -372,3 +372,8 @@ html.theme-high-contrast {
 .card-subtitle {
   color: #ffffff !important;
 }
+
+.theme-dark .text-muted,
+.theme-high-contrast .text-muted {
+  color: #fff !important;
+}

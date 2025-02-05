@@ -510,7 +510,6 @@
     gap: 2rem;
   }
   
-  /* Video Section – mit max-height, damit das Video nicht den gesamten Bildschirm einnimmt */
   .video-section {
     background: #000;
     border-radius: 12px;
