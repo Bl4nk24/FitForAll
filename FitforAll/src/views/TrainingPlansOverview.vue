@@ -1,37 +1,50 @@
 <template>
-  <!-- Äußerer Wrapper: Hier wird der Hintergrund flächenfüllend angezeigt -->
-  <div class="training-plans-page my-5">
-    <!-- Innerer Container für den Inhalt – bleibt transparent -->
-    <div class="container">
-      <header class="page-header text-center mb-5">
-        <h1 class="display-4 fw-bold">Deine Trainingspläne</h1>
-        <p class="lead text-muted">Verwalte deine Trainingspläne einfach und effizient.</p>
-      </header>
-  
-      <!-- Ladezustand / Fehler -->
-      <div v-if="loading" class="d-flex flex-column align-items-center">
-        <div class="spinner-border text-primary" role="status">
-          <span class="visually-hidden">Loading...</span>
+  <div class="training-plans-page container my-5">
+    <!-- Kopfbereich -->
+    <header class="page-header text-center mb-5">
+      <h1 class="display-4 fw-bold">Deine Trainingspläne</h1>
+      <p class="lead text-muted">Verwalte deine Trainingspläne einfach und effizient.</p>
+    </header>
+
+    <!-- Ladezustand / Fehler -->
+    <div v-if="loading" class="d-flex flex-column align-items-center">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <small class="mt-2">Lade Daten...</small>
+    </div>
+    <div v-else-if="errorMessage" class="alert alert-danger">
+      {{ errorMessage }}
+    </div>
+
+    <!-- Hauptinhalt -->
+    <main v-else>
+      <!-- Header mit Aktionen -->
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold mb-0">Meine Pläne</h3>
+        <div>
+          <button class="btn btn-primary me-2 btn-sm" @click="showAutoWizard = true">
+            <i class="bi bi-lightning-fill"></i>
+            <span class="d-none d-md-inline"> Automatisch erstellen</span>
+          </button>
+          <button class="btn btn-outline-primary btn-sm" @click="showManualModal = true">
+            <i class="bi bi-pencil-square"></i>
+            <span class="d-none d-md-inline"> Manuell erstellen</span>
+          </button>
         </div>
-        <small class="mt-2">Lade Daten...</small>
       </div>
-      <div v-else-if="errorMessage" class="alert alert-danger">
-        {{ errorMessage }}
-      </div>
-  
-      <!-- Hauptinhalt -->
-      <main v-else>
+
+      <!-- Trainingsplan Cards im responsiven Grid -->
+      <div v-if="plans.length > 0">
         <div class="row g-4">
           <div class="col-12 col-md-6 col-lg-4" v-for="(plan, index) in plans" :key="plan.id">
             <div class="card card-modern h-100">
               <div class="card-body d-flex flex-column">
+                <!-- Plan-Header: Titel, Datum und Aktionen -->
                 <div class="plan-header mb-3 d-flex justify-content-between align-items-center">
                   <div>
                     <h5 class="card-title fs-6 mb-1">{{ plan.plan_name || 'Unbenannter Plan' }}</h5>
-                    <!-- Beschreibung/Datum -->
-                    <p class="card-subtitle text-muted small">
-                      {{ formatDate(plan.created_at) }}
-                    </p>
+                    <p class="card-subtitle text-muted small">{{ formatDate(plan.created_at) }}</p>
                   </div>
                   <div class="plan-actions">
                     <button class="btn btn-link p-0 rename-btn" @click="renamePlan(plan, index)">
@@ -42,38 +55,35 @@
                     </button>
                   </div>
                 </div>
+                <!-- SVG-Bereich: Voll sichtbar in der oberen Hälfte der Card -->
                 <div class="svg-section mb-3" v-if="svgContent">
                   <div v-html="getPlanSvg(plan)"></div>
                 </div>
+                <!-- Aktionsbuttons -->
                 <div class="mt-auto">
                   <div class="btn-group w-100" role="group">
                     <router-link :to="`/training-plans/${plan.id}/start`" class="btn btn-success btn-sm">
                       Training starten
                     </router-link>
-                    <!-- "Anzeigen"-Button (Hover wird unten in CSS geregelt) -->
                     <router-link :to="`/training-plans/${plan.id}/detail`" class="btn btn-outline-secondary btn-sm">
                       Anzeigen
                     </router-link>
                   </div>
                 </div>
-              </div>
-            </div>
+              </div><!-- Ende Card-Body -->
+            </div><!-- Ende Card -->
           </div>
         </div>
-      </main>
-    </div>
-  
-    <!-- Modale für Plan-Erstellung -->
-    <AutoPlanWizard
-      v-if="showAutoWizard"
-      @close="showAutoWizard = false"
-      @plan-created="onPlanCreated"
-    />
-    <ManualPlanModal
-      v-if="showManualModal"
-      @close="showManualModal = false"
-      @plan-created="onPlanCreated"
-    />
+      </div>
+      <div v-else class="alert alert-info">
+        Du hast noch keine Trainingspläne erstellt.
+      </div>
+    </main>
+
+    <!-- Auto-Wizard -->
+    <AutoPlanWizard v-if="showAutoWizard" @close="showAutoWizard = false" @plan-created="onPlanCreated" />
+    <!-- Manuelles Modal -->
+    <ManualPlanModal v-if="showManualModal" @close="showManualModal = false" @plan-created="onPlanCreated" />
   </div>
 </template>
 
@@ -87,16 +97,22 @@ const loading = ref(true)
 const errorMessage = ref('')
 const plans = ref([])
 
+// Wir benötigen kein Dropdown mehr, daher entfällt openDropdownIndex
+// Wizard-States
 const showAutoWizard = ref(false)
 const showManualModal = ref(false)
+
+// Basis-SVG (wird einmalig geladen)
 const svgContent = ref('')
 
 onMounted(async () => {
   try {
+    // 1. Authentifizierung
     const { data: authData, error: authError } = await supabase.auth.getUser()
     if (authError || !authData?.user) {
       throw new Error('Du bist nicht eingeloggt.')
     }
+    // 2. Trainingspläne laden
     const { data: plansData, error: plansError } = await supabase
       .from('training_plans')
       .select('*')
@@ -105,6 +121,7 @@ onMounted(async () => {
     if (plansError) throw plansError
     plans.value = plansData || []
     
+    // 3. Alle referenzierten Workout-IDs sammeln
     const allWorkoutIds = new Set()
     plans.value.forEach(plan => {
       const planData = plan.plan_data
@@ -118,6 +135,7 @@ onMounted(async () => {
     })
     const workoutIdsArray = Array.from(allWorkoutIds)
     
+    // 4. Falls Workouts referenziert werden, diese einmalig laden
     if (workoutIdsArray.length > 0) {
       const { data: workoutsData, error: workoutsError } = await supabase
         .from('workouts')
@@ -130,6 +148,7 @@ onMounted(async () => {
         workoutMap[workout.id] = workout
       })
       
+      // 5. Für jeden Plan: Muskelgruppen deduplizieren
       plans.value.forEach(plan => {
         const muscleSet = new Set()
         const planData = plan.plan_data
@@ -149,6 +168,7 @@ onMounted(async () => {
       })
     }
     
+    // 6. Basis-SVG-Muskelkarte laden
     try {
       const response = await fetch("/assets/Muscle_Map.svg")
       svgContent.value = await response.text()
@@ -163,14 +183,17 @@ onMounted(async () => {
   }
 })
 
+// Callback: neuer Plan erstellt
 function onPlanCreated(newPlan) {
   plans.value.unshift(newPlan)
 }
 
+// Hilfsfunktion: Datum formatieren
 function formatDate(dateStr) {
   return dateStr ? new Date(dateStr).toLocaleString() : ''
 }
 
+// Funktion zum Umbenennen
 async function renamePlan(plan, idx) {
   const newName = prompt('Neuen Namen eingeben:', plan.plan_name || '')
   if (!newName || newName.trim() === plan.plan_name) return
@@ -189,6 +212,7 @@ async function renamePlan(plan, idx) {
   }
 }
 
+// Funktion zum Löschen
 async function deletePlan(plan, idx) {
   const ok = confirm(`Möchtest du den Plan "${plan.plan_name}" wirklich löschen?`)
   if (!ok) return
@@ -205,11 +229,18 @@ async function deletePlan(plan, idx) {
   }
 }
 
+/**
+ * getPlanSvg(plan):
+ * Parst die Basis-SVG und fügt für alle in plan.muscleGroups enthaltenen Muskel-IDs die CSS-Klasse "active" hinzu.
+ */
 function getPlanSvg(plan) {
   if (!svgContent.value) return ''
   const parser = new DOMParser()
   const doc = parser.parseFromString(svgContent.value, 'image/svg+xml')
+  
+  // Entferne vorhandene active-Klassen
   doc.querySelectorAll('.active').forEach(el => el.classList.remove('active'))
+  
   if (plan.muscleGroups && plan.muscleGroups.length > 0) {
     plan.muscleGroups.forEach(muscle => {
       const muscleEl = doc.getElementById(muscle)
@@ -223,20 +254,15 @@ function getPlanSvg(plan) {
 </script>
 
 <style scoped>
+/* Allgemeines Seitenlayout */
 .training-plans-page {
   min-height: 80vh;
   padding: 2rem;
-  /* Im Normalmodus: Verlauf mit weißen Punkten */
   background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
   background-image: radial-gradient(circle, rgba(255,255,255,0.4) 1px, transparent 1px);
   background-size: 40px 40px;
   border-radius: 0.75rem;
   font-family: 'Poppins', sans-serif;
-}
-
-/* Der innere Container bleibt transparent */
-.training-plans-page .container {
-  background: transparent !important;
 }
 
 /* Kopfbereich */
@@ -247,7 +273,7 @@ function getPlanSvg(plan) {
   font-size: 1.2rem;
 }
 
-/* Card Styles */
+/* Kompakte, moderne Card-Optik */
 .card-modern {
   border: none;
   border-radius: 10px;
@@ -264,10 +290,12 @@ function getPlanSvg(plan) {
   box-shadow: 0 5px 10px rgba(0,0,0,0.15);
 }
 
+/* Card Body */
 .card-body {
   padding: 1.5rem;
 }
 
+/* Plan Header */
 .plan-header {
   margin-bottom: 1rem;
   display: flex;
@@ -282,9 +310,10 @@ function getPlanSvg(plan) {
   color: #6c757d;
 }
 
+/* SVG-Bereich: Der Container soll die SVG komplett anzeigen */
 .svg-section {
   width: 100%;
-  height: 200px;
+  height: 200px; /* Hier wird die SVG angezeigt */
   margin-bottom: 1rem;
 }
 .svg-section svg {
@@ -294,6 +323,7 @@ function getPlanSvg(plan) {
   background: transparent;
 }
 
+/* Aktionsbuttons bleiben unverändert */
 .btn {
   border-radius: 50px;
   text-transform: none;
@@ -302,6 +332,9 @@ function getPlanSvg(plan) {
   flex: 1;
 }
 
+/* Dropdown entfällt */
+
+/* Basis-SVG-Muskelkarte */
 .s2 {
   fill: #cccccc;
   transition: fill 0.3s ease;
@@ -310,33 +343,7 @@ function getPlanSvg(plan) {
   fill: #ff0000;
 }
 
-/* ========== Deine bisherigen Anpassungen ========== */
-
-/* 1) Hover-Effekt für den "Anzeigen"-Button grün mit weißer Schrift */
-.btn-outline-secondary.btn-sm:hover {
-  background-color: #28a745 !important;
-  color: #ffffff !important;
-  border-color: #28a745 !important;
-}
-
-/* ================================== */
-/* =   THEME-SPEZIFISCHE FARBSCHEN  = */
-/* ================================== */
-
-/* Theme NORMAL: Text schwarz */
-:global(.theme-normal) .page-header p.lead.text-muted,
-:global(.theme-normal) .card-subtitle {
-  color: #000 !important;
-}
-
-/* Theme DARK & HIGH-CONTRAST: Text weiß */
-:global(.theme-dark) .page-header p.lead.text-muted,
-:global(.theme-dark) .card-subtitle,
-:global(.theme-high-contrast) .page-header p.lead.text-muted,
-:global(.theme-high-contrast) .card-subtitle {
-  color: #fff !important;
-}
-
+/* Responsivität */
 @media (max-width: 576px) {
   .training-plans-page {
     padding: 1rem;
@@ -344,26 +351,5 @@ function getPlanSvg(plan) {
   .svg-section {
     height: 150px;
   }
-}
-
-/* Override für Dunkles Design & Hoher Kontrast:
-   Mit :global() überschreiben wir den lokalen Hintergrund (Verlauf mit weißen Punkten)
-   und setzen ihn auf den vom Theme vorgegebenen Farbton. */
-:global(.theme-dark) .training-plans-page {
-  background: #121212 !important;
-  background-image: none !important;
-  background-size: auto !important;
-}
-
-:global(.theme-high-contrast) .training-plans-page {
-  background: #000000 !important;
-  background-image: none !important;
-  background-size: auto !important;
-}
-
-/* Entfernen des Hintergrunds für alle Kinder-Elemente */
-* {
-  background: none !important;
-  background-image: none !important;
 }
 </style>
