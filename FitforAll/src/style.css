@@ -13,10 +13,10 @@ html, body {
 
 /* ========== Globale Themes ========== */
 
-/* Normal Theme */
+/* 1. Normales Design (Standard-Farbpalette) */
 .theme-normal {
-  background-color: white !important;
-  color: black !important;
+  background-color: #F5F5F5 !important; /* hellgrau */
+  color: #1A1A1A !important; /* dunkelgrau/schwarz */
 }
 .theme-normal html,
 .theme-normal body,
@@ -25,53 +25,36 @@ html, body {
 .theme-normal section,
 .theme-normal .container,
 .theme-normal .row {
-  background-color: white !important;
-  color: black !important;
+  background-color: #F5F5F5 !important;
+  color: #1A1A1A !important;
 }
-/* Kleiner Gradient im Normal Theme */
-.theme-normal .full-background {
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+.theme-normal a,
+.theme-normal .btn,
+.theme-normal .btn:link,
+.theme-normal .btn:visited {
+  color: #005A9E !important; /* dunkelblau für Buttons und Links (Sekundärfarbe) */
 }
-
-/* High Contrast Theme */
-.theme-high-contrast {
-  background-color: black !important;
-  color: yellow !important;
+.theme-normal .btn-primary {
+  background-color: #007ACC !important; /* mittelblau (Primärfarbe) */
+  border-color: #007ACC !important;
+  color: #F5F5F5 !important;
 }
-.theme-high-contrast html,
-.theme-high-contrast body,
-.theme-high-contrast #main-content,
-.theme-high-contrast .home-page,
-.theme-high-contrast section,
-.theme-high-contrast .container,
-.theme-high-contrast .row {
-  background-color: black !important;
-  color: yellow !important;
+.theme-normal .btn-warning,
+.theme-normal .alert-warning {
+  background-color: #E63946 !important; /* rot für Warnhinweise (Akzentfarbe) */
+  border-color: #E63946 !important;
+  color: #FFFFFF !important;
 }
-.theme-high-contrast a {
-  color: yellow !important;
-}
-.theme-high-contrast a:hover {
-  color: white !important;
-}
-.theme-high-contrast .btn {
-  background-color: #444 !important;
-  color: yellow !important;
-  border-color: yellow !important;
-}
-.theme-high-contrast .card {
-  background-color: black !important;
-  color: yellow !important;
-  border: 2px solid yellow !important;
-}
-.theme-high-contrast .full-background {
-  background-color: black !important;
+.theme-normal .card {
+  background-color: #FFFFFF;
+  color: #1A1A1A;
+  border: 1px solid #ddd;
 }
 
-/* Dark Theme */
+/* 2. Dunkles Design (Dark Mode) */
 .theme-dark {
-  background-color: #1a1a1a !important;
-  color: white !important;
+  background-color: #121212 !important; /* sehr dunkelgrau, fast schwarz */
+  color: #E0E0E0 !important; /* hellgrau für Fließtext */
 }
 .theme-dark html,
 .theme-dark body,
@@ -80,109 +63,100 @@ html, body {
 .theme-dark section,
 .theme-dark .container,
 .theme-dark .row {
-  background-color: #1a1a1a !important;
-  color: white !important;
+  background-color: #121212 !important;
+  color: #E0E0E0 !important;
 }
-.theme-dark a {
-  color: #add8e6 !important;
+.theme-dark a,
+.theme-dark .btn,
+.theme-dark .btn:link,
+.theme-dark .btn:visited {
+  color: #03DAC6 !important; /* türkis für hervorgehobene Elemente (Sekundärfarbe) */
 }
-.theme-dark a:hover {
-  color: white !important;
+.theme-dark .btn-primary {
+  background-color: #BB86FC !important; /* violett-bläulicher Akzent (Primärfarbe) */
+  border-color: #BB86FC !important;
+  color: #121212 !important;
 }
-.theme-dark .btn {
-  background-color: #333 !important;
-  color: white !important;
-  border-color: #555 !important;
+.theme-dark .btn-warning,
+.theme-dark .alert-warning {
+  background-color: #CF6679 !important; /* rötlicher Akzent (Akzentfarbe) */
+  border-color: #CF6679 !important;
+  color: #121212 !important;
 }
 .theme-dark .card {
-  background-color: #232323 !important;
-  color: white !important;
-  border: 1px solid #444 !important;
-}
-.theme-dark .full-background {
-  background-color: #1a1a1a !important;
+  background-color: #1e1e1e;
+  color: #E0E0E0;
+  border: 1px solid #333;
 }
 
-/* Videos-Hero in den verschiedenen Themes */
-.theme-dark .videos-hero {
-  background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), #007bff;
+/* 3. Hoher Kontrast (High Contrast Mode) */
+.theme-high-contrast {
+  background-color: #000000 !important; /* schwarz */
+  color: #FFFFFF !important; /* weiß für primäre Inhalte */
 }
-.theme-high-contrast .videos-hero {
-  background-image: none;
-  background-color: black;
-  color: yellow !important;
+.theme-high-contrast html,
+.theme-high-contrast body,
+.theme-high-contrast #main-content,
+.theme-high-contrast .home-page,
+.theme-high-contrast section,
+.theme-high-contrast .container,
+.theme-high-contrast .row {
+  background-color: #000000 !important;
+  color: #FFFFFF !important;
 }
-
-/* Container, Rows, Sections sollen vererben */
-.container,
-.row,
-section {
-  background-color: inherit !important;
-  color: inherit !important;
+.theme-high-contrast a,
+.theme-high-contrast .btn,
+.theme-high-contrast .btn:link,
+.theme-high-contrast .btn:visited {
+  color: #00FF00 !important; /* grün für Links und interaktive Elemente (Sekundärfarbe) */
 }
-
-/* Bootstrap-Überschreibungen */
-.bg-light {
-  background-color: #1a1a1a !important; 
+.theme-high-contrast .btn-primary {
+  background-color: #FFFF00 !important; /* leuchtendes gelb (Primärfarbe) */
+  border-color: #FFFF00 !important;
+  color: #000000 !important;
 }
-.text-dark {
-  color: white !important;
+.theme-high-contrast .btn-warning,
+.theme-high-contrast .alert-warning {
+  background-color: #FF0000 !important; /* helles rot für Warnungen */
+  border-color: #FF0000 !important;
+  color: #FFFFFF !important;
 }
-
-/* Hero-Section im Dark/High-Contrast */
-.theme-dark .hero-section {
-  background-color: #1a1a1a !important;
-  color: white !important;
-}
-.theme-high-contrast .hero-section {
-  background-color: black !important;
-  color: yellow !important;
-}
-
-/* card-body überschreiben */
-.theme-dark .card-body {
-  background-color: #232323 !important;
-  color: white !important;
-}
-.theme-high-contrast .card-body {
-  background-color: black !important;
-  color: yellow !important;
-  border: 2px solid yellow !important;
+.theme-high-contrast .card {
+  background-color: #000000;
+  color: #FFFFFF;
+  border: 2px solid #00FF00; /* Sekundärfarbe als Rahmen */
 }
 
-/* alert-info überschreiben */
-.theme-dark .alert-info {
-  background-color: #333 !important;
-  color: white !important;
-  border-color: #555 !important;
-}
-.theme-high-contrast .alert-info {
-  background-color: black !important;
-  color: yellow !important;
-  border-color: yellow !important;
+/* ========== Globale Utility-Klassen und Anpassungen ========== */
+
+/* Links */
+a {
+  text-decoration: none;
 }
 
-/* Vorlese-Button unten rechts */
-.screenreader-button {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  z-index: 9999;
-  font-size: 1rem;
-  padding: 10px 15px;
-  border-radius: 5px;
+/* Buttons */
+.btn {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
   cursor: pointer;
-  background-color: #0d6efd;
-  color: #fff;
-  border: none;
+  transition: background-color 0.2s ease;
+}
+.btn:hover {
+  opacity: 0.85;
+}
+
+/* Cards */
+.card {
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 4px;
 }
 
 /* ===================== */
-/* ALLES KOMPLETT DUNKEL MACHEN IN DARK/HC 
-   UND BUTTON-HOVER-FARBEN */
+/* Zusätzliche Anpassungen für Dark/High Contrast */
 /* ===================== */
 
-/* 1) Dark Theme: Alle Container dunkel */
+/* Dark Theme: Allgemeiner Hintergrund & Text */
 body.theme-dark,
 body.theme-dark #app,
 body.theme-dark .page,
@@ -190,19 +164,19 @@ body.theme-dark .full-background,
 body.theme-dark section,
 body.theme-dark .container,
 body.theme-dark .row {
-  background-color: #1a1a1a !important;
-  color: #ffffff !important;
+  background-color: #121212 !important;
+  color: #E0E0E0 !important;
 }
 
-/* Button-Hover-Farben im Dark Theme */
+/* Button-Hover im Dark Theme */
 body.theme-dark .btn-success:hover {
-  background-color: #218838 !important; /* typisches Bootstrap-Grün */
+  background-color: #218838 !important;
 }
 body.theme-dark .btn-warning:hover {
-  background-color: #e0a800 !important; /* typisches Bootstrap-Orange */
+  background-color: #e0a800 !important;
 }
 
-/* 2) High Contrast: Alles komplett schwarz */
+/* High Contrast: Allgemeiner Hintergrund & Text */
 body.theme-high-contrast,
 body.theme-high-contrast #app,
 body.theme-high-contrast .page,
@@ -210,23 +184,23 @@ body.theme-high-contrast .full-background,
 body.theme-high-contrast section,
 body.theme-high-contrast .container,
 body.theme-high-contrast .row {
-  background-color: black !important;
-  color: yellow !important;
+  background-color: #000000 !important;
+  color: #FFFFFF !important;
 }
 
-/* Button-Hover-Farben im High Contrast */
+/* Button-Hover im High Contrast */
 body.theme-high-contrast .btn-success:hover {
   background-color: green !important;
-  color: black !important;
-  border-color: black !important;
+  color: #000000 !important;
+  border-color: #000000 !important;
 }
 body.theme-high-contrast .btn-warning:hover {
   background-color: orange !important;
-  color: black !important;
-  border-color: black !important;
+  color: #000000 !important;
+  border-color: #000000 !important;
 }
 
-/* .container in Dark/High Contrast -> volle Breite */
+/* Container in Dark/High Contrast – Volle Breite */
 .theme-dark .container,
 .theme-high-contrast .container {
   max-width: 100% !important;
@@ -236,7 +210,7 @@ body.theme-high-contrast .btn-warning:hover {
   padding-right: 2rem !important;
 }
 
-/* Separator-Farbe pro Theme */
+/* Separator */
 .theme-normal .separator {
   background: #ddd !important;
 }
@@ -245,51 +219,42 @@ body.theme-high-contrast .btn-warning:hover {
   height: 2px;
 }
 .theme-high-contrast .separator {
-  background: yellow !important;
+  background: #00FF00 !important;
   height: 2px;
 }
 
-/* Header im Dark/High Contrast ohne Rundung, kein Weiß */
+/* Header in Dark/High Contrast – ohne Abrundung */
 .theme-dark .header,
 .theme-high-contrast .header {
-  background-color: #1a1a1a !important; /* oder black */
+  background-color: #121212 !important;
   border-bottom: 1px solid #444 !important;
-  border-radius: 0 !important;  /* KEINE Abrundungen! */
+  border-radius: 0 !important;
   margin-bottom: 0 !important;
   overflow: hidden !important;
 }
 
 /* ========== NavigationBar-Overrides ========== */
-
-/* Immer: Entferne einen eventuellen Rand unten und Zwischenraum */
 .navbar {
   margin-bottom: 0 !important;
   border: none !important;
 }
 
-/* Normal Theme: 
-   Falls du in Normal Theme *keinen* weißen Balken willst, 
-   kannst du hier ebenso was ändern. 
-   Ansonsten lass es weg, wenn Normal ruhig weiß sein darf. */
-
-/* Dark Theme: Navbar komplett dunkel, keine Ränder */
+/* Dark Theme: Navbar komplett dunkel */
 .theme-dark .navbar,
 .theme-dark .navbar-light,
 .theme-dark .navbar-light.bg-light,
 .theme-dark .navbar-dark.bg-light {
-  background-color: #1a1a1a !important; /* Dunkelgrau wie der Rest */
+  background-color: #121212 !important;
   border: none !important;
-  /* ggf. Schriftfarbe anpassen: */
   color: #fff !important;
 }
 
-/* High Contrast: Navbar schwarz, keine Ränder */
+/* High Contrast: Navbar schwarz mit gut lesbarem Grün */
 .theme-high-contrast .navbar,
 .theme-high-contrast .navbar-light,
 .theme-high-contrast .navbar-light.bg-light,
 .theme-high-contrast .navbar-dark.bg-light {
-  background-color: black !important;
+  background-color: #000000 !important;
   border: none !important;
-  color: yellow !important;
+  color: #00FF00 !important;
 }
-
