@@ -58,7 +58,7 @@
           </div>
         </div>
         <!-- Ernährungsplan-Karte (leicht extra verbreitert) -->
-        <div class="col-md-6 col-lg-4 ernaehrungsplan-card">
+        <div class="col-md-6 col-lg-4">
           <div
             class="card h-100 shadow-sm card-enlarged"
             role="article"
