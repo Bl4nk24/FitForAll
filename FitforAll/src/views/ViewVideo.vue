@@ -552,9 +552,12 @@
   }
   
   .workout-description {
-    color: #555;
-    line-height: 1.6;
-  }
+  color: #000 !important;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+
   
   /* Right Column */
   .sidebar-column {

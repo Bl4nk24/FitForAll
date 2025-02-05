@@ -5,6 +5,7 @@
     <div class="container">
       <header class="page-header text-center mb-5">
         <h1 class="display-4 fw-bold">Deine Trainingspläne</h1>
+        <!-- Dieser Satz soll weiß sein -->
         <p class="lead text-muted">Verwalte deine Trainingspläne einfach und effizient.</p>
       </header>
   
@@ -28,6 +29,7 @@
                 <div class="plan-header mb-3 d-flex justify-content-between align-items-center">
                   <div>
                     <h5 class="card-title fs-6 mb-1">{{ plan.plan_name || 'Unbenannter Plan' }}</h5>
+                    <!-- Beschreibung: Wird unten in Weiß gefärbt -->
                     <p class="card-subtitle text-muted small">{{ formatDate(plan.created_at) }}</p>
                   </div>
                   <div class="plan-actions">
@@ -47,6 +49,7 @@
                     <router-link :to="`/training-plans/${plan.id}/start`" class="btn btn-success btn-sm">
                       Training starten
                     </router-link>
+                    <!-- Der "Anzeigen"-Button bekommt durch CSS beim Hover einen grünen Hintergrund. -->
                     <router-link :to="`/training-plans/${plan.id}/detail`" class="btn btn-outline-secondary btn-sm">
                       Anzeigen
                     </router-link>
@@ -231,6 +234,11 @@ function getPlanSvg(plan) {
 .page-header h1 {
   font-size: 2.5rem;
 }
+/* Neuer Stil: Sorgt dafür, dass die Unterzeile weiß ist */
+.page-header p.lead.text-muted {
+  color: #ffffff !important;
+}
+
 .page-header p {
   font-size: 1.2rem;
 }
@@ -298,6 +306,23 @@ function getPlanSvg(plan) {
   fill: #ff0000;
 }
 
+/* ===================== */
+/* = NEUE ANPASSUNGEN =  */
+/* ===================== */
+
+/* 1) Hover-Effekt für den "Anzeigen"-Button grün mit weißer Schrift */
+.btn-outline-secondary.btn-sm:hover {
+  background-color: #28a745 !important;
+  color: #ffffff !important;
+  border-color: #28a745 !important;
+}
+
+/* 2) Beschreibung (Subtitle) in Weiß einfärben */
+.card-subtitle {
+  color: #ffffff !important;
+}
+/* ===================== */
+
 @media (max-width: 576px) {
   .training-plans-page {
     padding: 1rem;
@@ -323,6 +348,7 @@ function getPlanSvg(plan) {
   background-size: auto !important;
 }
 
+/* Entfernen des Hintergrunds für alle Kinder-Elemente */
 * {
   background: none !important;
   background-image: none !important;

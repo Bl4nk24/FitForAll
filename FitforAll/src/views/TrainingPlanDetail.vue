@@ -18,6 +18,7 @@
         <!-- Überschrift -->
         <div class="plan-header text-center mb-4">
           <h1 class="display-5 fw-bold">{{ planNameDisplay }}</h1>
+          <!-- Dieser Satz soll weiß sein -->
           <p class="lead">Übersicht aller Workouts in diesem Plan</p>
           <!-- Button: Training starten -->
           <div v-if="firstWorkoutId" class="mt-3">
@@ -301,6 +302,11 @@ function getHighlightedMuscles(workoutId) {
   font-size: 2.5rem;
   margin-bottom: 0.5rem;
 }
+/* "Übersicht aller Workouts ..." in Weiß */
+.plan-header p.lead {
+  color: #fff !important;
+}
+
 .plan-header p {
   font-size: 1.2rem;
 }
@@ -336,7 +342,12 @@ function getHighlightedMuscles(workoutId) {
   transform: translateY(-3px);
 }
 
-/* Damit der globale Background (etwa im Dark- oder High Contrast-Theme) erhalten bleibt */
+/* ALLE Textstellen mit "text-muted" in Weiß (z.B. Beschreibungen, "Kein Training vorhanden", etc.) */
+.text-muted {
+  color: #fff !important;
+}
+
+/* Damit der globale Background (z.B. im Dark- oder High Contrast-Theme) erhalten bleibt */
 :deep(.theme-dark) .training-plan-page,
 :deep(.theme-high-contrast) .training-plan-page {
   background: inherit !important;
