@@ -26,29 +26,30 @@ html, body {
 
 /* --- Buttons --- */
 .btn {
-  padding: 0.5rem 1rem;
-  border-radius: 8px; /* Modernere, abgerundete Ecken */
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px; /* Modernere, abgerundete Ecken */
   cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+  font-weight: 600; /* Dickere Schrift für Buttons */
 }
 
 .btn:hover {
-  transform: translateY(-4px) scale(1.03);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  transform: translateY(-5px) scale(1.05);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
 }
 
 /* --- Cards --- */
 .card {
-  padding: 1rem;
-  margin-bottom: 1rem;
-  border-radius: 10px; /* Mehr Abrundung für ein modernes Erscheinungsbild */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Subtiler Schatten */
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border-radius: 12px; /* Mehr Abrundung für ein modernes Erscheinungsbild */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Subtiler Schatten */
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  transform: translateY(-8px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
 }
 
 /* --- Links --- */
@@ -59,7 +60,7 @@ a {
 }
 
 a:hover {
-  transform: translateY(-4px);
+  transform: translateY(-5px);
 }
 
 a::after {
@@ -267,15 +268,15 @@ body.theme-high-contrast .btn-warning:hover {
 
 /* Header in Dark/High Contrast – leichte Abrundung und Schatten */
 .header {
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   overflow: hidden;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 .theme-dark .header,
 .theme-high-contrast .header {
-  border-radius: 8px !important;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
 }
 
 /* ========== NavigationBar-Overrides ========== */
