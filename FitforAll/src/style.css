@@ -3,19 +3,40 @@
   box-sizing: border-box;
 }
 
-/* ========== Basis-Einstellungen für alle Themes ========== */
+/* ========== Basis-Einstellungen für alle Elemente ========== */
 html, body, #app {
   margin: 0;
   padding: 0;
   min-height: 100vh;
   width: 100%;
-  /* Die Schriftgröße wird nicht fix per Inline-Stil gesetzt, damit unsere Klassen greifen */
+  /* Schriftgröße: Wir setzen hier nur die Basis, weitere Anpassungen erfolgen über Klassen */
   line-height: 1.5 !important;
   transform: none !important;
   zoom: 1 !important;
+  background-color: inherit;
 }
 
-/* Moderne, serifenlose Schrift für ein aktuelles Design */
+/* Sicherstellen, dass <html> und <body> den Hintergrund des aktiven Themes übernehmen */
+html, body {
+  background-color: inherit;
+}
+
+/* Safe-Area-Inset (für iOS u.a.) */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: env(safe-area-inset-top);
+  background-color: inherit;
+  z-index: 9998;
+}
+html {
+  padding-top: env(safe-area-inset-top);
+}
+
+/* Moderne, serifenlose Schrift – hier könntest du auch 'Poppins' einbinden, falls gewünscht */
 html, body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
@@ -29,27 +50,31 @@ html, body {
   padding: 0.75rem 1.5rem;
   border-radius: 12px;
   cursor: pointer;
+  border: none;
   transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
   font-weight: 600;
+  /* Leicht modernere Box-Schatten */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .btn:hover {
-  transform: translateY(-5px) scale(1.05);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
 }
 
 /* --- Cards --- */
 .card {
   padding: 1.5rem;
   margin-bottom: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 16px; /* Etwas abgerundet */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background-clip: border-box;
 }
 
 .card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.18);
 }
 
 /* --- Links --- */
@@ -60,7 +85,7 @@ a {
 }
 
 a:hover {
-  transform: translateY(-5px);
+  transform: translateY(-2px);
 }
 
 a::after {
@@ -199,16 +224,12 @@ a:hover::after {
 /* Zusätzliche Anpassungen für Dark/High Contrast */
 /* ==================== */
 
-/* Allgemeine Einstellungen für Dark Theme */
-body.theme-dark,
-body.theme-dark #app,
-body.theme-dark .page,
-body.theme-dark .full-background,
-body.theme-dark section,
-body.theme-dark .container,
-body.theme-dark .row {
+/* Sicherstellen, dass <body> im Dark/High Contrast-Modus den korrekten Hintergrund erhält */
+body.theme-dark {
   background-color: #121212 !important;
-  color: #E0E0E0 !important;
+}
+body.theme-high-contrast {
+  background-color: #000000 !important;
 }
 
 /* Button-Hover im Dark Theme */
@@ -217,18 +238,6 @@ body.theme-dark .btn-success:hover {
 }
 body.theme-dark .btn-warning:hover {
   background-color: #e0a800 !important;
-}
-
-/* Allgemeine Einstellungen für High Contrast */
-body.theme-high-contrast,
-body.theme-high-contrast #app,
-body.theme-high-contrast .page,
-body.theme-high-contrast .full-background,
-body.theme-high-contrast section,
-body.theme-high-contrast .container,
-body.theme-high-contrast .row {
-  background-color: #000000 !important;
-  color: #FFFFFF !important;
 }
 
 /* Button-Hover im High Contrast */
@@ -316,7 +325,6 @@ body.theme-high-contrast .btn-warning:hover {
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
-
 .screenreader-button:hover {
   background-color: #005a9e;
 }
@@ -325,11 +333,28 @@ body.theme-high-contrast .btn-warning:hover {
 .font-normal {
   font-size: 16px !important;
 }
-
 .font-large {
-  font-size: 22px !important; 
+  font-size: 22px !important;
+}
+.font-x-large {
+  font-size: 26px !important;
 }
 
-.font-x-large {
-  font-size: 26px !important; 
+/* --- Spezifische Anpassungen für den Main-Container --- */
+#main-content {
+  background-color: transparent !important;
+  overflow: auto;
+  /* Padding oder transparenten Rand nutzen, um margin-collapse zu verhindern */
+  padding-top: 1.5rem;
+}
+
+/* --- Hintergrund für das <html> Element in den jeweiligen Themes --- */
+html.theme-normal {
+  background-color: #F5F5F5 !important;
+}
+html.theme-dark {
+  background-color: #121212 !important;
+}
+html.theme-high-contrast {
+  background-color: #000000 !important;
 }
