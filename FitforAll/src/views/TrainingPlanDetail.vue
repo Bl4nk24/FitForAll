@@ -18,7 +18,7 @@
         <!-- Überschrift -->
         <div class="plan-header text-center mb-4">
           <h1 class="display-5 fw-bold">{{ planNameDisplay }}</h1>
-          <!-- Dieser Satz soll weiß sein -->
+          <!-- Dieser Satz soll in Dark/HighContrast weiß sein, im Normalmodus schwarz. -->
           <p class="lead">Übersicht aller Workouts in diesem Plan</p>
           <!-- Button: Training starten -->
           <div v-if="firstWorkoutId" class="mt-3">
@@ -216,43 +216,31 @@ function excerpt(text, maxLength) {
   return text.length <= maxLength ? text : text.slice(0, maxLength) + '...'
 }
 
-/**
- * Angepasste Funktion zum Erkennen von YouTube Shorts und Standard-URLs:
- * – Prüft zunächst, ob es sich um einen YouTube Shorts-Link handelt (z. B. "youtube.com/shorts/VIDEO_ID")
- * – Falls nicht, wird der Parameter "v" (Standard-URL) bzw. "youtu.be" geprüft.
- * Die Funktion gibt dann die Thumbnail-URL zurück.
- */
+/* Prüft YouTube Shorts vs. Standard-URL und gibt Thumbnail zurück */
 function getYoutubeThumbnail(url) {
   if (!url) return '/fallback-thumbnail.jpg'
   try {
-    let videoId = null;
-    // Prüfe, ob es sich um einen YouTube Shorts-Link handelt
+    let videoId = null
+    // Shorts
     if (url.includes("youtube.com/shorts/")) {
-      const match = url.match(/youtube\.com\/shorts\/([^?]+)/);
-      if (match && match[1]) {
-        videoId = match[1];
-      }
+      const match = url.match(/youtube\.com\/shorts\/([^?]+)/)
+      if (match && match[1]) videoId = match[1]
     }
-    // Falls nicht, prüfe Standard-YouTube URL (Parameter v=...)
+    // Normal
     if (!videoId) {
-      let match = url.match(/[?&]v=([^&]+)/);
-      if (match && match[1]) {
-        videoId = match[1];
-      }
+      let match = url.match(/[?&]v=([^&]+)/)
+      if (match && match[1]) videoId = match[1]
     }
-    // Falls weiterhin nicht gefunden, prüfe verkürzte URL (youtu.be)
+    // Youtu.be
     if (!videoId) {
-      let match = url.match(/youtu\.be\/([^?]+)/);
-      if (match && match[1]) {
-        videoId = match[1];
-      }
+      let match = url.match(/youtu\.be\/([^?]+)/)
+      if (match && match[1]) videoId = match[1]
     }
-    if (videoId) {
-      return `https://img.youtube.com/vi/${videoId}/0.jpg`;
-    }
-    return '/fallback-thumbnail.jpg';
+    return videoId
+      ? `https://img.youtube.com/vi/${videoId}/0.jpg`
+      : '/fallback-thumbnail.jpg'
   } catch (e) {
-    return '/fallback-thumbnail.jpg';
+    return '/fallback-thumbnail.jpg'
   }
 }
 
@@ -302,15 +290,13 @@ function getHighlightedMuscles(workoutId) {
   font-size: 2.5rem;
   margin-bottom: 0.5rem;
 }
-/* "Übersicht aller Workouts ..." in Weiß */
-.plan-header p.lead {
-  color: #fff !important;
-}
 
-.plan-header p {
-  font-size: 1.2rem;
-}
+/*
+  (A) Entferne hier die pauschale ".plan-header p.lead { color: #fff !important; }"
+  (B) Nutze stattdessen Theme-spezifische Overrides
+*/
 
+/* -- Workshop-Karten etc. -- */
 .workout-card {
   transition: transform 0.2s ease;
 }
@@ -342,8 +328,28 @@ function getHighlightedMuscles(workoutId) {
   transform: translateY(-3px);
 }
 
-/* ALLE Textstellen mit "text-muted" in Weiß (z.B. Beschreibungen, "Kein Training vorhanden", etc.) */
-.text-muted {
+/* 
+   THEME-OVERRIDES:
+   Im Normal-Theme: Schwarz
+   Im Dark/High-Contrast: Weiß
+*/
+:global(.theme-normal) .training-plan-page .plan-header p.lead {
+  color: #000 !important;
+}
+:global(.theme-dark) .training-plan-page .plan-header p.lead,
+:global(.theme-high-contrast) .training-plan-page .plan-header p.lead {
+  color: #fff !important;
+}
+
+/* Für die .text-muted Texte in Normal vs. Dark/HC */
+:global(.theme-normal) .training-plan-page .card-text.text-muted,
+:global(.theme-normal) .training-plan-page .text-muted {
+  color: #000 !important;
+}
+:global(.theme-dark) .training-plan-page .card-text.text-muted,
+:global(.theme-dark) .training-plan-page .text-muted,
+:global(.theme-high-contrast) .training-plan-page .card-text.text-muted,
+:global(.theme-high-contrast) .training-plan-page .text-muted {
   color: #fff !important;
 }
 

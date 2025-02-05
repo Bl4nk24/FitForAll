@@ -5,7 +5,6 @@
     <div class="container">
       <header class="page-header text-center mb-5">
         <h1 class="display-4 fw-bold">Deine Trainingspläne</h1>
-        <!-- Dieser Satz soll weiß sein -->
         <p class="lead text-muted">Verwalte deine Trainingspläne einfach und effizient.</p>
       </header>
   
@@ -29,8 +28,10 @@
                 <div class="plan-header mb-3 d-flex justify-content-between align-items-center">
                   <div>
                     <h5 class="card-title fs-6 mb-1">{{ plan.plan_name || 'Unbenannter Plan' }}</h5>
-                    <!-- Beschreibung: Wird unten in Weiß gefärbt -->
-                    <p class="card-subtitle text-muted small">{{ formatDate(plan.created_at) }}</p>
+                    <!-- Beschreibung/Datum -->
+                    <p class="card-subtitle text-muted small">
+                      {{ formatDate(plan.created_at) }}
+                    </p>
                   </div>
                   <div class="plan-actions">
                     <button class="btn btn-link p-0 rename-btn" @click="renamePlan(plan, index)">
@@ -49,7 +50,7 @@
                     <router-link :to="`/training-plans/${plan.id}/start`" class="btn btn-success btn-sm">
                       Training starten
                     </router-link>
-                    <!-- Der "Anzeigen"-Button bekommt durch CSS beim Hover einen grünen Hintergrund. -->
+                    <!-- "Anzeigen"-Button (Hover wird unten in CSS geregelt) -->
                     <router-link :to="`/training-plans/${plan.id}/detail`" class="btn btn-outline-secondary btn-sm">
                       Anzeigen
                     </router-link>
@@ -63,8 +64,16 @@
     </div>
   
     <!-- Modale für Plan-Erstellung -->
-    <AutoPlanWizard v-if="showAutoWizard" @close="showAutoWizard = false" @plan-created="onPlanCreated" />
-    <ManualPlanModal v-if="showManualModal" @close="showManualModal = false" @plan-created="onPlanCreated" />
+    <AutoPlanWizard
+      v-if="showAutoWizard"
+      @close="showAutoWizard = false"
+      @plan-created="onPlanCreated"
+    />
+    <ManualPlanModal
+      v-if="showManualModal"
+      @close="showManualModal = false"
+      @plan-created="onPlanCreated"
+    />
   </div>
 </template>
 
@@ -234,11 +243,6 @@ function getPlanSvg(plan) {
 .page-header h1 {
   font-size: 2.5rem;
 }
-/* Neuer Stil: Sorgt dafür, dass die Unterzeile weiß ist */
-.page-header p.lead.text-muted {
-  color: #ffffff !important;
-}
-
 .page-header p {
   font-size: 1.2rem;
 }
@@ -306,9 +310,7 @@ function getPlanSvg(plan) {
   fill: #ff0000;
 }
 
-/* ===================== */
-/* = NEUE ANPASSUNGEN =  */
-/* ===================== */
+/* ========== Deine bisherigen Anpassungen ========== */
 
 /* 1) Hover-Effekt für den "Anzeigen"-Button grün mit weißer Schrift */
 .btn-outline-secondary.btn-sm:hover {
@@ -317,11 +319,23 @@ function getPlanSvg(plan) {
   border-color: #28a745 !important;
 }
 
-/* 2) Beschreibung (Subtitle) in Weiß einfärben */
-.card-subtitle {
-  color: #ffffff !important;
+/* ================================== */
+/* =   THEME-SPEZIFISCHE FARBSCHEN  = */
+/* ================================== */
+
+/* Theme NORMAL: Text schwarz */
+:global(.theme-normal) .page-header p.lead.text-muted,
+:global(.theme-normal) .card-subtitle {
+  color: #000 !important;
 }
-/* ===================== */
+
+/* Theme DARK & HIGH-CONTRAST: Text weiß */
+:global(.theme-dark) .page-header p.lead.text-muted,
+:global(.theme-dark) .card-subtitle,
+:global(.theme-high-contrast) .page-header p.lead.text-muted,
+:global(.theme-high-contrast) .card-subtitle {
+  color: #fff !important;
+}
 
 @media (max-width: 576px) {
   .training-plans-page {
@@ -334,8 +348,7 @@ function getPlanSvg(plan) {
 
 /* Override für Dunkles Design & Hoher Kontrast:
    Mit :global() überschreiben wir den lokalen Hintergrund (Verlauf mit weißen Punkten)
-   und setzen ihn auf den vom Theme vorgegebenen Farbton.
-   Wir verwenden hier einen allgemeinen globalen Selektor, der sowohl für html als auch body gilt. */
+   und setzen ihn auf den vom Theme vorgegebenen Farbton. */
 :global(.theme-dark) .training-plans-page {
   background: #121212 !important;
   background-image: none !important;
