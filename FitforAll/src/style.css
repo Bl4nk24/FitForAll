@@ -1,14 +1,13 @@
-/* ========== Grundlayout ========== */
-html, body {
+/* ========== Basis-Einstellungen für alle Themes ========== */
+html, body, #app {
   margin: 0;
   padding: 0;
   min-height: 100vh;
   width: 100%;
-}
-
-#app {
-  min-height: 100vh;
-  width: 100%;
+  font-size: 16px !important;
+  line-height: 1.5 !important;
+  transform: none !important;
+  zoom: 1 !important;
 }
 
 /* ========== Globale Themes ========== */
@@ -16,7 +15,7 @@ html, body {
 /* 1. Normales Design (Standard-Farbpalette) */
 .theme-normal {
   background-color: #F5F5F5 !important; /* hellgrau */
-  color: #1A1A1A !important; /* dunkelgrau/schwarz */
+  color: #1A1A1A !important;            /* dunkelgrau/schwarz */
 }
 .theme-normal html,
 .theme-normal body,
@@ -54,7 +53,7 @@ html, body {
 /* 2. Dunkles Design (Dark Mode) */
 .theme-dark {
   background-color: #121212 !important; /* sehr dunkelgrau, fast schwarz */
-  color: #E0E0E0 !important; /* hellgrau für Fließtext */
+  color: #E0E0E0 !important;            /* hellgrau für Fließtext */
 }
 .theme-dark html,
 .theme-dark body,
@@ -92,7 +91,7 @@ html, body {
 /* 3. Hoher Kontrast (High Contrast Mode) */
 .theme-high-contrast {
   background-color: #000000 !important; /* schwarz */
-  color: #FFFFFF !important; /* weiß für primäre Inhalte */
+  color: #FFFFFF !important;            /* weiß für primäre Inhalte */
 }
 .theme-high-contrast html,
 .theme-high-contrast body,
@@ -156,7 +155,7 @@ a {
 /* Zusätzliche Anpassungen für Dark/High Contrast */
 /* ===================== */
 
-/* Dark Theme: Allgemeiner Hintergrund & Text */
+/* Allgemeine Einstellungen für Dark Theme */
 body.theme-dark,
 body.theme-dark #app,
 body.theme-dark .page,
@@ -176,7 +175,7 @@ body.theme-dark .btn-warning:hover {
   background-color: #e0a800 !important;
 }
 
-/* High Contrast: Allgemeiner Hintergrund & Text */
+/* Allgemeine Einstellungen für High Contrast */
 body.theme-high-contrast,
 body.theme-high-contrast #app,
 body.theme-high-contrast .page,
@@ -200,12 +199,12 @@ body.theme-high-contrast .btn-warning:hover {
   border-color: #000000 !important;
 }
 
-/* Container in Dark/High Contrast – Volle Breite */
+/* Angepasste Container in Dark/High Contrast – gleiche Breite wie im Normalen Design */
 .theme-dark .container,
 .theme-high-contrast .container {
-  max-width: 100% !important;
+  max-width: 1140px !important; /* Standardwert, kann angepasst werden */
   width: 100% !important;
-  margin: 0 !important;
+  margin: auto !important;       /* Zentriert den Container */
   padding-left: 2rem !important;
   padding-right: 2rem !important;
 }
@@ -238,8 +237,6 @@ body.theme-high-contrast .btn-warning:hover {
   margin-bottom: 0 !important;
   border: none !important;
 }
-
-/* Dark Theme: Navbar komplett dunkel */
 .theme-dark .navbar,
 .theme-dark .navbar-light,
 .theme-dark .navbar-light.bg-light,
@@ -248,8 +245,6 @@ body.theme-high-contrast .btn-warning:hover {
   border: none !important;
   color: #fff !important;
 }
-
-/* High Contrast: Navbar schwarz mit gut lesbarem Grün */
 .theme-high-contrast .navbar,
 .theme-high-contrast .navbar-light,
 .theme-high-contrast .navbar-light.bg-light,

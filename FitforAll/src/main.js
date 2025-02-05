@@ -7,22 +7,37 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
-// Importiere deine angepasste CSS-Datei, in der die Theme-Klassen definiert sind
+// Importiere deine angepasste CSS-Datei, die die Theme‑Klassen enthält
 import './style.css';
 
-// Theme aus LocalStorage auslesen, Standardwert: 'normal'
+/*
+  WICHTIG: Stelle sicher, dass in deiner index.html im <head> folgender Meta-Tag steht,
+  um automatische Skalierung (Zoom) zu verhindern:
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+*/
+
+// Lese das gespeicherte Theme aus LocalStorage, Standard: 'normal'
 const savedTheme = localStorage.getItem('color_contrast') || 'normal';
+
+// Setze die Theme-Klasse auf beiden Wurzel-Elementen (<html> und <body>)
+// und lege eine einheitliche Basis-Schriftgröße fest.
+document.documentElement.className = `theme-${savedTheme}`;
 document.body.className = `theme-${savedTheme}`;
 
-// Globale Funktion zum Ändern des Themes
+// Stelle sicher, dass beide Elemente eine einheitliche Schriftgröße haben:
+document.documentElement.style.fontSize = '16px';
+document.body.style.fontSize = '16px';
+
 const toggleTheme = (theme) => {
+  // Setze den Klassennamen auf <html> und <body>
+  document.documentElement.className = `theme-${theme}`;
   document.body.className = `theme-${theme}`;
+  // Stelle sicher, dass die Basis-Schriftgröße unverändert bleibt:
+  document.documentElement.style.fontSize = '16px';
+  document.body.style.fontSize = '16px';
   localStorage.setItem('color_contrast', theme);
 };
 
 const app = createApp(App);
-
-// Diese Funktion wird global bereitgestellt, sodass du sie z. B. in deiner NavigationBar nutzen kannst.
 app.config.globalProperties.$toggleTheme = toggleTheme;
-
 app.use(router).mount('#app');
