@@ -1,3 +1,8 @@
+/* ========== Globaler Reset und Box-Sizing ========== */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 /* ========== Basis-Einstellungen für alle Themes ========== */
 html, body, #app {
   margin: 0;
@@ -10,12 +15,75 @@ html, body, #app {
   zoom: 1 !important;
 }
 
+/* Moderne, serifenlose Schrift für ein aktuelles Design */
+html, body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* ==================== */
+/* Globale Designelemente */
+/* ==================== */
+
+/* --- Buttons --- */
+.btn {
+  padding: 0.5rem 1rem;
+  border-radius: 8px; /* Modernere, abgerundete Ecken */
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn:hover {
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* --- Cards --- */
+.card {
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 10px; /* Mehr Abrundung für ein modernes Erscheinungsbild */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Subtiler Schatten */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* --- Links --- */
+a {
+  text-decoration: none;
+  position: relative;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+a:hover {
+  transform: translateY(-4px);
+}
+
+a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 0;
+  height: 2px;
+  background-color: currentColor;
+  transition: width 0.2s ease;
+}
+
+a:hover::after {
+  width: 100%;
+}
+
+/* ==================== */
 /* ========== Globale Themes ========== */
 
 /* 1. Normales Design (Standard-Farbpalette) */
 .theme-normal {
-  background-color: #F5F5F5 !important; /* hellgrau */
-  color: #1A1A1A !important;            /* dunkelgrau/schwarz */
+  background-color: #F5F5F5 !important;
+  color: #1A1A1A !important;
 }
 .theme-normal html,
 .theme-normal body,
@@ -31,16 +99,16 @@ html, body, #app {
 .theme-normal .btn,
 .theme-normal .btn:link,
 .theme-normal .btn:visited {
-  color: #005A9E !important; /* dunkelblau für Buttons und Links (Sekundärfarbe) */
+  color: #005A9E !important;
 }
 .theme-normal .btn-primary {
-  background-color: #007ACC !important; /* mittelblau (Primärfarbe) */
+  background-color: #007ACC !important;
   border-color: #007ACC !important;
   color: #F5F5F5 !important;
 }
 .theme-normal .btn-warning,
 .theme-normal .alert-warning {
-  background-color: #E63946 !important; /* rot für Warnhinweise (Akzentfarbe) */
+  background-color: #E63946 !important;
   border-color: #E63946 !important;
   color: #FFFFFF !important;
 }
@@ -52,8 +120,8 @@ html, body, #app {
 
 /* 2. Dunkles Design (Dark Mode) */
 .theme-dark {
-  background-color: #121212 !important; /* sehr dunkelgrau, fast schwarz */
-  color: #E0E0E0 !important;            /* hellgrau für Fließtext */
+  background-color: #121212 !important;
+  color: #E0E0E0 !important;
 }
 .theme-dark html,
 .theme-dark body,
@@ -69,16 +137,16 @@ html, body, #app {
 .theme-dark .btn,
 .theme-dark .btn:link,
 .theme-dark .btn:visited {
-  color: #03DAC6 !important; /* türkis für hervorgehobene Elemente (Sekundärfarbe) */
+  color: #03DAC6 !important;
 }
 .theme-dark .btn-primary {
-  background-color: #BB86FC !important; /* violett-bläulicher Akzent (Primärfarbe) */
+  background-color: #BB86FC !important;
   border-color: #BB86FC !important;
   color: #121212 !important;
 }
 .theme-dark .btn-warning,
 .theme-dark .alert-warning {
-  background-color: #CF6679 !important; /* rötlicher Akzent (Akzentfarbe) */
+  background-color: #CF6679 !important;
   border-color: #CF6679 !important;
   color: #121212 !important;
 }
@@ -90,8 +158,8 @@ html, body, #app {
 
 /* 3. Hoher Kontrast (High Contrast Mode) */
 .theme-high-contrast {
-  background-color: #000000 !important; /* schwarz */
-  color: #FFFFFF !important;            /* weiß für primäre Inhalte */
+  background-color: #000000 !important;
+  color: #FFFFFF !important;
 }
 .theme-high-contrast html,
 .theme-high-contrast body,
@@ -107,53 +175,28 @@ html, body, #app {
 .theme-high-contrast .btn,
 .theme-high-contrast .btn:link,
 .theme-high-contrast .btn:visited {
-  color: #00FF00 !important; /* grün für Links und interaktive Elemente (Sekundärfarbe) */
+  color: #00FF00 !important;
 }
 .theme-high-contrast .btn-primary {
-  background-color: #FFFF00 !important; /* leuchtendes gelb (Primärfarbe) */
+  background-color: #FFFF00 !important;
   border-color: #FFFF00 !important;
   color: #000000 !important;
 }
 .theme-high-contrast .btn-warning,
 .theme-high-contrast .alert-warning {
-  background-color: #FF0000 !important; /* helles rot für Warnungen */
+  background-color: #FF0000 !important;
   border-color: #FF0000 !important;
   color: #FFFFFF !important;
 }
 .theme-high-contrast .card {
   background-color: #000000;
   color: #FFFFFF;
-  border: 2px solid #00FF00; /* Sekundärfarbe als Rahmen */
+  border: 2px solid #00FF00;
 }
 
-/* ========== Globale Utility-Klassen und Anpassungen ========== */
-
-/* Links */
-a {
-  text-decoration: none;
-}
-
-/* Buttons */
-.btn {
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-.btn:hover {
-  opacity: 0.85;
-}
-
-/* Cards */
-.card {
-  padding: 1rem;
-  margin-bottom: 1rem;
-  border-radius: 4px;
-}
-
-/* ===================== */
+/* ==================== */
 /* Zusätzliche Anpassungen für Dark/High Contrast */
-/* ===================== */
+/* ==================== */
 
 /* Allgemeine Einstellungen für Dark Theme */
 body.theme-dark,
@@ -202,9 +245,9 @@ body.theme-high-contrast .btn-warning:hover {
 /* Angepasste Container in Dark/High Contrast – gleiche Breite wie im Normalen Design */
 .theme-dark .container,
 .theme-high-contrast .container {
-  max-width: 1140px !important; /* Standardwert, kann angepasst werden */
+  max-width: 1140px !important;
   width: 100% !important;
-  margin: auto !important;       /* Zentriert den Container */
+  margin: auto !important;
   padding-left: 2rem !important;
   padding-right: 2rem !important;
 }
@@ -222,20 +265,24 @@ body.theme-high-contrast .btn-warning:hover {
   height: 2px;
 }
 
-/* Header in Dark/High Contrast – ohne Abrundung */
+/* Header in Dark/High Contrast – leichte Abrundung und Schatten */
+.header {
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
 .theme-dark .header,
 .theme-high-contrast .header {
-  background-color: #121212 !important;
-  border-bottom: 1px solid #444 !important;
-  border-radius: 0 !important;
-  margin-bottom: 0 !important;
-  overflow: hidden !important;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
 }
 
 /* ========== NavigationBar-Overrides ========== */
 .navbar {
   margin-bottom: 0 !important;
   border: none !important;
+  transition: background-color 0.3s ease;
 }
 .theme-dark .navbar,
 .theme-dark .navbar-light,
