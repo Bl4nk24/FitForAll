@@ -12,7 +12,7 @@
           @click="gotoWorkouts"
           aria-label="Klicke hier, um zu den Workouts zu gelangen"
         >
-          Jetzt zu den Workouts
+          Jetzt zu den Videos
         </button>
       </div>
     </section>
@@ -98,7 +98,7 @@ export default {
   name: "HomeView",
   methods: {
     gotoWorkouts() {
-      this.$router.push('/workouts');
+      this.$router.push('/videos');
     },
     gotoCommunity() {
       this.$router.push('/community');
