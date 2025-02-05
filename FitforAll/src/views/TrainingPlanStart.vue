@@ -787,4 +787,11 @@ onUnmounted(() => {
     font-size: 1rem;
   }
 }
+
+.workout-description {
+  color: #000 !important;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
 </style>
