@@ -4,8 +4,8 @@
     <!-- Navigation oben -->
     <NavigationBar @toggleTheme="changeTheme" />
 
-    <!-- Hauptbereich für Router -->
-    <main id="main-content" class="mt-4">
+    <!-- Hauptbereich für Router: Hier wurde mt-4 entfernt und stattdessen Padding oben gesetzt -->
+    <main id="main-content">
       <router-view />
     </main>
 
@@ -39,9 +39,7 @@ export default {
 </script>
 
 <style>
-/* ========== Themestyles (kannst du 1:1 übernehmen) ========== */
-
-/* Normal Theme */
+/* Globale Themestyles bleiben unverändert */
 .theme-normal {
   background-color: white;
   color: black;
@@ -58,7 +56,6 @@ export default {
   border: 1px solid #ddd;
 }
 
-/* High Contrast Theme */
 .theme-high-contrast {
   background-color: black;
   color: yellow;
@@ -76,7 +73,6 @@ export default {
   border: 2px solid yellow;
 }
 
-/* Dark Theme */
 .theme-dark {
   background-color: #121212;
   color: white;
@@ -112,5 +108,12 @@ export default {
 
 .s1 {
   fill: #bbbdbf;
+}
+
+/* Spezifische Anpassungen für den Main-Container in Option 1 */
+/* Statt margin-top wird hier padding-top verwendet, um einen Abstand zu erzeugen, ohne dass ein Margin-Collapse auftritt */
+#main-content {
+  padding-top: 1.5rem;
+  background-color: transparent !important;
 }
 </style>

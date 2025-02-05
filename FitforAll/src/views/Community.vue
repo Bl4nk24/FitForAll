@@ -76,7 +76,6 @@
   
   <style scoped>
   .community-page {
-    /* Hier kannst du weitere Styles anpassen */
   }
   
   /* Formular für neue Beiträge */
