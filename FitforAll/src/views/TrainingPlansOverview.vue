@@ -322,4 +322,9 @@ function getPlanSvg(plan) {
   background-image: none !important;
   background-size: auto !important;
 }
+
+* {
+  background: none !important;
+  background-image: none !important;
+}
 </style>
