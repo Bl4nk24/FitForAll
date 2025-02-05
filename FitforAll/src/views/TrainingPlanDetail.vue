@@ -1,10 +1,10 @@
 <template>
   <div class="training-plan-page">
-    <!-- Inhalt in einem Container mit fester Max‑Breite; dieser Container bekommt keinen eigenen Hintergrund -->
+    <!-- Container mit fester Max‑Breite -->
     <div class="container my-5" style="max-width: 900px;">
       <!-- Fehlermeldung -->
       <div v-if="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
-  
+
       <!-- Ladeanzeige -->
       <div v-else-if="loading" class="text-center loading-section">
         <div class="spinner-border text-primary" role="status">
@@ -12,7 +12,7 @@
         </div>
         <p class="mt-3 fw-semibold">Lade Trainingsplan...</p>
       </div>
-  
+
       <!-- Plan-Inhalt -->
       <div v-else>
         <!-- Überschrift -->
@@ -26,12 +26,12 @@
             </router-link>
           </div>
         </div>
-  
-        <!-- Falls keine Tagesdaten vorhanden -->
+
+        <!-- Hinweis, falls keine Tagesdaten vorhanden -->
         <div v-if="!planData.days || planData.days.length === 0" class="alert alert-info">
           Keine Tagesdaten vorhanden.
         </div>
-  
+
         <!-- Tagesliste -->
         <div v-else>
           <div v-for="(day, dayIndex) in planData.days" :key="dayIndex" class="mb-5">
@@ -47,27 +47,27 @@
                     />
                   </router-link>
                   <div class="card-body d-flex flex-column">
-                    <!-- Workout-Name & Beschreibung -->
+                    <!-- Workout-Name und Beschreibung -->
                     <h5 class="card-title">
                       {{ workoutMap[workoutId]?.name || 'Unbekanntes Workout' }}
                     </h5>
                     <p class="card-text text-muted">
                       {{ excerpt(workoutMap[workoutId]?.description, 60) }}
                     </p>
-  
-                    <!-- Zielmuskeln -->
+
+                    <!-- Anzeige der beanspruchten Muskeln -->
                     <div v-if="hasTargetMuscles(workoutId)" class="mb-3">
                       <strong>Beanspruchte Muskeln:</strong>
                     </div>
-  
+
                     <!-- Muskelkarte (SVG) -->
                     <div
                       class="muscle-map-container"
                       v-if="svgContent"
                       v-html="getHighlightedMuscles(workoutId)"
                     ></div>
-  
-                    <!-- Letztes Training -->
+
+                    <!-- Anzeige des letzten Trainings -->
                     <div class="last-training mt-auto" v-if="lastSessions[workoutId]">
                       <hr />
                       <h6 class="text-primary">Letztes Training:</h6>
@@ -86,7 +86,7 @@
                       <hr />
                       <p>Kein Training vorhanden</p>
                     </div>
-  
+
                     <!-- Button: Workout ansehen -->
                     <router-link :to="`/workout/${workoutId}`" class="btn btn-primary mt-3">
                       Workout ansehen
@@ -97,7 +97,7 @@
             </div>
           </div>
         </div>
-  
+
         <!-- Zurück-Button -->
         <router-link to="/training-plans" class="btn btn-outline-primary mt-4">
           Zur Trainingsplan-Übersicht
@@ -215,20 +215,43 @@ function excerpt(text, maxLength) {
   return text.length <= maxLength ? text : text.slice(0, maxLength) + '...'
 }
 
+/**
+ * Angepasste Funktion zum Erkennen von YouTube Shorts und Standard-URLs:
+ * – Prüft zunächst, ob es sich um einen YouTube Shorts-Link handelt (z. B. "youtube.com/shorts/VIDEO_ID")
+ * – Falls nicht, wird der Parameter "v" (Standard-URL) bzw. "youtu.be" geprüft.
+ * Die Funktion gibt dann die Thumbnail-URL zurück.
+ */
 function getYoutubeThumbnail(url) {
   if (!url) return '/fallback-thumbnail.jpg'
   try {
-    let match = url.match(/[?&]v=([^&]+)/)
-    if (match && match[1]) {
-      return `https://img.youtube.com/vi/${match[1]}/0.jpg`
+    let videoId = null;
+    // Prüfe, ob es sich um einen YouTube Shorts-Link handelt
+    if (url.includes("youtube.com/shorts/")) {
+      const match = url.match(/youtube\.com\/shorts\/([^?]+)/);
+      if (match && match[1]) {
+        videoId = match[1];
+      }
     }
-    match = url.match(/youtu\.be\/([^?]+)/)
-    if (match && match[1]) {
-      return `https://img.youtube.com/vi/${match[1]}/0.jpg`
+    // Falls nicht, prüfe Standard-YouTube URL (Parameter v=...)
+    if (!videoId) {
+      let match = url.match(/[?&]v=([^&]+)/);
+      if (match && match[1]) {
+        videoId = match[1];
+      }
     }
-    return '/fallback-thumbnail.jpg'
-  } catch {
-    return '/fallback-thumbnail.jpg'
+    // Falls weiterhin nicht gefunden, prüfe verkürzte URL (youtu.be)
+    if (!videoId) {
+      let match = url.match(/youtu\.be\/([^?]+)/);
+      if (match && match[1]) {
+        videoId = match[1];
+      }
+    }
+    if (videoId) {
+      return `https://img.youtube.com/vi/${videoId}/0.jpg`;
+    }
+    return '/fallback-thumbnail.jpg';
+  } catch (e) {
+    return '/fallback-thumbnail.jpg';
   }
 }
 
@@ -246,6 +269,7 @@ function getHighlightedMuscles(workoutId) {
   if (!svgContent.value) return ''
   const parser = new DOMParser()
   const doc = parser.parseFromString(svgContent.value, 'image/svg+xml')
+  // Entferne vorhandene Hervorhebungen
   doc.querySelectorAll('.active').forEach(el => el.classList.remove('active'))
   const muscles = workoutMap[workoutId]?.target_muscles || []
   muscles.forEach(mId => {
@@ -257,7 +281,6 @@ function getHighlightedMuscles(workoutId) {
 </script>
 
 <style scoped>
-/* Der äußere Wrapper – statt eines eigenen Farbverlaufs wird hier einfach der globale Background übernommen */
 .training-plan-page {
   font-family: 'Poppins', sans-serif;
   background: inherit;
@@ -265,13 +288,11 @@ function getHighlightedMuscles(workoutId) {
   padding-bottom: 2rem;
 }
 
-/* Verhindert, dass der innere Container einen eigenen Hintergrund setzt */
 .training-plan-page .container {
   background: transparent !important;
   box-shadow: none !important;
 }
 
-/* Standard-Styles für den Inhalt */
 .plan-header {
   text-align: center;
   margin-bottom: 2rem;
@@ -284,12 +305,11 @@ function getHighlightedMuscles(workoutId) {
   font-size: 1.2rem;
 }
 
-/* Weitere Styles (Cards, Muscle Map etc.) bleiben unverändert */
 .workout-card {
   transition: transform 0.2s ease;
 }
 .workout-card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-3px);
 }
 .workout-card img {
   height: 150px;
@@ -316,7 +336,7 @@ function getHighlightedMuscles(workoutId) {
   transform: translateY(-3px);
 }
 
-/* Falls nötig: Override für Dark / High Contrast – hier wird der globale Hintergrund (z. B. #121212 bzw. #000000) verwendet */
+/* Damit der globale Background (etwa im Dark- oder High Contrast-Theme) erhalten bleibt */
 :deep(.theme-dark) .training-plan-page,
 :deep(.theme-high-contrast) .training-plan-page {
   background: inherit !important;

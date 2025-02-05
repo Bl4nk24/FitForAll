@@ -16,7 +16,7 @@
 
 <script>
 import NavigationBar from './components/NavigationBar.vue';
-import ScreenReaderButton from './views/ScreenReader.vue';
+import ScreenReaderButton from './views/ScreenReader.vue'; // Stelle sicher, dass der Pfad stimmt
 
 export default {
   name: 'App',
@@ -26,17 +26,18 @@ export default {
   },
   computed: {
     themeClass() {
-      // Liest die globale Klasse vom <body> aus
+      // Liest die globale Klasse vom <body> aus – dadurch passt sich das Layout dem aktuell gesetzten Theme an
       return document.body.className;
     },
   },
   methods: {
     changeTheme(theme) {
-      this.$toggleTheme(theme); // Globale Funktion für das Farbschema
+      this.$toggleTheme(theme); // Ruft die globale Theme-Wechsel-Funktion auf
     },
   },
 };
 </script>
+
 <style>
 /* ========== Themestyles (kannst du 1:1 übernehmen) ========== */
 
@@ -106,10 +107,10 @@ export default {
 }
 
 .s0 {
-  fill: #808284
+  fill: #808284;
 }
 
 .s1 {
-  fill: #bbbdbf
+  fill: #bbbdbf;
 }
 </style>

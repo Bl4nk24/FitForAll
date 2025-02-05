@@ -1,13 +1,13 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import { supabase } from './supabase'
-import HomeView from './views/HomeView.vue'
-import ProfileView from './views/ProfileView.vue'
-import AuthView from './views/AuthView.vue'
-import OnboardingView from './views/OnboardingView.vue'
-import AddWorkoutView from './views/AddWorkoutView.vue'
-import VideosPage from './views/VideosPage.vue'
-import TrainingPlansOverview from './views/TrainingPlansOverview.vue'
-import ErnaehrungsplanPage from './views/ErnaehrungsplanPage.vue'
+import { createRouter, createWebHistory } from 'vue-router';
+import { supabase } from './supabase';
+import HomeView from './views/HomeView.vue';
+import ProfileView from './views/ProfileView.vue';
+import AuthView from './views/AuthView.vue';
+import OnboardingView from './views/OnboardingView.vue';
+import AddWorkoutView from './views/AddWorkoutView.vue';
+import VideosPage from './views/VideosPage.vue';
+import TrainingPlansOverview from './views/TrainingPlansOverview.vue';
+import ErnaehrungsplanPage from './views/ErnaehrungsplanPage.vue';
 
 const routes = [
   { path: '/auth', component: AuthView },
@@ -34,29 +34,29 @@ const routes = [
     component: () => import('./views/TrainingPlanStart.vue'),
     props: true,
   },
-]
+];
 
 const router = createRouter({
   history: createWebHistory(),
-  routes
-})
+  routes,
+});
 
 // Authentifizierungsprüfung
 router.beforeEach(async (to, from) => {
   if (to.meta.requiresAuth) {
-    const { data } = await supabase.auth.getUser()
+    const { data } = await supabase.auth.getUser();
     if (!data?.user) {
-      return '/auth'
+      return '/auth';
     }
     const { data: profileData } = await supabase
       .from('user_settings')
       .select('has_finished_onboarding')
       .eq('user_id', data.user.id)
-      .single()
+      .single();
     if (profileData && !profileData.has_finished_onboarding && to.path !== '/onboarding') {
-      return '/onboarding'
+      return '/onboarding';
     }
   }
-})
+});
 
-export default router
+export default router;

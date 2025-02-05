@@ -27,10 +27,10 @@ html, body {
 /* --- Buttons --- */
 .btn {
   padding: 0.75rem 1.5rem;
-  border-radius: 12px; /* Modernere, abgerundete Ecken */
+  border-radius: 12px;
   cursor: pointer;
   transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
-  font-weight: 600; /* Dickere Schrift für Buttons */
+  font-weight: 600;
 }
 
 .btn:hover {
@@ -42,8 +42,8 @@ html, body {
 .card {
   padding: 1.5rem;
   margin-bottom: 1.5rem;
-  border-radius: 12px; /* Mehr Abrundung für ein modernes Erscheinungsbild */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Subtiler Schatten */
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -300,4 +300,23 @@ body.theme-high-contrast .btn-warning:hover {
   background-color: #000000 !important;
   border: none !important;
   color: #00FF00 !important;
+}
+
+/* ======= Screenreader Button ======= */
+.screenreader-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9999;
+  padding: 0.5rem 1rem;
+  background-color: #007acc;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.screenreader-button:hover {
+  background-color: #005a9e;
 }
