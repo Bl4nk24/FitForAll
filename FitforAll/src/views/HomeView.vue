@@ -12,7 +12,7 @@
           @click="gotoWorkouts"
           aria-label="Klicke hier, um zu den Workouts zu gelangen"
         >
-          Jetzt zu den Workouts
+          Jetzt zu den Videos
         </button>
       </div>
     </section>
@@ -58,7 +58,7 @@
           </div>
         </div>
         <!-- Ernährungsplan-Karte (leicht extra verbreitert) -->
-        <div class="col-md-6 col-lg-4 ernaehrungsplan-card">
+        <div class="col-md-6 col-lg-4">
           <div
             class="card h-100 shadow-sm card-enlarged"
             role="article"
@@ -98,7 +98,7 @@ export default {
   name: "HomeView",
   methods: {
     gotoWorkouts() {
-      this.$router.push('/workouts');
+      this.$router.push('/videos');
     },
     gotoCommunity() {
       this.$router.push('/community');
@@ -137,10 +137,5 @@ export default {
 /* Zusätzliche Klasse für leichte Vergrößerung der Karten (nur horizontale Anpassung wird hier nicht verändert) */
 .card-enlarged {
   transform: scale(1.05);
-}
-
-/* Extra Anpassung für die Ernährungsplan-Karte – falls gewünscht */
-.ernaehrungsplan-card .card {
-  transform: scale(1.07);
 }
 </style>

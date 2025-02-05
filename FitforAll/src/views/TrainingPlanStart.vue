@@ -410,11 +410,25 @@ function skipTimer() {
 }
 
 function isYoutube(url) {
-  return url.includes('youtube.com')
+  return /(youtube\.com|youtu\.be)/.test(url);
 }
 
 function getEmbeddedUrl(url) {
-  const videoId = url.split('v=')[1]
+  let videoId = '';
+  let match = url.match(/[?&]v=([^&]+)/);
+  if (match && match[1]) {
+    videoId = match[1];
+  } else {
+    match = url.match(/youtu\.be\/([^?]+)/);
+    if (match && match[1]) {
+      videoId = match[1];
+    } else {
+      match = url.match(/youtube\.com\/shorts\/([^?/]+)/);
+      if (match && match[1]) {
+        videoId = match[1];
+      }
+    }
+  }
   return `https://www.youtube.com/embed/${videoId}`;
 }
 
